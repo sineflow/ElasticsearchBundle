@@ -1,5 +1,5 @@
 {
-    "name": "pmishev/elasticsearch-bundle",
+    "name": "sineflow/elasticsearch-bundle",
     "description": "Bundle for integrating official Elasticsearch client with Symfony2",
     "type": "symfony-bundle",
     "homepage": "https://github.com/pmishev/ElasticsearchBundle",
