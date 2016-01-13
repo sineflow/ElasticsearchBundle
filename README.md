@@ -1,6 +1,6 @@
 # Sineflow Elasticsearch Bundle for Symfony
 
-This bundle was initially based on the [elasticsearch bundle by ONGR.io](https://github.com/ongr-io/ElasticsearchBundle), however a different vision about how some things are handled, and some additional core requirements eventually turned it into a separate project.
+This bundle was initially based on the Elasticsearch bundle by ONGR.io, however a different vision about how some things are handled, and some additional core requirements eventually turned it into a separate project.
 
 ## Key points
 
