@@ -6,7 +6,7 @@
 Assuming you have [Composer](https://getcomposer.org) installed globally, enter your project directory and execute the following command to download the latest stable version of this bundle:
 
 ```
-$ composer require pmishev/elasticsearch-bundle "~0.2"
+$ composer require sineflow/elasticsearch-bundle "~0.4"
 ```
 
 ### Step 2: Enable the Bundle
