@@ -25,22 +25,22 @@ class RegisterDataProvidersPassTest extends \PHPUnit_Framework_TestCase
         $containerMock->method('hasDefinition')->with('sfes.provider_registry')->willReturn(true);
 
         $containerMock->expects($this->exactly(1))->method('findTaggedServiceIds')->willReturn(
-            array (
+            [
                 'app.es.data_provider.mytype' =>
-                    array (
+                    [
                         0 =>
-                            array (
+                            [
                                 'type' => 'AppBundle:MyType',
-                            ),
-                    ),
+                            ],
+                    ],
                 'app.es.data_provider.mytype2' =>
-                    array (
+                    [
                         0 =>
-                            array (
+                            [
                                 'type' => 'AppBundle:MyType2',
-                            ),
-                    ),
-            )
+                            ],
+                    ],
+            ]
         );
 
         $containerMock->expects($this->exactly(3))->method('getDefinition')->with($this->anything())
@@ -66,7 +66,7 @@ class RegisterDataProvidersPassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Test registering a provider that does not have a type tag set
-     * 
+     *
      * @expectedException \InvalidArgumentException
      */
     public function testProcessWithProviderWithoutTypeTag()
@@ -78,22 +78,23 @@ class RegisterDataProvidersPassTest extends \PHPUnit_Framework_TestCase
         $containerMock->method('hasDefinition')->with('sfes.provider_registry')->willReturn(true);
 
         $containerMock->expects($this->exactly(1))->method('findTaggedServiceIds')->willReturn(
-            array (
+            [
                 'app.es.data_provider.notype' =>
-                    array (
-                        0 =>
-                            array (),
-                    ),
-            )
+                    [
+                        0 => [],
+                    ],
+            ]
         );
 
-        $containerMock->expects($this->exactly(1))->method('getDefinition')->with($this->anything())
+        $containerMock->expects($this->exactly(2))->method('getDefinition')->with($this->anything())
             ->will(
                 $this->returnCallback(
                     function ($parameter) {
                         switch ($parameter) {
                             case 'sfes.provider_registry':
                                 return new Definition('\Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry');
+                            case 'app.es.data_provider.notype':
+                                return new Definition('\Sineflow\ElasticsearchBundle\Document\Provider\ElasticsearchProvider');
                             default:
                                 return null;
                         }
@@ -104,4 +105,61 @@ class RegisterDataProvidersPassTest extends \PHPUnit_Framework_TestCase
         $compilerPass = new RegisterDataProvidersPass();
         $compilerPass->process($containerMock);
     }
+
+    public function testProcessWithSameProviderForSeveralTypes()
+    {
+        $containerMock = $this->getMockBuilder('\Symfony\Component\DependencyInjection\ContainerBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $containerMock->method('hasDefinition')->with('sfes.provider_registry')->willReturn(true);
+
+        $containerMock->expects($this->exactly(1))->method('findTaggedServiceIds')->willReturn(
+            [
+                'app.es.data_provider.dummy' =>
+                    [
+                        0 =>
+                            [
+                                'type' => 'AppBundle:MyType1',
+                            ],
+                        1 =>
+                            [
+                                'type' => 'AppBundle:MyType2',
+                            ],
+                    ],
+            ]
+        );
+
+        $providerDefinitionMock = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Definition')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $containerMock->expects($this->exactly(2))->method('getDefinition')->with($this->anything())
+            ->will(
+                $this->returnCallback(
+                    function ($parameter) use ($providerDefinitionMock) {
+                        switch ($parameter) {
+                            case 'sfes.provider_registry':
+                                return $providerDefinitionMock;
+                            case 'app.es.data_provider.dummy':
+                                return new Definition('\Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Provider\OrderProvider');
+                            default:
+                                return null;
+                        }
+                    }
+                )
+            );
+
+        $providerDefinitionMock
+            ->expects($this->exactly(2))
+            ->method('addMethodCall')
+            ->withConsecutive(
+                array($this->equalTo('addProvider'), $this->equalTo(['AppBundle:MyType1', 'app.es.data_provider.dummy'])),
+                array($this->equalTo('addProvider'), $this->equalTo(['AppBundle:MyType2', 'app.es.data_provider.dummy']))
+            );
+
+        $compilerPass = new RegisterDataProvidersPass();
+        $compilerPass->process($containerMock);
+    }
+
 }
