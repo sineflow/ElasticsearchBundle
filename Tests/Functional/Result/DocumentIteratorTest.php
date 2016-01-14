@@ -53,7 +53,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
                         'related_categories' => [],
                     ],
                     [
-                        '_id' => '12345',
+                        '_id' => '54321',
                     ]
                 ],
             ],
