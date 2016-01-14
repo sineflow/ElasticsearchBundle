@@ -1,0 +1,30 @@
+language: php
+php:
+  - '5.5'
+  - '5.6'
+  - '7.0'
+  - hhvm
+
+env:
+  - SYMFONY_VERSION="~3.0" ES_VERSION="2.1.1"
+
+matrix:
+  allow_failures:
+    - php: hhvm
+  include:
+    - php: 7.0
+      env: ES_VERSION="1.7.4"
+    - php: 7.0
+      env: ES_VERSION="1.6.2"
+    - php: 7.0
+      env: SYMFONY="2.7.*"
+
+install:
+  - composer require --no-update symfony/symfony:${SYMFONY}
+  - wget https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
+  - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
+  - ./elasticsearch-${ES_VERSION}/bin/elasticsearch > /dev/null 2>&1 &
+
+script:
+ - vendor/bin/phpunit --coverage-clover=coveralls.clover
+ - vendor/bin/phpcs -p --standard=PSR2 --ignore=vendor/,Tests/app/ ./
