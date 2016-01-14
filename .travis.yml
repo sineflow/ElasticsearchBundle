@@ -24,7 +24,8 @@ install:
   - wget https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
   - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
   - ./elasticsearch-${ES_VERSION}/bin/elasticsearch > /dev/null 2>&1 &
+  - composer install --dev --no-interaction
 
 script:
- - vendor/bin/phpunit --coverage-clover=coveralls.clover
- - vendor/bin/phpcs -p --standard=PSR2 --ignore=vendor/,Tests/app/ ./
+  - vendor/bin/phpunit --coverage-clover=coveralls.clover
+  - vendor/bin/phpcs -p --standard=PSR2 --ignore=vendor/,Tests/app/ ./
