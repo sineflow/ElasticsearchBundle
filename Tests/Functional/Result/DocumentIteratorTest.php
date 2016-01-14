@@ -21,7 +21,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
             'bar' => [
                 'AcmeBarBundle:Product' => [
                     [
-                        '_id' => 'doc1',
+                        '_id' => '1',
                         'title' => 'Foo Product',
                         'category' => [
                             'title' => 'Bar',
@@ -35,7 +35,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
                         'ml_info-fr' => 'info in French',
                     ],
                     [
-                        '_id' => 'doc2',
+                        '_id' => '2',
                         'title' => 'Bar Product',
                         'category' => null,
                         'related_categories' => [
@@ -48,7 +48,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
                         ],
                     ],
                     [
-                        '_id' => 'doc3',
+                        '_id' => '3',
                         'title' => '3rd Product',
                         'related_categories' => [],
                     ],
@@ -69,7 +69,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
         $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
 
         /** @var DocumentIterator $iterator */
-        $iterator = $repo->find(['query' => ['match_all' => []], 'size' => 3], Finder::RESULTS_OBJECT);
+        $iterator = $repo->find(['query' => ['match_all' => []], 'size' => 3, 'sort' => ['_id' => ['order' =>'asc']]], Finder::RESULTS_OBJECT);
 
         $this->assertInstanceOf('Sineflow\ElasticsearchBundle\Result\DocumentIterator', $iterator);
 
@@ -116,7 +116,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
         $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
 
         /** @var DocumentIterator $iterator */
-        $iterator = $repo->find(['query' => ['match_all' => []], 'size' => 3], Finder::RESULTS_OBJECT);
+        $iterator = $repo->find(['query' => ['match_all' => []], 'size' => 3, 'sort' => ['_id' => ['order' =>'asc']]], Finder::RESULTS_OBJECT);
 
         $i = 0;
         $expected = [
