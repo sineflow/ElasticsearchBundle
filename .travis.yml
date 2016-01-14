@@ -20,7 +20,7 @@ matrix:
       env: SYMFONY="2.7.*"
 
 install:
-  - composer require --no-update symfony/symfony:${SYMFONY}
+  - composer require --no-update symfony/symfony:${SYMFONY_VERSION}
   - wget https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
   - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
   - ./elasticsearch-${ES_VERSION}/bin/elasticsearch > /dev/null 2>&1 &
