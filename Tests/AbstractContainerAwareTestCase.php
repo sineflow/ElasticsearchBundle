@@ -32,5 +32,4 @@ abstract class AbstractContainerAwareTestCase extends WebTestCase
 
         return $this->container;
     }
-
 }

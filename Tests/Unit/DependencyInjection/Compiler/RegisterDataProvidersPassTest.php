@@ -161,5 +161,4 @@ class RegisterDataProvidersPassTest extends \PHPUnit_Framework_TestCase
         $compilerPass = new RegisterDataProvidersPass();
         $compilerPass->process($containerMock);
     }
-
 }

@@ -24,5 +24,4 @@ class BulkRequestException extends Exception
     {
         return $this->bulkResponseItems;
     }
-
 }

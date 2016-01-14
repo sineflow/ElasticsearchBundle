@@ -12,12 +12,14 @@ matrix:
   allow_failures:
     - php: hhvm
   include:
+    - php: 5.6
+      env: SYMFONY_VERSION="~2.7" ES_VERSION="1.7.4"
     - php: 7.0
-      env: ES_VERSION="1.7.4"
+      env: SYMFONY_VERSION="~3.0" ES_VERSION="1.7.4"
     - php: 7.0
-      env: ES_VERSION="1.6.2"
+      env: SYMFONY_VERSION="~3.0" ES_VERSION="1.6.2"
     - php: 7.0
-      env: SYMFONY="2.7.*"
+      env: SYMFONY_VERSION="2.7.*" ES_VERSION="2.1.1"
 
 install:
   - composer require --no-update symfony/symfony:${SYMFONY_VERSION}
@@ -28,4 +30,4 @@ install:
 
 script:
   - vendor/bin/phpunit --coverage-clover=coveralls.clover
-  - vendor/bin/phpcs -p --standard=PSR2 --ignore=vendor/,Tests/app/ ./
+  - vendor/bin/phpcs -np --standard=PSR2 --ignore=vendor/,Tests/app/ ./

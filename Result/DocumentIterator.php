@@ -153,5 +153,4 @@ class DocumentIterator implements \Countable, \Iterator
 
         return $this->documentConverter->convertToDocument($rawData, $documentClass);
     }
-
 }

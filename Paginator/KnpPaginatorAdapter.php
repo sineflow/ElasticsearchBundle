@@ -103,5 +103,4 @@ class KnpPaginatorAdapter
     {
         return $this->totalHits;
     }
-
 }

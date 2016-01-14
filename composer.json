@@ -23,7 +23,8 @@
         "monolog/monolog": "~1.0",
         "knplabs/knp-paginator-bundle": "~2.5",
         "mikey179/vfsStream": "~1.4",
-        "phpunit/phpunit": "~4.4"
+        "phpunit/phpunit": "~4.4",
+        "squizlabs/php_codesniffer": "2.*"
     },
     "suggest": {
         "monolog/monolog": "Allows for client-level logging and tracing",

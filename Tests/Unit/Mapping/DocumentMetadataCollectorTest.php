@@ -58,27 +58,27 @@ class DocumentMetadataCollectorTest extends \PHPUnit_Framework_TestCase
                                 'null_value' => false,
                                 'type' => 'boolean',
                             ),
-                        '_id' =>
+                            '_id' =>
                             array (
                                 'type' => 'string',
                             ),
-                        '_score' =>
+                            '_score' =>
                             array (
                                 'type' => 'float',
                             ),
-                        '_parent' =>
+                            '_parent' =>
                             array (
                                 'type' => 'string',
                             ),
                     ),
-                'fields' =>
+                    'fields' =>
                     array (
                         '_all' =>
                             array (
                                 'enabled' => true,
                             ),
                     ),
-                'propertiesMetadata' =>
+                    'propertiesMetadata' =>
                     array (
                         'title' =>
                             array (
@@ -87,21 +87,21 @@ class DocumentMetadataCollectorTest extends \PHPUnit_Framework_TestCase
                                 'multilanguage' => null,
                                 'propertyAccess' => 1,
                             ),
-                        '_id' =>
+                            '_id' =>
                             array (
                                 'propertyName' => 'id',
                                 'type' => 'string',
                                 'multilanguage' => null,
                                 'propertyAccess' => 1,
                             ),
-                        '_score' =>
+                            '_score' =>
                             array (
                                 'propertyName' => 'score',
                                 'type' => 'float',
                                 'multilanguage' => null,
                                 'propertyAccess' => 1,
                             ),
-                        '_parent' =>
+                            '_parent' =>
                             array (
                                 'propertyName' => 'parent',
                                 'type' => 'string',
@@ -109,14 +109,14 @@ class DocumentMetadataCollectorTest extends \PHPUnit_Framework_TestCase
                                 'propertyAccess' => 1,
                             ),
                     ),
-                'objects' =>
+                    'objects' =>
                     array (
                         0 => 'AppBundle\\ElasticSearch\\Document\\ObjSome',
                         1 => 'AppBundle\\ElasticSearch\\Document\\ObjOther',
                     ),
-                'repositoryClass' => null,
-                'className' => 'AppBundle\\ElasticSearch\\Document\\Foo',
-                'shortClassName' => 'TestBundle:Foo',
+                    'repositoryClass' => null,
+                    'className' => 'AppBundle\\ElasticSearch\\Document\\Foo',
+                    'shortClassName' => 'TestBundle:Foo',
             )
         );
         $this->cache->method('fetch')->willReturn(

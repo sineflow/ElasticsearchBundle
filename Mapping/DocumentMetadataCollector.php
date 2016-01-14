@@ -111,8 +111,11 @@ class DocumentMetadataCollector
             foreach ($indexSettings['types'] as $documentClass) {
                 if (isset($documentClasses[$documentClass])) {
                     throw new \InvalidArgumentException(
-                        sprintf('You cannot have type %s under "%s" index manager, as it is already managed by "%s" index manager',
-                            $documentClass, $indexManagerName, $documentClasses[$documentClass]
+                        sprintf(
+                            'You cannot have type %s under "%s" index manager, as it is already managed by "%s" index manager',
+                            $documentClass,
+                            $indexManagerName,
+                            $documentClasses[$documentClass]
                         )
                     );
                 }

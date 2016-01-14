@@ -38,5 +38,4 @@ class SineflowElasticsearchExtension extends Extension
         $container->setParameter('sfes.connections', $config['connections']);
         $container->setParameter('sfes.indices', $config['indices']);
     }
-
 }

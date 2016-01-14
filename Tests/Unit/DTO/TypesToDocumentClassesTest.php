@@ -1,6 +1,7 @@
 <?php
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\DTO;
+
 use Sineflow\ElasticsearchBundle\DTO\TypesToDocumentClasses;
 
 /**
@@ -24,5 +25,4 @@ class TypesToDocumentClassesTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('InvalidArgumentException');
         $obj->get('non_existing_index', 'my_real_type');
     }
-
 }

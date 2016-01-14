@@ -14,5 +14,4 @@ interface LanguageProviderInterface
      * @return array
      */
     public function getLanguages();
-
 }

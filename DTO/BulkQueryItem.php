@@ -105,5 +105,4 @@ class BulkQueryItem
 
         return $result;
     }
-
 }

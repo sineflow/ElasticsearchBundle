@@ -56,5 +56,4 @@ class AddIndexManagersPass implements CompilerPassInterface
             );
         }
     }
-
 }

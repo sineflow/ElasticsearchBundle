@@ -16,5 +16,4 @@ class LanguageProvider implements LanguageProviderInterface
     {
         return ['en', 'fr'];
     }
-
 }

@@ -48,8 +48,9 @@ class Finder
     public function __construct(
         DocumentMetadataCollector $documentMetadataCollector,
         IndexManagerRegistry $indexManagerRegistry,
-        DocumentConverter $documentConverter)
-    {
+        DocumentConverter $documentConverter
+    ) {
+    
         $this->documentMetadataCollector = $documentMetadataCollector;
         $this->indexManagerRegistry = $indexManagerRegistry;
         $this->documentConverter = $documentConverter;
@@ -291,4 +292,3 @@ class Finder
         return $connection;
     }
 }
-

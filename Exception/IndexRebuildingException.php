@@ -31,5 +31,4 @@ class IndexRebuildingException extends Exception
     {
         return $this->indicesInProgress;
     }
-
 }

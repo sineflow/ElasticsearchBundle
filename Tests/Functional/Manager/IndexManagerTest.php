@@ -404,5 +404,4 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('foo', $imWithAliases->getManagerName());
         $this->assertEquals('bar', $imWithoutAliases->getManagerName());
     }
-
 }

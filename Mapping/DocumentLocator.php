@@ -119,5 +119,4 @@ class DocumentLocator
 
         return $className;
     }
-
 }

@@ -116,5 +116,4 @@ abstract class AbstractDoctrineProvider extends AbstractProvider
 
         return $this->getAsDocument($entity);
     }
-
 }

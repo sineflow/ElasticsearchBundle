@@ -95,7 +95,7 @@ class Configuration implements ConfigurationInterface
             ->useAttributeAsKey('id')
             ->info('Defines Elasticsearch indices')
             ->beforeNormalization()
-                ->always(function($v) {
+                ->always(function ($v) {
                     $templates = [];
                     if (!is_array($v)) {
                         return [];

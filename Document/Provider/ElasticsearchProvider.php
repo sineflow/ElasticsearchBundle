@@ -115,5 +115,4 @@ class ElasticsearchProvider extends AbstractProvider
 
         return $result;
     }
-
 }

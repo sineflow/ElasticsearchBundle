@@ -1,6 +1,7 @@
 <?php
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\DTO;
+
 use Sineflow\ElasticsearchBundle\DTO\BulkQueryItem;
 
 /**

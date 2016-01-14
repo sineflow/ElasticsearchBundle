@@ -340,5 +340,4 @@ class ConnectionManager
 
         return false;
     }
-
 }

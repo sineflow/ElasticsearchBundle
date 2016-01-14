@@ -38,5 +38,4 @@ class OrderProvider extends AbstractProvider
 
         return $doc;
     }
-
 }

@@ -100,15 +100,15 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
                         array (
                             'title' => 'Bar',
                         ),
-                    'related_categories' =>
+                        'related_categories' =>
                         array (
                             0 =>
                                 array (
                                     'title' => 'Acme',
                                 ),
                         ),
-                    'ml_info-en' => 'info in English',
-                    'ml_info-fr' => 'info in French',
+                        'ml_info-en' => 'info in English',
+                        'ml_info-fr' => 'info in French',
                 ),
         );
 
@@ -139,16 +139,16 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
                         array (
                             0 => 'Foo Product',
                         ),
-                    'related_categories.title' =>
+                        'related_categories.title' =>
                         array (
                             0 => 'Acme',
                             1 => 'Bar',
                         ),
-                    'category.title' =>
+                        'category.title' =>
                         array (
                             0 => 'Bar',
                         ),
-                    'ml_info-en' =>
+                        'ml_info-en' =>
                         array (
                             0 => 'info in English',
                         ),
@@ -165,5 +165,4 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         $this->assertInstanceOf(MLProperty::class, $product->mlInfo);
         $this->assertEquals('info in English', $product->mlInfo->getValue('en'));
     }
-
 }

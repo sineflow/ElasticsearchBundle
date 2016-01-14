@@ -91,8 +91,9 @@ class IndexManager
         ProviderRegistry $providerRegistry,
         Finder $finder,
         DocumentConverter $documentConverter,
-        array $indexSettings)
-    {
+        array $indexSettings
+    ) {
+    
         $this->managerName = $managerName;
         $this->connection = $connection;
         $this->metadataCollector = $metadataCollector;
@@ -690,5 +691,4 @@ class IndexManager
             $this->getConnection()->commit();
         }
     }
-
 }

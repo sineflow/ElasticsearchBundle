@@ -49,8 +49,9 @@ class IndexManagerFactory
         ProviderRegistry $providerRegistry,
         Finder $finder,
         DocumentConverter $documentConverter,
-        $languageSeparator)
-    {
+        $languageSeparator
+    ) {
+    
         $this->metadataCollector = $metadataCollector;
         $this->providerRegistry = $providerRegistry;
         $this->finder = $finder;
@@ -69,8 +70,9 @@ class IndexManagerFactory
         $managerClass,
         $managerName,
         ConnectionManager $connection,
-        array $indexSettings)
-    {
+        array $indexSettings
+    ) {
+    
         $manager = new $managerClass(
             $managerName,
             $connection,

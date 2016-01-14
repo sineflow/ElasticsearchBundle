@@ -29,5 +29,4 @@ abstract class AbstractDocument implements DocumentInterface
      * @ES\Property(type="string", name="_parent")
      */
     public $parent;
-
 }
