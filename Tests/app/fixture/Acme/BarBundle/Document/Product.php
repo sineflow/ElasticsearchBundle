@@ -11,7 +11,10 @@ use Sineflow\ElasticsearchBundle\Document\MLProperty;
  *
  * @ES\Document(
  *  type="product",
- *  repositoryClass="Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Repository\ProductRepository"
+ *  repositoryClass="Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Repository\ProductRepository",
+ *  options={
+ *      "dynamic":"strict",
+ *  }
  * )
  */
 class Product extends AbstractDocument

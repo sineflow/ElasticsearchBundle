@@ -94,22 +94,22 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
             '_version' => 1,
             'found' => true,
             '_source' =>
-                array (
+                [
                     'title' => 'Foo Product',
                     'category' =>
-                        array (
+                        [
                             'title' => 'Bar',
-                        ),
-                        'related_categories' =>
-                        array (
-                            0 =>
-                                array (
-                                    'title' => 'Acme',
-                                ),
-                        ),
-                        'ml_info-en' => 'info in English',
-                        'ml_info-fr' => 'info in French',
-                ),
+                        ],
+                    'related_categories' =>
+                    [
+                        0 =>
+                            [
+                                'title' => 'Acme',
+                            ],
+                    ],
+                    'ml_info-en' => 'info in English',
+                    'ml_info-fr' => 'info in French',
+                ],
         );
 
         $converter = $this->getContainer()->get('sfes.document_converter');
@@ -134,25 +134,25 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
             '_id' => 'doc1',
             '_score' => 1,
             'fields' =>
-                array (
+                [
                     'title' =>
-                        array (
+                        [
                             0 => 'Foo Product',
-                        ),
-                        'related_categories.title' =>
-                        array (
+                        ],
+                    'related_categories.title' =>
+                        [
                             0 => 'Acme',
                             1 => 'Bar',
-                        ),
-                        'category.title' =>
-                        array (
+                        ],
+                    'category.title' =>
+                        [
                             0 => 'Bar',
-                        ),
-                        'ml_info-en' =>
-                        array (
+                        ],
+                    'ml_info-en' =>
+                        [
                             0 => 'info in English',
-                        ),
-                ),
+                        ],
+                ],
         ];
 
         $converter = $this->getContainer()->get('sfes.document_converter');

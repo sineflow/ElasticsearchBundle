@@ -3,6 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Tests;
 
 use Elasticsearch\Common\Exceptions\ElasticsearchException;
+use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -98,8 +99,12 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
                     $indexManager->persistRaw($type, $document);
                 }
             }
-            $indexManager->getConnection()->commit();
-            $indexManager->getConnection()->refresh();
+            try {
+                $indexManager->getConnection()->commit();
+                $indexManager->getConnection()->refresh();
+            } catch (BulkRequestException $e) {
+                print_r($e->getBulkResponseItems());
+            }
         }
     }
 

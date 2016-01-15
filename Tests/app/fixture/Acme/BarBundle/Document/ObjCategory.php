@@ -22,4 +22,11 @@ class ObjCategory implements ObjectInterface
      * @ES\Property(type="string", name="title", options={"index"="not_analyzed"})
      */
     public $title;
+
+    /**
+     * @var ObjTag[]
+     * @ES\Property(type="object", name="tags", multiple=true, objectName="AcmeBarBundle:ObjTag")
+     */
+    public $tags;
+
 }
