@@ -1,6 +1,6 @@
 # Sineflow Elasticsearch Bundle for Symfony
 
-[![Build Status](https://travis-ci.org/sineflow/ElasticsearchBundle.svg?branch=master)](https://travis-ci.org/sineflow/ElasticsearchBundle) [![Coverage Status](https://coveralls.io/repos/sineflow/ElasticsearchBundle/badge.svg?branch=master&service=github)](https://coveralls.io/github/sineflow/ElasticsearchBundle?branch=master)
+[![Build Status](https://travis-ci.org/sineflow/ElasticsearchBundle.svg?branch=master)](https://travis-ci.org/sineflow/ElasticsearchBundle) [![Coverage Status](https://coveralls.io/repos/sineflow/ElasticsearchBundle/badge.svg?branch=master&service=github)](https://coveralls.io/github/sineflow/ElasticsearchBundle?branch=master) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/6b260852-6b41-43a3-8fa4-39f0313b8326/mini.png)](https://insight.sensiolabs.com/projects/6b260852-6b41-43a3-8fa4-39f0313b8326)
 
 This bundle was initially based on the Elasticsearch bundle by ONGR.io, however a different vision about how some things are handled, and some additional core requirements eventually turned it into a separate project.
 
