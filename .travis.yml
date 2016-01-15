@@ -29,5 +29,8 @@ install:
   - composer install --dev --no-interaction
 
 script:
-  - vendor/bin/phpunit --coverage-clover=coveralls.clover
+  - vendor/bin/phpunit --coverage-clover=Tests/app/build/clover.xml
   - vendor/bin/phpcs -np --standard=PSR2 --ignore=vendor/,Tests/app/ ./
+
+after_script:
+  - travis_retry php vendor/bin/coveralls
