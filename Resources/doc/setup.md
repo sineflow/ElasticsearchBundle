@@ -9,6 +9,8 @@ Assuming you have [Composer](https://getcomposer.org) installed globally, enter 
 $ composer require sineflow/elasticsearch-bundle "~0.4"
 ```
 
+> NOTE: Replace version accordingly. Latest release is [![Latest Stable Version](https://poser.pugx.org/sineflow/elasticsearch-bundle/v/stable)](https://packagist.org/packages/sineflow/elasticsearch-bundle)
+
 ### Step 2: Enable the Bundle
 
 To enable the bundle, add the following to `app/AppKernel.php` in your project.

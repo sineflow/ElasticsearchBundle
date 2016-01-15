@@ -15,6 +15,16 @@ class MLProperty
     private $values = [];
 
     /**
+     * @param array $values
+     */
+    public function __construct(array $values = [])
+    {
+        foreach ($values as $language => $value) {
+            $this->setValue($value, $language);
+        }
+    }
+
+    /**
      * Set value of property in given language
      *
      * @param string $value

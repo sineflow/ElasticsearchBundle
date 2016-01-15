@@ -47,7 +47,9 @@ $im = $this->get('sfes.index.product');
 
 ## Repositories
 
-When you need to work with a specific type, you can do so through the Repository class of an entity. You can get the repository through the index manager that manages it:
+When you need to work with a specific type, you can do so through the Repository class of an entity. 
+The default Repository is mostly a convenience class, as its methods are also available either through the IndexManager or the Finder services. However it may be useful to have type-specific methods in your own custom repositories.
+You can get a type's repository through the index manager that manages it:
 
 ```php
 $repo = $im->getRepository('AppBundle:Product');
@@ -63,7 +65,17 @@ $repo->persist($product);
 $repo->getIndexManager()->getConnection()->commit();
 ```
 
-or
+Alternatively, you can directly persist the document through the index manager as well:
+```php
+$product = new Product();
+$product->id = 5; // If not set, elasticsearch will set a random unique id.
+$product->title = 'Acme title';
+$im->persist($product);
+$im->getConnection()->commit();
+```
+
+
+If you want to bypass the entity objects for some reason, you can persist a raw array into the index like this:
 
 ```php
 $product = [

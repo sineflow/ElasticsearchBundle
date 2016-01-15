@@ -161,6 +161,8 @@ class ConnectionManager
      *                           If immediate availability of the data for searching is not crucial, it's better
      *                           to set this to false, to get better performance. In the latter case, data would be
      *                           normally available within 1 second
+     *
+     * @throws BulkRequestException
      */
     public function commit($forceRefresh = true)
     {
