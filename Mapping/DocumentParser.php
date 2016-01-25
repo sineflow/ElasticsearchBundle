@@ -165,13 +165,13 @@ class DocumentParser
     }
 
     /**
-     * Finds properties metadata for every property used in document including parent classes.
+     * Finds properties' metadata for every property used in document or inner/nested object
      *
      * @param \ReflectionClass $documentReflection
      *
      * @return array
      */
-    private function getPropertiesMetadata(\ReflectionClass $documentReflection)
+    public function getPropertiesMetadata(\ReflectionClass $documentReflection)
     {
         $className = $documentReflection->getName();
         if (array_key_exists($className, $this->propertiesMetadata)) {

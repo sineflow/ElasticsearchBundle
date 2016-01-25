@@ -55,7 +55,6 @@ services:
     sfes.document_parser:
         class: Sineflow\ElasticsearchBundle\Mapping\DocumentParser
         arguments: ['@sfes.annotations.cached_reader', '@sfes.document_locator', %sfes.mlproperty.language_separator%]
-        public: false
 
     sfes.document_metadata_collector:
         class: Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector
