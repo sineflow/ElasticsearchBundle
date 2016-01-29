@@ -150,7 +150,7 @@ class DocumentConverter
     public function convertToArray(ObjectInterface $object, $propertiesMetadata = [])
     {
         if (empty($propertiesMetadata)) {
-            $propertiesMetadata = $this->metadataCollector->getDocumentMetadata(get_class($object))->getPropertiesMetadata();
+            $propertiesMetadata = $this->metadataCollector->getObjectPropertiesMetadata(get_class($object));
         }
 
         $array = [];

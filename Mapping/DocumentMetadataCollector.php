@@ -3,13 +3,15 @@
 namespace Sineflow\ElasticsearchBundle\Mapping;
 
 use Doctrine\Common\Cache\Cache;
+use Sineflow\ElasticsearchBundle\Exception\Exception;
 
 /**
  * Class for getting type/document metadata.
  */
 class DocumentMetadataCollector
 {
-    const CACHE_KEY = 'sfes.documents_metadata';
+    const DOCUMENTS_CACHE_KEY = 'sfes.documents_metadata';
+    const OBJECTS_CACHE_KEY = 'sfes.objects_metadata.';
 
     /**
      * <index_manager_name> => [
@@ -21,6 +23,14 @@ class DocumentMetadataCollector
      * @var array
      */
     private $metadata = [];
+
+    /**
+     * <object_class_short_name> => [<properties_metadata>]
+     * ...
+     *
+     * @var array
+     */
+    private $objectsMetadata = [];
 
     /**
      * @var array
@@ -48,6 +58,11 @@ class DocumentMetadataCollector
     private $debug;
 
     /**
+     * @var int
+     */
+    private $documentsLastModifiedTime = 0;
+
+    /**
      * @param array           $indexManagers   The list of index managers defined
      * @param DocumentLocator $documentLocator For finding documents.
      * @param DocumentParser  $parser          For reading document annotations.
@@ -62,11 +77,17 @@ class DocumentMetadataCollector
         $this->cache = $cache;
         $this->debug = (boolean) $debug;
 
-        $this->metadata = $this->cache->fetch(self::CACHE_KEY);
+        // Gets the time when the documents' folders were last modified
+        $documentDirs = $this->documentLocator->getAllDocumentDirs();
+        foreach ($documentDirs as $dir) {
+            $this->documentsLastModifiedTime = max($this->documentsLastModifiedTime, filemtime($dir));
+        }
+
+        $this->metadata = $this->cache->fetch(self::DOCUMENTS_CACHE_KEY);
         // If there was metadata in the cache
         if (false !== $this->metadata) {
-            // If in debug mode and the cache has expired
-            if ($this->debug && !$this->isCacheFresh()) {
+            // If in debug mode and the cache has expired, don't use it
+            if ($this->debug && !$this->isDocumentsCacheFresh()) {
                 $this->metadata = false;
             }
         }
@@ -78,22 +99,13 @@ class DocumentMetadataCollector
     }
 
     /**
-     * Returns true if metadata cache is up to date
+     * Returns true if documents' metadata cache is up to date
      *
      * @return bool
      */
-    private function isCacheFresh()
+    private function isDocumentsCacheFresh()
     {
-        $documentDirs = $this->documentLocator->getAllDocumentDirs();
-
-        foreach ($documentDirs as $dir) {
-            $isFresh = $this->cache->fetch('[C]'.self::CACHE_KEY) >= filemtime($dir);
-            if (!$isFresh) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->cache->fetch('[C]'.self::DOCUMENTS_CACHE_KEY) > $this->documentsLastModifiedTime;
     }
 
     /**
@@ -125,9 +137,9 @@ class DocumentMetadataCollector
             }
         }
 
-        $this->cache->save(self::CACHE_KEY, $this->metadata);
+        $this->cache->save(self::DOCUMENTS_CACHE_KEY, $this->metadata);
         if ($this->debug) {
-            $this->cache->save('[C]'.self::CACHE_KEY, time());
+            $this->cache->save('[C]'.self::DOCUMENTS_CACHE_KEY, time());
         }
 
         return $this->metadata;
@@ -151,6 +163,45 @@ class DocumentMetadataCollector
             }
         }
         throw new \InvalidArgumentException(sprintf('Metadata for type "%s" is not available', $documentClass));
+    }
+
+    /**
+     * Returns metadata for the specified object class name
+     * Class can also be specified in short notation (e.g AppBundle:ObjCategory)
+     *
+     * @param string $objectClass
+     * @return array
+     * @throw Exception
+     */
+    public function getObjectPropertiesMetadata($objectClass)
+    {
+        $objectMetadata = null;
+
+        $objectClass = $this->documentLocator->getShortClassName($objectClass);
+        if (isset($this->objectsMetadata[$objectClass])) {
+            return $this->objectsMetadata[$objectClass];
+        } else {
+            // If we have it cached and up-to-date, get the data from cache
+            if ($this->cache->fetch('[C]'.self::OBJECTS_CACHE_KEY . $objectClass) > $this->documentsLastModifiedTime) {
+                $objectMetadata = $this->cache->fetch(self::OBJECTS_CACHE_KEY . $objectClass);
+            }
+
+            // Get the metadata the slow way and put it in the cache
+            if (!$objectMetadata) {
+                $objectMetadata = $this->parser->getPropertiesMetadata(new \ReflectionClass($this->documentLocator->resolveClassName($objectClass)));
+                $this->cache->save(self::OBJECTS_CACHE_KEY . $objectClass, $objectMetadata);
+                $this->cache->save('[C]'.self::OBJECTS_CACHE_KEY . $objectClass, time());
+            }
+        }
+
+        if (!is_array($objectMetadata)) {
+            throw new Exception(sprintf('Metadata for object "%s" could not be retrieved', $objectClass));
+        }
+
+        // Cache the value in the class as well
+        $this->objectsMetadata[$objectClass] = $objectMetadata;
+
+        return $objectMetadata;
     }
 
     /**

@@ -39,6 +39,7 @@ class DocumentMetadataCollectorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->docLocator->method('getShortClassName')->willReturnArgument(0);
+        $this->docLocator->method('getAllDocumentDirs')->willReturn([]);
 
         $this->docParser = $this->getMockBuilder('Sineflow\ElasticsearchBundle\Mapping\DocumentParser')
             ->disableOriginalConstructor()
