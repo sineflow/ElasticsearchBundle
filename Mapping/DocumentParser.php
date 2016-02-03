@@ -21,6 +21,11 @@ class DocumentParser
     /**
      * @const string
      */
+    const META_SCORE_ANNOTATION = 'Sineflow\ElasticsearchBundle\Annotation\Score';
+
+    /**
+     * @const string
+     */
     const DOCUMENT_ANNOTATION = 'Sineflow\ElasticsearchBundle\Annotation\Document';
 
     /**
@@ -151,7 +156,9 @@ class DocumentParser
      */
     private function getPropertyAnnotationData($property)
     {
-        return $this->reader->getPropertyAnnotation($property, self::PROPERTY_ANNOTATION);
+        $annotation = $this->reader->getPropertyAnnotation($property, self::PROPERTY_ANNOTATION);
+
+        return $annotation;
     }
 
     /**
@@ -183,30 +190,40 @@ class DocumentParser
         /** @var \ReflectionProperty $property */
         foreach ($this->getDocumentPropertiesReflection($documentReflection) as $propertyName => $property) {
             $propertyAnnotation = $this->getPropertyAnnotationData($property);
+            $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, self::META_SCORE_ANNOTATION);
 
             if ($propertyAnnotation !== null) {
-                $propertyMetadata[$propertyAnnotation->name] = [
-                    'propertyName' => $propertyName,
-                    'type' => $propertyAnnotation->type,
-                    'multilanguage' => $propertyAnnotation->multilanguage,
-                ];
+                if (get_class($propertyAnnotation) === self::PROPERTY_ANNOTATION) {
+                    $propertyMetadata[$propertyAnnotation->name] = [
+                        'propertyName' => $propertyName,
+                        'type' => $propertyAnnotation->type,
+                        'multilanguage' => $propertyAnnotation->multilanguage,
+                    ];
 
-                // If property is a (nested) object
-                if (in_array($propertyAnnotation->type, ['object', 'nested'])) {
-                    if (!$propertyAnnotation->objectName) {
-                        throw new \InvalidArgumentException(
-                            sprintf('Property "%s" in %s is missing "objectName" setting', $propertyName, $className)
+                    // If property is a (nested) object
+                    if (in_array($propertyAnnotation->type, ['object', 'nested'])) {
+                        if (!$propertyAnnotation->objectName) {
+                            throw new \InvalidArgumentException(
+                                sprintf('Property "%s" in %s is missing "objectName" setting', $propertyName, $className)
+                            );
+                        }
+                        $child = new \ReflectionClass($this->documentLocator->resolveClassName($propertyAnnotation->objectName));
+                        $propertyMetadata[$propertyAnnotation->name] = array_merge(
+                            $propertyMetadata[$propertyAnnotation->name],
+                            [
+                                'multiple' => $propertyAnnotation->multiple,
+                                'propertiesMetadata' => $this->getPropertiesMetadata($child),
+                                'className' => $child->getName(),
+                            ]
                         );
                     }
-                    $child = new \ReflectionClass($this->documentLocator->resolveClassName($propertyAnnotation->objectName));
-                    $propertyMetadata[$propertyAnnotation->name] = array_merge(
-                        $propertyMetadata[$propertyAnnotation->name],
-                        [
-                            'multiple' => $propertyAnnotation->multiple,
-                            'propertiesMetadata' => $this->getPropertiesMetadata($child),
-                            'className' => $child->getName(),
-                        ]
-                    );
+                } elseif (get_class($propertyAnnotation) === self::META_SCORE_ANNOTATION) {
+                    $propertyAnnotation->name = '_score';
+                    $propertyAnnotation->type = 'float';
+                    $propertyMetadata['$propertyAnnotation->name'] = [
+                        'propertyName' => $propertyName,
+                        'type' => $propertyAnnotation->type,
+                    ];
                 }
 
                 if ($property->isPublic()) {

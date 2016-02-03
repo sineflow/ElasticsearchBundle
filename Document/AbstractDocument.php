@@ -19,14 +19,14 @@ abstract class AbstractDocument implements DocumentInterface
     /**
      * @var string
      *
-     * @ES\Property(type="float", name="_score")
-     */
-    public $score;
-
-    /**
-     * @var string
-     *
      * @ES\Property(type="string", name="_parent")
      */
     public $parent;
+
+    /**
+     * @var float
+     *
+     * @ES\Score
+     */
+    public $score;
 }
