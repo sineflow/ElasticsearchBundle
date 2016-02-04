@@ -99,6 +99,13 @@ Sometimes, you may have a field that is available in more than one language. Thi
 
 When you have a property definition like that, there will not be a field `name` in your index, but instead there will be `name-en`, `name-fr`, `name-de`, etc. where the suffixes are taken from the available languages in your application. You may also use the special `{lang}` placeholder in the options array, as often you would need to specify different analyzers, depending on the language. For more information on how that works, see [multilanguage support](i18n.md).
 
+### Meta property annotations
+
+#### @ES\Score
+
+You should have a property with this annotation, if you wish the matching `_score` of the document to be populated in it when searching.
+Such property is already defined in `AbstractDocument`, so you don't need to do anything if you extend it.
+
 ## Object class annotation
 
 Object classes are almost the same as document classes:

@@ -220,7 +220,7 @@ class DocumentParser
                 } elseif (get_class($propertyAnnotation) === self::META_SCORE_ANNOTATION) {
                     $propertyAnnotation->name = '_score';
                     $propertyAnnotation->type = 'float';
-                    $propertyMetadata['$propertyAnnotation->name'] = [
+                    $propertyMetadata[$propertyAnnotation->name] = [
                         'propertyName' => $propertyName,
                         'type' => $propertyAnnotation->type,
                     ];
@@ -266,6 +266,7 @@ class DocumentParser
             'Document',
             'Property',
             'Object',
+            'Score',
         ];
 
         foreach ($annotations as $annotation) {
