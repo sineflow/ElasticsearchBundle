@@ -139,15 +139,15 @@ class Finder
      * @param array $additionalRequestParams
      * @return int
      */
-    public function count(array $documentClasses, array $searchBody, array $additionalRequestParams = [])
+    public function count(array $documentClasses, array $searchBody = [], array $additionalRequestParams = [])
     {
         $client = $this->getConnection($documentClasses)->getClient();
 
-        $indicesAndTypes = $this->getTargetIndicesAndTypes($documentClasses);
+        $params = $this->getTargetIndicesAndTypes($documentClasses);
 
-        $params = array_merge($indicesAndTypes, [
-            'body' => $searchBody,
-        ]);
+        if (!empty($searchBody)) {
+            $params['body'] = $searchBody;
+        }
 
         if (!empty($additionalRequestParams)) {
             $params = array_merge($additionalRequestParams, $params);

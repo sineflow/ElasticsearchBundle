@@ -104,7 +104,7 @@ class Repository
      * @param array $additionalRequestParams
      * @return int
      */
-    public function count(array $searchBody, array $additionalRequestParams = [])
+    public function count(array $searchBody = [], array $additionalRequestParams = [])
     {
         return $this->finder->count([$this->documentClass], $searchBody, $additionalRequestParams);
     }
