@@ -277,13 +277,15 @@ class IndexManager
         if (true === $this->getUseAliases()) {
             if ($this->getConnection()->existsAlias(['name' => $this->readAlias])) {
                 $indexName = key($indices->getAlias(['name' => $this->readAlias]));
+            } else {
+                throw new Exception(sprintf('Index alias "%s" not found', $this->readAlias));
             }
         } else {
             $indexName = $this->getBaseIndexName();
         }
 
-        if (!$indexName || !$this->getConnection()->existsIndexOrAlias(['index' => $indexName])) {
-            throw new Exception('Live index not found');
+        if (!$this->getConnection()->existsIndexOrAlias(['index' => $indexName])) {
+            throw new Exception(sprintf('Live index "%s" not found', $indexName));
         }
 
         return $indexName;
