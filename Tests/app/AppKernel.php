@@ -17,6 +17,8 @@ class AppKernel extends Kernel
     {
         return [
             new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
+            new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(),
+            new Symfony\Bundle\DebugBundle\DebugBundle(),
             new Sineflow\ElasticsearchBundle\SineflowElasticsearchBundle(),
             new Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\AcmeBarBundle(),
             new Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\AcmeFooBundle(),

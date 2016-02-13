@@ -35,7 +35,6 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
         if ($event->target instanceof KnpPaginatorAdapter) {
             // Add sort to query
             list($sortField, $sortDirection) = $this->getSorting($event);
-            /** @var $results PartialResultsInterface */
             $results = $event->target->getResults($event->getOffset(), $event->getLimit(), $sortField, $sortDirection);
             $event->count = $event->target->getTotalHits();
 
@@ -69,15 +68,20 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
      */
     protected function getSorting(ItemsEvent $event)
     {
+        $sortField = null;
+        $sortDirection = 'asc';
+
         $request = $this->requestStack->getCurrentRequest();
 
-        $sortField = $request->get($event->options['sortFieldParameterName']);
-        $sortDirection = $request->get($event->options['sortDirectionParameterName']);
-        $sortDirection = ('desc' === strtolower($sortDirection)) ? 'desc' : 'asc';
+        if ($request) {
+            $sortField = $request->get($event->options['sortFieldParameterName']);
+            $sortDirection = $request->get($event->options['sortDirectionParameterName']);
+            $sortDirection = ('desc' === strtolower($sortDirection)) ? 'desc' : 'asc';
 
-        // check if the requested sort field is in the sort whitelist
-        if (isset($event->options['sortFieldWhitelist']) && !in_array($sortField, $event->options['sortFieldWhitelist'])) {
-            throw new \UnexpectedValueException(sprintf('Cannot sort by [%s] as it is not in the whitelist', $sortField));
+            // check if the requested sort field is in the sort whitelist
+            if (isset($event->options['sortFieldWhitelist']) && !in_array($sortField, $event->options['sortFieldWhitelist'])) {
+                throw new \UnexpectedValueException(sprintf('Cannot sort by [%s] as it is not in the whitelist', $sortField));
+            }
         }
 
         return [$sortField, $sortDirection];

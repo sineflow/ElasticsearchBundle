@@ -2,6 +2,8 @@
 framework:
     secret: "SUPER-TOP-SECRET"
     test: ~
+    router:
+        resource: ~
 
 sineflow_elasticsearch:
     connections:
