@@ -96,6 +96,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         /** @var SlidingPagination $pagination */
         $pagination = $paginator->paginate($adapter, 2, 2);
 
+        dump($pagination);
         $this->assertEquals(3, $pagination->key());
         $this->assertEquals('3rd Product', $pagination->current()['title']);
 
