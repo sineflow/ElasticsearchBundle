@@ -3,7 +3,6 @@
 namespace Sineflow\ElasticsearchBundle\Subscriber;
 
 use Knp\Component\Pager\Event\ItemsEvent;
-use Sineflow\ElasticsearchBundle\Exception\Exception;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Paginator\KnpPaginatorAdapter;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
