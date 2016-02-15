@@ -79,7 +79,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         // Test object results
 
         /** @var KnpPaginatorAdapter $adapter */
-        $adapter = $repo->find(['query' => ['match_all' => []], 'sort' => ['_id' => ['order' =>'asc']]], Finder::RESULTS_OBJECT | Finder::ADAPTER_KNP);
+        $adapter = $repo->find(['query' => ['match_all' => []], 'sort' => ['_uid' => ['order' =>'asc']]], Finder::RESULTS_OBJECT | Finder::ADAPTER_KNP);
 
         /** @var SlidingPagination $pagination */
         $pagination = $paginator->paginate($adapter, 2, 2);
@@ -96,7 +96,6 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         /** @var SlidingPagination $pagination */
         $pagination = $paginator->paginate($adapter, 2, 2);
 
-        dump($pagination);
         $this->assertEquals(3, $pagination->key());
         $this->assertEquals('3rd Product', $pagination->current()['title']);
 
