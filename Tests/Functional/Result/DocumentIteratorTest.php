@@ -126,7 +126,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
         $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
 
         /** @var DocumentIterator $iterator */
-        $iterator = $repo->find(['query' => ['match_all' => []], 'size' => 3, 'sort' => ['_id' => ['order' =>'asc']]], Finder::RESULTS_OBJECT);
+        $iterator = $repo->find(['query' => ['match_all' => []], 'size' => 3, 'sort' => ['_uid' => ['order' =>'asc']]], Finder::RESULTS_OBJECT);
 
         $i = 0;
         $expected = [

@@ -76,10 +76,12 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
         $paginator = $this->getContainer()->get('knp_paginator');
 
+        $query = ['query' => ['match_all' => []], 'sort' => ['_uid' => ['order' =>'asc']]];
+
         // Test object results
 
         /** @var KnpPaginatorAdapter $adapter */
-        $adapter = $repo->find(['query' => ['match_all' => []], 'sort' => ['_uid' => ['order' =>'asc']]], Finder::RESULTS_OBJECT | Finder::ADAPTER_KNP);
+        $adapter = $repo->find($query, Finder::RESULTS_OBJECT | Finder::ADAPTER_KNP);
 
         /** @var SlidingPagination $pagination */
         $pagination = $paginator->paginate($adapter, 2, 2);
@@ -91,7 +93,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         // Test array results
 
         /** @var KnpPaginatorAdapter $adapter */
-        $adapter = $repo->find(['query' => ['match_all' => []]], Finder::RESULTS_ARRAY | Finder::ADAPTER_KNP);
+        $adapter = $repo->find($query, Finder::RESULTS_ARRAY | Finder::ADAPTER_KNP);
 
         /** @var SlidingPagination $pagination */
         $pagination = $paginator->paginate($adapter, 2, 2);
@@ -102,7 +104,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         // Test raw results
 
         /** @var KnpPaginatorAdapter $adapter */
-        $adapter = $repo->find(['query' => ['match_all' => []]], Finder::RESULTS_RAW | Finder::ADAPTER_KNP);
+        $adapter = $repo->find($query, Finder::RESULTS_RAW | Finder::ADAPTER_KNP);
 
         /** @var SlidingPagination $pagination */
         $pagination = $paginator->paginate($adapter, 2, 2);
