@@ -87,5 +87,4 @@ class IndexCreateCommandTest extends AbstractCommandTestCase
 
         return $command;
     }
-
 }

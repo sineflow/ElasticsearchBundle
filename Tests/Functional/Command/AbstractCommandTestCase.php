@@ -54,5 +54,4 @@ abstract class AbstractCommandTestCase extends WebTestCase
 
         return $commandTester;
     }
-
 }

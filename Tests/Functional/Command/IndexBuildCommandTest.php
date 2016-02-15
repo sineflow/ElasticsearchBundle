@@ -51,5 +51,4 @@ class IndexBuildCommandTest extends AbstractCommandTestCase
 
         return $command;
     }
-
 }
