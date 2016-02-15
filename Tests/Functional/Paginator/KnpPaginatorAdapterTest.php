@@ -112,4 +112,19 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $this->assertEquals(3, $pagination->current()['_id']);
         $this->assertEquals('3rd Product', $pagination->current()['_source']['title']);
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidResultsType()
+    {
+        /** @var Repository $repo */
+        $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
+        $paginator = $this->getContainer()->get('knp_paginator');
+
+        $query = ['query' => ['match_all' => []]];
+
+        $adapter = $repo->find($query, Finder::ADAPTER_KNP);
+        $paginator->paginate($adapter);
+    }
 }

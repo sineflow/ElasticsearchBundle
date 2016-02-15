@@ -53,7 +53,7 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
                     break;
 
                 default:
-                    throw new Exception(sprintf('Unsupported results type "%s" for KNP paginator', $resultsType));
+                    throw new \InvalidArgumentException(sprintf('Unsupported results type "%s" for KNP paginator', $resultsType));
             }
 
             $event->stopPropagation();

@@ -134,6 +134,7 @@ class ElasticsearchExtensionTest extends \PHPUnit_Framework_TestCase
         class_exists('testClass') ? : eval('class testClass {}');
         $container->setParameter('kernel.bundles', ['testBundle' => 'testClass']);
         $container->setParameter('kernel.cache_dir', '');
+        $container->setParameter('kernel.logs_dir', '');
         $container->setParameter('kernel.debug', true);
         $extension = new SineflowElasticsearchExtension();
         $extension->load(
