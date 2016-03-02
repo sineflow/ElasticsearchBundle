@@ -1,6 +1,7 @@
 <?php
 
 namespace Sineflow\ElasticsearchBundle\Document;
+
 use Sineflow\ElasticsearchBundle\Annotation\Property;
 
 /**
