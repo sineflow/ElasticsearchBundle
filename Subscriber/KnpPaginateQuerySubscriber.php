@@ -70,12 +70,9 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
         $sortField = null;
         $sortDirection = 'asc';
 
-        $request = $this->requestStack->getCurrentRequest();
-
-        if ($request) {
-            $sortField = $request->get($event->options['sortFieldParameterName']);
-            $sortDirection = $request->get($event->options['sortDirectionParameterName']);
-            $sortDirection = ('desc' === strtolower($sortDirection)) ? 'desc' : 'asc';
+        if (isset($_GET[$event->options['sortFieldParameterName']])) {
+            $sortField = $_GET[$event->options['sortFieldParameterName']];
+            $sortDirection = isset($_GET[$event->options['sortDirectionParameterName']]) && strtolower($_GET[$event->options['sortDirectionParameterName']]) === 'desc' ? 'desc' : 'asc';
 
             // check if the requested sort field is in the sort whitelist
             if (isset($event->options['sortFieldWhitelist']) && !in_array($sortField, $event->options['sortFieldWhitelist'])) {
