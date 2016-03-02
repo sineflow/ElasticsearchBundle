@@ -1,6 +1,7 @@
 <?php
 
 namespace Sineflow\ElasticsearchBundle\Document;
+use Sineflow\ElasticsearchBundle\Annotation\Property;
 
 /**
  * Class MLProperty
@@ -36,12 +37,21 @@ class MLProperty
     }
 
     /**
+     * Gets value based on passed language, if value is missing returns default value
+     *
      * @param string $language
+     *
      * @return null|string
      */
     public function getValue($language)
     {
-        return isset($this->values[$language]) ? $this->values[$language] : null;
+        if (isset($this->values[$language])) {
+            return $this->values[$language];
+        } elseif (isset($this->values[Property::DEFAULT_LANG_SUFFIX])) {
+            return $this->values[Property::DEFAULT_LANG_SUFFIX];
+        } else {
+            return null;
+        }
     }
 
     /**
