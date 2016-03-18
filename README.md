@@ -11,7 +11,7 @@ This bundle was initially based on the Elasticsearch bundle by ONGR.io, however 
 - Uses Doctrine-like entity declarations for Elasticsearch documents
 - Supports multilanguage documents
 - Supports searching in multiple types and indices
-- Supports zero-time reindexing by utilizing read and write index aliases
+- Supports zero-downtime reindexing by utilizing read and write index aliases
 - Supports data providers for synchronizing Elasticsearch indices with an external data source such as Doctrine
 
 ## Documentation
