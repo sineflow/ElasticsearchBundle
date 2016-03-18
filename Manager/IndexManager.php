@@ -23,57 +23,57 @@ class IndexManager
     /**
      * @var string The unique manager name (the key from the index configuration)
      */
-    private $managerName;
+    protected $managerName;
 
     /**
      * @var ConnectionManager Elasticsearch connection.
      */
-    private $connection;
+    protected $connection;
 
     /**
      * @var DocumentMetadataCollector
      */
-    private $metadataCollector;
+    protected $metadataCollector;
 
     /**
      * @var ProviderRegistry
      */
-    private $providerRegistry;
+    protected $providerRegistry;
 
     /**
      * @var Finder
      */
-    private $finder;
+    protected $finder;
 
     /**
      * @var DocumentConverter
      */
-    private $documentConverter;
+    protected $documentConverter;
 
     /**
      * @var array
      */
-    private $indexMapping;
+    protected $indexMapping;
 
     /**
      * @var RepositoryInterface[]
      */
-    private $repositories = [];
+    protected $repositories = [];
 
     /**
      * @var bool Whether to use index aliases
      */
-    private $useAliases = true;
+    protected $useAliases = true;
 
     /**
      * @var string The alias where data should be read from
      */
-    private $readAlias = null;
+    protected $readAlias = null;
 
     /**
      * @var string The alias where data should be written to
      */
-    private $writeAlias = null;
+    protected $writeAlias = null;
 
     /**
      * @param string                    $managerName
@@ -91,9 +91,8 @@ class IndexManager
         ProviderRegistry $providerRegistry,
         Finder $finder,
         DocumentConverter $documentConverter,
-        array $indexSettings
-    ) {
-    
+        array $indexSettings)
+    {
         $this->managerName = $managerName;
         $this->connection = $connection;
         $this->metadataCollector = $metadataCollector;
