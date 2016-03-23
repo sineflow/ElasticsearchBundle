@@ -9,7 +9,7 @@ use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product;
 
-class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
+class ScanScrollAdapterTest extends AbstractElasticsearchTestCase
 {
     /**
      * {@inheritdoc}
