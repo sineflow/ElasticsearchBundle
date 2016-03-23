@@ -4,6 +4,7 @@ namespace Sineflow\ElasticsearchBundle\Finder;
 
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Sineflow\ElasticsearchBundle\DTO\TypesToDocumentClasses;
+use Sineflow\ElasticsearchBundle\Finder\Adapter\ScanScrollAdapter;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
@@ -21,8 +22,12 @@ class Finder
     const RESULTS_OBJECT = 2;
     const RESULTS_RAW = 4;
 
-    const BITMASK_RESULT_ADAPTERS = 64;
+    const BITMASK_RESULT_ADAPTERS = 192;
     const ADAPTER_KNP = 64;
+    const ADAPTER_SCANSCROLL = 128;
+
+    const SCROLL_TIME = '2m';
+    const SCAN_CHUNK_SIZE = '500';
 
     /**
      * @var DocumentMetadataCollector
@@ -48,9 +53,8 @@ class Finder
     public function __construct(
         DocumentMetadataCollector $documentMetadataCollector,
         IndexManagerRegistry $indexManagerRegistry,
-        DocumentConverter $documentConverter
-    ) {
-    
+        DocumentConverter $documentConverter)
+    {
         $this->documentMetadataCollector = $documentMetadataCollector;
         $this->indexManagerRegistry = $indexManagerRegistry;
         $this->documentConverter = $documentConverter;
@@ -103,7 +107,7 @@ class Finder
      * @param array    $searchBody              The body of the search request
      * @param int      $resultsType             Bitmask value determining how the results are returned
      * @param array    $additionalRequestParams Additional params to pass to the ES client's search() method
-     * @param int      $totalHits               The total hits of the query response
+     * @param int      $totalHits               (out param) The total hits of the query response
      * @return mixed
      */
     public function find(array $documentClasses, array $searchBody, $resultsType = self::RESULTS_OBJECT, array $additionalRequestParams = [], &$totalHits = null)
@@ -120,8 +124,23 @@ class Finder
             'body' => $searchBody,
         ]);
 
+        // Add any additional params specified, without overwriting the current ones
         if (!empty($additionalRequestParams)) {
             $params = array_merge($additionalRequestParams, $params);
+        }
+
+        // Execute a Scan(&Scroll) request
+        if (($resultsType & self::BITMASK_RESULT_ADAPTERS) === self::ADAPTER_SCANSCROLL) {
+            $params['search_type'] = 'scan';
+            // Set default scroll and size, unless custom ones were provided through $additionalRequestParams
+            $params = array_merge([
+                'scroll' => self::SCROLL_TIME,
+                'size' => self::SCAN_CHUNK_SIZE,
+            ], $params);
+
+            $scrollId = $client->search($params)['_scroll_id'];
+
+            return new ScanScrollAdapter($this, $documentClasses, $scrollId, $resultsType);
         }
 
         $raw = $client->search($params);
@@ -129,6 +148,35 @@ class Finder
         $totalHits = $raw['hits']['total'];
 
         return $this->parseResult($raw, $resultsType, $documentClasses);
+    }
+
+    /**
+     * Executes a scroll request, based on a given scrollId.
+     * Returns false when there are no more hits
+     *
+     * @param array  $documentClasses The ES entities involved in the scrolled search
+     * @param string $scrollId        (in/out param) The Scroll ID as returned from the Scan request or a previous Scroll request
+     * @param string $scrollTime      The time to keep the scroll window open
+     * @param int    $resultsType     Bitmask value determining how the results are returned
+     * @param int    $totalHits       (out param) The total hits of the query response
+     * @return mixed
+     */
+    public function scroll(array $documentClasses, &$scrollId, $scrollTime = self::SCROLL_TIME, $resultsType = self::RESULTS_OBJECT, &$totalHits = null)
+    {
+        $client = $this->getConnection($documentClasses)->getClient();
+
+        $params = [
+            'scroll_id' => $scrollId,
+            'scroll' => $scrollTime
+        ];
+
+        $raw = $client->scroll($params);
+
+        $scrollId = $raw['_scroll_id'];
+
+        $totalHits = $raw['hits']['total'];
+
+        return (count($raw['hits']['hits']) > 0) ? $this->parseResult($raw, $resultsType, $documentClasses) : false;
     }
 
     /**

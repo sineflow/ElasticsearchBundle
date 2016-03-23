@@ -79,7 +79,6 @@ class ElasticsearchProvider extends AbstractProvider
                 )
             );
             if (count($response['hits']['hits']) > 0) {
-                // Bulk request for save batch
                 foreach ($response['hits']['hits'] as $hit) {
                     $doc = $hit['_source'];
                     $doc['_id'] = $hit['_id'];
