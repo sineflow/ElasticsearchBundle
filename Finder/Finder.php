@@ -8,7 +8,7 @@ use Sineflow\ElasticsearchBundle\Finder\Adapter\ScanScrollAdapter;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
-use Sineflow\ElasticsearchBundle\Paginator\KnpPaginatorAdapter;
+use Sineflow\ElasticsearchBundle\Finder\Adapter\KnpPaginatorAdapter;
 use Sineflow\ElasticsearchBundle\Result\DocumentConverter;
 use Sineflow\ElasticsearchBundle\Result\DocumentIterator;
 

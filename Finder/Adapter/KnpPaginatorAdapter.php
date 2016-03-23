@@ -1,6 +1,6 @@
 <?php
 
-namespace Sineflow\ElasticsearchBundle\Paginator;
+namespace Sineflow\ElasticsearchBundle\Finder\Adapter;
 
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 

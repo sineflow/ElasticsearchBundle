@@ -92,3 +92,30 @@ return $this->render('template.twig', array(
     'pagination' => $pagination,
 ));
 ```
+
+## Using scan&scroll to retrieve documents
+
+When you need to quickly retrieve a lot of documents fast and you don't care about the order you're getting them in, using [scan and scroll](https://www.elastic.co/guide/en/elasticsearch/guide/1.x/scan-scroll.html) is the most efficient way to go.
+You just need to pass the **Finder::ADAPTER_SCANSCROLL** flag to the search results type, regardless of whether you are using the find() method of the **sfes.finder** service, or a **Repository** instance.
+That will give you a ScanScrollAdapter object, instead of actual results.
+Then you can use the adapter's **getNextScrollResults()** method to get the next scroll results until there are no more.
+
+
+```
+$finder = $this->get('sfes.finder');
+$scanScrollAdapter = $finder->find(
+    ['AppBundle:Product'], 
+    $searchQuery, 
+    Finder::RESULTS_RAW | Finder::ADAPTER_SCANSCROLL, 
+    ['size' => 1000, 'scroll' => '5m']
+);
+
+while (false !== ($matches = $scanScrollAdapter->getNextScrollResults())) {
+    foreach ($matches['hits']['hits'] as $rawDoc) {
+        // Do stuff with the document 
+        // ...
+    }
+}
+```
+> You can optionally specify the chunk `size` and `scroll` time as additional params to the find() method. The defaults are `500` and `2m` 
+> **Tip:** The **Finder::ADAPTER_SCANSCROLL** works with any type of results, but you would usually want speed when you use it, so the most efficient way would be to get the raw results. 

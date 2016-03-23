@@ -4,7 +4,7 @@ namespace Sineflow\ElasticsearchBundle\Subscriber;
 
 use Knp\Component\Pager\Event\ItemsEvent;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
-use Sineflow\ElasticsearchBundle\Paginator\KnpPaginatorAdapter;
+use Sineflow\ElasticsearchBundle\Finder\Adapter\KnpPaginatorAdapter;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
