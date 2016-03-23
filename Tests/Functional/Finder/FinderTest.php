@@ -3,7 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Finder;
 
 use Sineflow\ElasticsearchBundle\Finder\Finder;
-use Sineflow\ElasticsearchBundle\Paginator\KnpPaginatorAdapter;
+use Sineflow\ElasticsearchBundle\Finder\Adapter\KnpPaginatorAdapter;
 use Sineflow\ElasticsearchBundle\Result\DocumentIterator;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product;

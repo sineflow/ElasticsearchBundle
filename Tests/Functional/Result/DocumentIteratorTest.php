@@ -5,7 +5,10 @@ namespace Sineflow\ElasticsearchBundle\Tests\Functional\Result;
 use Sineflow\ElasticsearchBundle\Document\Repository\Repository;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Result\DocumentIterator;
+use Sineflow\ElasticsearchBundle\Result\ObjectIterator;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
+use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\ObjCategory;
+use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product;
 
 /**
  * Class DocumentIteratorTest
@@ -79,38 +82,30 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
         $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
 
         /** @var DocumentIterator $iterator */
-        $iterator = $repo->find(['query' => ['match_all' => []], 'size' => 3, 'sort' => ['_id' => ['order' =>'asc']]], Finder::RESULTS_OBJECT);
+        $iterator = $repo->find(['query' => ['match_all' => []], 'size' => 3, 'sort' => ['_uid' => ['order' =>'asc']]], Finder::RESULTS_OBJECT);
 
-        $this->assertInstanceOf('Sineflow\ElasticsearchBundle\Result\DocumentIterator', $iterator);
+        $this->assertInstanceOf(DocumentIterator::class, $iterator);
 
         $this->assertCount(3, $iterator);
 
         $this->assertEquals(4, $iterator->getTotalCount());
 
         $iteration = 0;
+        /** @var Product $document */
         foreach ($iterator as $document) {
             $categories = $document->relatedCategories;
 
             if ($iteration === 0) {
-                $this->assertInstanceOf(
-                    'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\ObjCategory',
-                    $document->category
-                );
+                $this->assertInstanceOf(ObjCategory::class, $document->category);
             } else {
                 $this->assertNull($document->category);
             }
 
-            $this->assertInstanceOf(
-                'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product',
-                $document
-            );
-            $this->assertInstanceOf('Sineflow\ElasticsearchBundle\Result\ObjectIterator', $categories);
+            $this->assertInstanceOf(Product::class, $document);
+            $this->assertInstanceOf(ObjectIterator::class, $categories);
 
             foreach ($categories as $category) {
-                $this->assertInstanceOf(
-                    'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\ObjCategory',
-                    $category
-                );
+                $this->assertInstanceOf(ObjCategory::class, $category);
             }
 
             $iteration++;
