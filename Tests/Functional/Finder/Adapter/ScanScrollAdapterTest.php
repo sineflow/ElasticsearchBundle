@@ -69,7 +69,8 @@ class ScanScrollAdapterTest extends AbstractElasticsearchTestCase
 
         $this->assertInstanceOf(ScanScrollAdapter::class, $scanScrollAdapter);
 
-        $i = 0; $scrolls = 0;
+        $i = 0;
+        $scrolls = 0;
         while (false !== ($matches = $scanScrollAdapter->getNextScrollResults())) {
             foreach ($matches as $doc) {
                 $this->assertInstanceOf(Product::class, $doc);
@@ -88,7 +89,9 @@ class ScanScrollAdapterTest extends AbstractElasticsearchTestCase
 
         $this->assertInstanceOf(ScanScrollAdapter::class, $scanScrollAdapter);
 
-        $i = 0; $scrolls = 0; $prevId = null;
+        $i = 0;
+        $scrolls = 0;
+        $prevId = null;
         while (false !== ($matches = $scanScrollAdapter->getNextScrollResults())) {
             foreach ($matches as $id => $doc) {
                 $this->assertInternalType('array', $doc);
@@ -110,7 +113,9 @@ class ScanScrollAdapterTest extends AbstractElasticsearchTestCase
 
         $this->assertInstanceOf(ScanScrollAdapter::class, $scanScrollAdapter);
 
-        $i = 0; $scrolls = 0; $prevId = null;
+        $i = 0;
+        $scrolls = 0;
+        $prevId = null;
         while (false !== ($matches = $scanScrollAdapter->getNextScrollResults())) {
             $this->assertArrayHasKey('hits', $matches, 'Raw results returned');
             foreach ($matches['hits']['hits'] as $doc) {
@@ -126,5 +131,4 @@ class ScanScrollAdapterTest extends AbstractElasticsearchTestCase
         $this->assertEquals(6, $scanScrollAdapter->getTotalHits(), 'Total hits returned by scroll');
         $this->assertEquals(3, $scrolls, 'Total number of scrolls');
     }
-
 }
