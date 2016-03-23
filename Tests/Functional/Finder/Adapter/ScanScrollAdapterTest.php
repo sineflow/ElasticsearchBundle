@@ -80,7 +80,9 @@ class ScanScrollAdapterTest extends AbstractElasticsearchTestCase
         }
         $this->assertEquals(6, $i, 'Total matching documents iterated');
         $this->assertEquals(6, $scanScrollAdapter->getTotalHits(), 'Total hits returned by scroll');
-        $this->assertEquals(3, $scrolls, 'Total number of scrolls');
+        // The number of documents in each scroll should be 4 ([the size given to find()] * [number of shards for the index])
+        // So 6 matching results should be retrieved in 2 scrolls
+        $this->assertEquals(2, $scrolls, 'Total number of scrolls');
 
         // Test array results
 
@@ -104,7 +106,7 @@ class ScanScrollAdapterTest extends AbstractElasticsearchTestCase
         }
         $this->assertEquals(6, $i, 'Total matching documents iterated');
         $this->assertEquals(6, $scanScrollAdapter->getTotalHits(), 'Total hits returned by scroll');
-        $this->assertEquals(3, $scrolls, 'Total number of scrolls');
+        $this->assertEquals(2, $scrolls, 'Total number of scrolls');
 
         // Test raw results
 
@@ -129,6 +131,6 @@ class ScanScrollAdapterTest extends AbstractElasticsearchTestCase
         }
         $this->assertEquals(6, $i, 'Total matching documents iterated');
         $this->assertEquals(6, $scanScrollAdapter->getTotalHits(), 'Total hits returned by scroll');
-        $this->assertEquals(3, $scrolls, 'Total number of scrolls');
+        $this->assertEquals(2, $scrolls, 'Total number of scrolls');
     }
 }

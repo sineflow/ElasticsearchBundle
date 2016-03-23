@@ -34,6 +34,7 @@ sineflow_elasticsearch:
             use_aliases: false
             name: sineflow-esb-test-bar
             settings:
+                number_of_shards: 2
                 analysis:
                     analyzer:
                         default_analyzer:
