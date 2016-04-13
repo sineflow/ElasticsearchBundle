@@ -18,6 +18,12 @@ class ObjCategory implements ObjectInterface
     public $withoutAnnotation;
 
     /**
+     * @var int
+     * @ES\Property(type="integer", name="id")
+     */
+    public $id;
+
+    /**
      * @var string
      * @ES\Property(type="string", name="title", options={"index"="not_analyzed"})
      */

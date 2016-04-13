@@ -79,6 +79,10 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                             'type' => 'object',
                             'properties' =>
                                 [
+                                    'id' =>
+                                        [
+                                            'type' => 'integer',
+                                        ],
                                     'title' =>
                                         [
                                             'index' => 'not_analyzed',
@@ -102,6 +106,10 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                             'type' => 'object',
                             'properties' =>
                                 [
+                                    'id' =>
+                                        [
+                                            'type' => 'integer',
+                                        ],
                                     'title' =>
                                         [
                                             'index' => 'not_analyzed',
@@ -199,6 +207,13 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                             'multiple' => null,
                             'propertiesMetadata' =>
                                 [
+                                    'id' =>
+                                        [
+                                            'propertyName' => 'id',
+                                            'type' => 'integer',
+                                            'multilanguage' => null,
+                                            'propertyAccess' => 1,
+                                        ],
                                     'title' =>
                                         [
                                             'propertyName' => 'title',
@@ -237,6 +252,13 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                             'multiple' => true,
                             'propertiesMetadata' =>
                                 [
+                                    'id' =>
+                                        [
+                                            'propertyName' => 'id',
+                                            'type' => 'integer',
+                                            'multilanguage' => null,
+                                            'propertyAccess' => 1,
+                                        ],
                                     'title' =>
                                         [
                                             'propertyName' => 'title',
