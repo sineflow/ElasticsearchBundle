@@ -113,7 +113,6 @@ class DocumentConverter
                         $objectValue->setValue($value, $language);
                     }
                 }
-
             } elseif (in_array($propertyMetadata['type'], ['object', 'nested'])) {
                 if ($propertyMetadata['multiple']) {
                     $objectValue = new ObjectIterator($this, $array[$esField], $propertyMetadata);
@@ -124,7 +123,6 @@ class DocumentConverter
                         $propertyMetadata['propertiesMetadata']
                     );
                 }
-
             } else {
                 $objectValue = $array[$esField];
             }
@@ -181,12 +179,10 @@ class DocumentConverter
                         $new = $this->convertToArray($value, $propertyMetadata['propertiesMetadata']);
                     }
                     $array[$name] = $new;
-
                 } elseif ($value instanceof MLProperty) {
                     foreach ($value->getValues() as $language => $langValue) {
                         $array[$name . $this->languageSeparator . $language] = $langValue;
                     }
-
                 } else {
                     $array[$name] = $value;
                 }

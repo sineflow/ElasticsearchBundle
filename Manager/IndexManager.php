@@ -332,7 +332,6 @@ class IndexManager
                 ],
             ];
             $this->getConnection()->getClient()->indices()->updateAliases($setAliasParams);
-
         } else {
             // Make sure the index name does not exist already as a physical index or alias
             if ($this->getConnection()->existsIndexOrAlias(array('index' => $this->getBaseIndexName()))) {
@@ -488,7 +487,6 @@ class IndexManager
                 $this->getConnection()->getClient()->indices()->delete(['index' => $oldIndex]);
                 $this->getConnection()->getLogger()->notice(sprintf('Deleted old index %s', $oldIndex));
             }
-
         } catch (Exception $e) {
             // Bulk exceptions are logged in the connection manager, so only log other exceptions here
             if (!($e instanceof BulkRequestException)) {

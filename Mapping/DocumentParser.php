@@ -347,7 +347,6 @@ class DocumentParser
             } else {
                 $mapping[$propertyAnnotation->name] = $this->getPropertyMapping($propertyAnnotation, null, $indexAnalyzers);
             }
-
         }
 
         return $mapping;
