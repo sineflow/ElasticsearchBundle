@@ -29,10 +29,7 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
         foreach (range(1, $this->getNumberOfRetries()) as $try) {
             try {
                 return parent::runTest();
-            } catch (\Exception $e) {
-                if (!($e instanceof ElasticsearchException)) {
-                    throw $e;
-                }
+            } catch (ElasticsearchException $e) {
                 // If error was from elasticsearch re-setup tests and retry.
                 if ($try !== $this->getNumberOfRetries()) {
                     $this->tearDown();
