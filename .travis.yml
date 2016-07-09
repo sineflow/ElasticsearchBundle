@@ -12,16 +12,21 @@ matrix:
   allow_failures:
     - php: hhvm
   include:
-    - php: 5.6
-      env: SYMFONY_VERSION="~2.7" ES_VERSION="1.6.2"
+#    - php: 5.6
+#      env: SYMFONY_VERSION="~2.7" ES_VERSION="1.6.2"
+#    - php: 7.0
+#      env: SYMFONY_VERSION="~3.0" ES_VERSION="1.7.4"
+#    - php: 7.0
+#      env: SYMFONY_VERSION="~3.0" ES_VERSION="1.6.2"
+#    - php: 7.0
+#      env: SYMFONY_VERSION="~3.0" ES_VERSION="2.1.1"
+#    - php: 7.0
+#      env: SYMFONY_VERSION="~3.0" ES_VERSION="2.2.2"
+
     - php: 7.0
-      env: SYMFONY_VERSION="~3.0" ES_VERSION="1.7.4"
+      env: SYMFONY_VERSION="~3.0" ES_VERSION="2.1.2"
     - php: 7.0
-      env: SYMFONY_VERSION="~3.0" ES_VERSION="1.6.2"
-    - php: 7.0
-      env: SYMFONY_VERSION="~3.0" ES_VERSION="2.1.1"
-    - php: 7.0
-      env: SYMFONY_VERSION="~3.0" ES_VERSION="2.2.2"
+      env: SYMFONY_VERSION="~3.0" ES_VERSION="2.2.0"
 
 install:
   - composer require --no-update symfony/symfony:${SYMFONY_VERSION}
