@@ -20,6 +20,8 @@ matrix:
       env: SYMFONY_VERSION="~3.0" ES_VERSION="1.6.2"
     - php: 7.0
       env: SYMFONY_VERSION="2.7.*" ES_VERSION="2.1.1"
+    - php: 7.0
+      env: SYMFONY_VERSION="2.7.*" ES_VERSION="2.3.2"
 
 install:
   - composer require --no-update symfony/symfony:${SYMFONY_VERSION}
