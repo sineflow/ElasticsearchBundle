@@ -26,6 +26,11 @@ class DocumentParser
     /**
      * @const string
      */
+    const META_ID_ANNOTATION = 'Sineflow\ElasticsearchBundle\Annotation\Id';
+
+    /**
+     * @const string
+     */
     const DOCUMENT_ANNOTATION = 'Sineflow\ElasticsearchBundle\Annotation\Document';
 
     /**
@@ -132,6 +137,109 @@ class DocumentParser
     }
 
     /**
+     * Finds properties' metadata for every property used in document or inner/nested object
+     *
+     * @param \ReflectionClass $documentReflection
+     *
+     * @return array
+     */
+    public function getPropertiesMetadata(\ReflectionClass $documentReflection)
+    {
+        $className = $documentReflection->getName();
+        if (array_key_exists($className, $this->propertiesMetadata)) {
+            return $this->propertiesMetadata[$className];
+        }
+
+        $propertyMetadata = [];
+
+        /** @var \ReflectionProperty $property */
+        foreach ($this->getDocumentPropertiesReflection($documentReflection) as $propertyName => $property) {
+            $propertyAnnotation = $this->getPropertyAnnotationData($property);
+            $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, self::META_ID_ANNOTATION);
+            $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, self::META_SCORE_ANNOTATION);
+
+            // Ignore class properties without any recognized annotation
+            if ($propertyAnnotation === null) {
+                continue;
+            }
+
+            switch (get_class($propertyAnnotation)) {
+                case self::PROPERTY_ANNOTATION:
+                    $propertyMetadata[$propertyAnnotation->name] = [
+                        'propertyName' => $propertyName,
+                        'type' => $propertyAnnotation->type,
+                        'multilanguage' => $propertyAnnotation->multilanguage,
+                    ];
+
+                    // If property is a (nested) object
+                    if (in_array($propertyAnnotation->type, ['object', 'nested'])) {
+                        if (!$propertyAnnotation->objectName) {
+                            throw new \InvalidArgumentException(
+                                sprintf('Property "%s" in %s is missing "objectName" setting', $propertyName, $className)
+                            );
+                        }
+                        $child = new \ReflectionClass($this->documentLocator->resolveClassName($propertyAnnotation->objectName));
+                        $propertyMetadata[$propertyAnnotation->name] = array_merge(
+                            $propertyMetadata[$propertyAnnotation->name],
+                            [
+                                'multiple' => $propertyAnnotation->multiple,
+                                'propertiesMetadata' => $this->getPropertiesMetadata($child),
+                                'className' => $child->getName(),
+                            ]
+                        );
+                    }
+                    break;
+
+                case self::META_ID_ANNOTATION:
+                    $propertyAnnotation->name = '_id';
+                    $propertyAnnotation->type = 'string';
+                    $propertyMetadata[$propertyAnnotation->name] = [
+                        'propertyName' => $propertyName,
+                        'type' => $propertyAnnotation->type,
+                    ];
+                    break;
+
+                case self::META_SCORE_ANNOTATION:
+                    $propertyAnnotation->name = '_score';
+                    $propertyAnnotation->type = 'float';
+                    $propertyMetadata[$propertyAnnotation->name] = [
+                        'propertyName' => $propertyName,
+                        'type' => $propertyAnnotation->type,
+                    ];
+                    break;
+            }
+
+            if ($property->isPublic()) {
+                $propertyAccess = DocumentMetadata::PROPERTY_ACCESS_PUBLIC;
+            } else {
+                $propertyAccess = DocumentMetadata::PROPERTY_ACCESS_PRIVATE;
+                $camelCaseName = ucfirst(Caser::camel($propertyName));
+                $setterMethod = 'set'.$camelCaseName;
+                $getterMethod = 'get'.$camelCaseName;
+                // Allow issers as getters for boolean properties
+                if ($propertyAnnotation->type === 'boolean' && !$documentReflection->hasMethod($getterMethod)) {
+                    $getterMethod = 'is'.$camelCaseName;
+                }
+                if ($documentReflection->hasMethod($getterMethod) && $documentReflection->hasMethod($setterMethod)) {
+                    $propertyMetadata[$propertyAnnotation->name]['methods'] = [
+                        'getter' => $getterMethod,
+                        'setter' => $setterMethod,
+                    ];
+                } else {
+                    $message = sprintf('Property "%s" either needs to be public or %s() and %s() methods must be defined', $propertyName, $getterMethod, $setterMethod);
+                    throw new \LogicException($message);
+                }
+            }
+
+            $propertyMetadata[$propertyAnnotation->name]['propertyAccess'] = $propertyAccess;
+        }
+
+        $this->propertiesMetadata[$className] = $propertyMetadata;
+
+        return $this->propertiesMetadata[$className];
+    }
+
+    /**
      * Returns document's elasticsearch type.
      *
      * @param \ReflectionClass $documentReflection
@@ -172,92 +280,6 @@ class DocumentParser
     }
 
     /**
-     * Finds properties' metadata for every property used in document or inner/nested object
-     *
-     * @param \ReflectionClass $documentReflection
-     *
-     * @return array
-     */
-    public function getPropertiesMetadata(\ReflectionClass $documentReflection)
-    {
-        $className = $documentReflection->getName();
-        if (array_key_exists($className, $this->propertiesMetadata)) {
-            return $this->propertiesMetadata[$className];
-        }
-
-        $propertyMetadata = [];
-
-        /** @var \ReflectionProperty $property */
-        foreach ($this->getDocumentPropertiesReflection($documentReflection) as $propertyName => $property) {
-            $propertyAnnotation = $this->getPropertyAnnotationData($property);
-            $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, self::META_SCORE_ANNOTATION);
-
-            if ($propertyAnnotation !== null) {
-                if (get_class($propertyAnnotation) === self::PROPERTY_ANNOTATION) {
-                    $propertyMetadata[$propertyAnnotation->name] = [
-                        'propertyName' => $propertyName,
-                        'type' => $propertyAnnotation->type,
-                        'multilanguage' => $propertyAnnotation->multilanguage,
-                    ];
-
-                    // If property is a (nested) object
-                    if (in_array($propertyAnnotation->type, ['object', 'nested'])) {
-                        if (!$propertyAnnotation->objectName) {
-                            throw new \InvalidArgumentException(
-                                sprintf('Property "%s" in %s is missing "objectName" setting', $propertyName, $className)
-                            );
-                        }
-                        $child = new \ReflectionClass($this->documentLocator->resolveClassName($propertyAnnotation->objectName));
-                        $propertyMetadata[$propertyAnnotation->name] = array_merge(
-                            $propertyMetadata[$propertyAnnotation->name],
-                            [
-                                'multiple' => $propertyAnnotation->multiple,
-                                'propertiesMetadata' => $this->getPropertiesMetadata($child),
-                                'className' => $child->getName(),
-                            ]
-                        );
-                    }
-                } elseif (get_class($propertyAnnotation) === self::META_SCORE_ANNOTATION) {
-                    $propertyAnnotation->name = '_score';
-                    $propertyAnnotation->type = 'float';
-                    $propertyMetadata[$propertyAnnotation->name] = [
-                        'propertyName' => $propertyName,
-                        'type' => $propertyAnnotation->type,
-                    ];
-                }
-
-                if ($property->isPublic()) {
-                    $propertyAccess = DocumentMetadata::PROPERTY_ACCESS_PUBLIC;
-                } else {
-                    $propertyAccess = DocumentMetadata::PROPERTY_ACCESS_PRIVATE;
-                    $camelCaseName = ucfirst(Caser::camel($propertyName));
-                    $setterMethod = 'set'.$camelCaseName;
-                    $getterMethod = 'get'.$camelCaseName;
-                    // Allow issers as getters for boolean properties
-                    if ($propertyAnnotation->type === 'boolean' && !$documentReflection->hasMethod($getterMethod)) {
-                        $getterMethod = 'is'.$camelCaseName;
-                    }
-                    if ($documentReflection->hasMethod($getterMethod) && $documentReflection->hasMethod($setterMethod)) {
-                        $propertyMetadata[$propertyAnnotation->name]['methods'] = [
-                            'getter' => $getterMethod,
-                            'setter' => $setterMethod,
-                        ];
-                    } else {
-                        $message = sprintf('Property "%s" either needs to be public or %s() and %s() methods must be defined', $propertyName, $getterMethod, $setterMethod);
-                        throw new \LogicException($message);
-                    }
-                }
-
-                $propertyMetadata[$propertyAnnotation->name]['propertyAccess'] = $propertyAccess;
-            }
-        }
-
-        $this->propertiesMetadata[$className] = $propertyMetadata;
-
-        return $this->propertiesMetadata[$className];
-    }
-
-    /**
      * Registers annotations to registry so that it could be used by reader.
      */
     private function registerAnnotations()
@@ -266,11 +288,12 @@ class DocumentParser
             'Document',
             'Property',
             'Object',
+            'Id',
             'Score',
         ];
 
         foreach ($annotations as $annotation) {
-            AnnotationRegistry::registerFile(__DIR__ . "/../Annotation/{$annotation}.php");
+            AnnotationRegistry::registerFile(__DIR__."/../Annotation/{$annotation}.php");
         }
     }
 
@@ -336,13 +359,13 @@ class DocumentParser
                     throw new \InvalidArgumentException('There must be a service tagged as "sfes.language_provider" in order to use multilanguage properties');
                 }
                 foreach ($this->languageProvider->getLanguages() as $language) {
-                    $mapping[$propertyAnnotation->name . $this->languageSeparator . $language] = $this->getPropertyMapping($propertyAnnotation, $language, $indexAnalyzers);
+                    $mapping[$propertyAnnotation->name.$this->languageSeparator.$language] = $this->getPropertyMapping($propertyAnnotation, $language, $indexAnalyzers);
                 }
                 // TODO: The application should decide whether it wants to use a default field at all and set its mapping on a global base (or per property?)
                 // The custom mapping from the application should be set here, using perhaps some kind of decorator
-                $mapping[$propertyAnnotation->name . $this->languageSeparator . Property::DEFAULT_LANG_SUFFIX] = [
+                $mapping[$propertyAnnotation->name.$this->languageSeparator.Property::DEFAULT_LANG_SUFFIX] = [
                     'type' => 'string',
-                    'index' => 'not_analyzed'
+                    'index' => 'not_analyzed',
                 ];
             } else {
                 $mapping[$propertyAnnotation->name] = $this->getPropertyMapping($propertyAnnotation, null, $indexAnalyzers);
@@ -356,7 +379,7 @@ class DocumentParser
     {
         $propertyMapping = $propertyAnnotation->dump([
             'language' => $language,
-            'indexAnalyzers' => $indexAnalyzers
+            'indexAnalyzers' => $indexAnalyzers,
         ]);
 
         // Object.

@@ -59,18 +59,6 @@ class DocumentMetadataCollectorTest extends \PHPUnit_Framework_TestCase
                                 'null_value' => false,
                                 'type' => 'boolean',
                             ),
-                            '_id' =>
-                            array (
-                                'type' => 'string',
-                            ),
-                            '_score' =>
-                            array (
-                                'type' => 'float',
-                            ),
-                            '_parent' =>
-                            array (
-                                'type' => 'string',
-                            ),
                     ),
                     'fields' =>
                     array (
@@ -92,21 +80,12 @@ class DocumentMetadataCollectorTest extends \PHPUnit_Framework_TestCase
                             array (
                                 'propertyName' => 'id',
                                 'type' => 'string',
-                                'multilanguage' => null,
                                 'propertyAccess' => 1,
                             ),
                             '_score' =>
                             array (
                                 'propertyName' => 'score',
                                 'type' => 'float',
-                                'multilanguage' => null,
-                                'propertyAccess' => 1,
-                            ),
-                            '_parent' =>
-                            array (
-                                'propertyName' => 'parent',
-                                'type' => 'string',
-                                'multilanguage' => null,
                                 'propertyAccess' => 1,
                             ),
                     ),

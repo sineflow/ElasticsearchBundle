@@ -248,12 +248,12 @@ class IndexManager
      */
     private function getUniqueIndexName()
     {
-        $indexName = $baseName = $this->getBaseIndexName() . '_' . date('YmdHis');
+        $indexName = $baseName = $this->getBaseIndexName().'_'.date('YmdHis');
 
         $i = 1;
         // Keep trying other names until there is no such existing index or alias
         while ($this->getConnection()->existsIndexOrAlias(array('index' => $indexName))) {
-            $indexName = $baseName . '_' . $i;
+            $indexName = $baseName.'_'.$i;
             $i++;
         }
 
@@ -319,15 +319,15 @@ class IndexManager
                         [
                             'add' => [
                                 'index' => $settings['index'],
-                                'alias' => $this->readAlias
+                                'alias' => $this->readAlias,
                             ],
                         ],
                         [
                             'add' => [
                                 'index' => $settings['index'],
-                                'alias' => $this->writeAlias
+                                'alias' => $this->writeAlias,
                             ],
-                        ]
+                        ],
                     ],
                 ],
             ];
@@ -410,9 +410,9 @@ class IndexManager
                         [
                             'add' => [
                                 'index' => $newIndex,
-                                'alias' => $this->writeAlias
+                                'alias' => $this->writeAlias,
                             ],
-                        ]
+                        ],
                     ],
                 ],
             ];
@@ -462,21 +462,21 @@ class IndexManager
                         [
                             'add' => [
                                 'index' => $newIndex,
-                                'alias' => $this->readAlias
+                                'alias' => $this->readAlias,
                             ],
                         ],
                         [
                             'remove' => [
                                 'index' => $oldIndex,
-                                'alias' => $this->readAlias
+                                'alias' => $this->readAlias,
                             ],
                         ],
                         [
                             'remove' => [
                                 'index' => $oldIndex,
-                                'alias' => $this->writeAlias
+                                'alias' => $this->writeAlias,
                             ],
-                        ]
+                        ],
                     ],
                 ],
             ];

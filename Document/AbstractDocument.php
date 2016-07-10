@@ -12,16 +12,9 @@ abstract class AbstractDocument implements DocumentInterface
     /**
      * @var string
      *
-     * @ES\Property(type="string", name="_id")
+     * @ES\Id
      */
     public $id;
-
-    /**
-     * @var string
-     *
-     * @ES\Property(type="string", name="_parent")
-     */
-    public $parent;
 
     /**
      * @var float

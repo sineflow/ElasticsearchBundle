@@ -170,14 +170,6 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                 ],
                             'type' => 'string',
                         ],
-                    '_id' =>
-                        [
-                            'type' => 'string',
-                        ],
-                    '_parent' =>
-                        [
-                            'type' => 'string',
-                        ],
                 ],
             'fields' =>
                 [
@@ -335,20 +327,12 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                         [
                             'propertyName' => 'id',
                             'type' => 'string',
-                            'multilanguage' => null,
                             'propertyAccess' => 1,
                         ],
                     '_score' =>
                         [
                             'propertyName' => 'score',
                             'type' => 'float',
-                            'propertyAccess' => 1,
-                        ],
-                    '_parent' =>
-                        [
-                            'propertyName' => 'parent',
-                            'type' => 'string',
-                            'multilanguage' => null,
                             'propertyAccess' => 1,
                         ],
                 ],
