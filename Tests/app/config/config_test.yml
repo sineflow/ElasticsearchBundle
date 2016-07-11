@@ -29,6 +29,13 @@ sineflow_elasticsearch:
                 - AcmeFooBundle:Customer
                 - AcmeFooBundle:Order
 
+        qanda:
+            extends: _base
+            name: sineflow-esb-test-qanda
+            types:
+                - AcmeFooBundle:Question
+                - AcmeFooBundle:Answer
+
         bar:
             connection: default
             use_aliases: false

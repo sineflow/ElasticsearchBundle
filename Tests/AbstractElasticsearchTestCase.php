@@ -101,6 +101,7 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
                 $indexManager->getConnection()->refresh();
             } catch (BulkRequestException $e) {
                 print_r($e->getBulkResponseItems());
+                throw $e;
             }
         }
     }

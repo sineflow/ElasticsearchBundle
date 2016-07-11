@@ -44,6 +44,7 @@ repositoryClass="AppBundle\Document\Repository\ProductRepository"
 ```
 parent="AppBundle:ParentDoc"
 ```
+This should be used in conjunction with the <a href="#parentid">@ES\ParentId</a> meta annotation
 
 - `options` Allows to specify any type option supported by Elasticsearch, such as [\_all](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-all-field.html), [dynamic_templates](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-templates.html), [dynamic_date_formats](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-field-mapping.html#date-detection), etc. 
 
@@ -101,10 +102,76 @@ When you have a property definition like that, there will not be a field `name` 
 
 ### Meta property annotations
 
+#### @ES\Id
+
+If you need to have access to the `_id` property of an Elasticsearch document you need to have a class property with this annotation.
+This way, you can specify the `_id` when you create or update a document and you will also have that value populated in your object when you retrieve an existing document.
+
+```php
+use Sineflow\ElasticsearchBundle\Annotation as ES;
+
+/**
+ * @ES\Document(type="product")
+ */
+class Product
+{
+    /**
+     * @var string
+     *
+     * @ES\Id
+     */
+    public $id;
+}
+```
+> Such property is already defined in `AbstractDocument`, so you can just extend it.
+
 #### @ES\Score
 
 You should have a property with this annotation, if you wish the matching `_score` of the document to be populated in it when searching.
-Such property is already defined in `AbstractDocument`, so you don't need to do anything if you extend it.
+
+```php
+use Sineflow\ElasticsearchBundle\Annotation as ES;
+
+/**
+ * @ES\Document(type="product")
+ */
+class Product
+{
+    /**
+     * @var float
+     *
+     * @ES\Score
+     */
+    public $score;
+}
+```
+> Such property is already defined in `AbstractDocument`, so you can just extend it.
+
+#### <a name=parentid></a>@ES\ParentId
+
+When you need to have a parent-child relation between two types in your index, you'd need access to the `_parent` meta field of the document.
+To do that, you will need a class property with that annotation that can be used for both setting and getting the `_parent` value.
+
+```php
+use Sineflow\ElasticsearchBundle\Annotation as ES;
+
+/**
+ * @ES\Document(
+ *     type="answers",
+ *     parent="AppBundle:Question"
+ * );
+ */
+class Answer
+{
+    /**
+     * @var string
+     *
+     * @ES\ParentId
+     */
+    public $parent;
+}
+```
+> Do not forget to also set the `parent` property of the `@ES\Document` annotation to specify the parent entity for that type. 
 
 ## Object class annotation
 

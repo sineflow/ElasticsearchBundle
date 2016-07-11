@@ -71,7 +71,7 @@ class DocumentConverter
         }
 
         // Add special fields to data
-        foreach (['_id', '_score'] as $specialField) {
+        foreach (['_id', '_parent', '_score'] as $specialField) {
             if (isset($rawData[$specialField])) {
                 $data[$specialField] = $rawData[$specialField];
             }

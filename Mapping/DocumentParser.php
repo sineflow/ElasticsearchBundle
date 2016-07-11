@@ -21,12 +21,17 @@ class DocumentParser
     /**
      * @const string
      */
-    const META_SCORE_ANNOTATION = 'Sineflow\ElasticsearchBundle\Annotation\Score';
+    const META_ID_ANNOTATION = 'Sineflow\ElasticsearchBundle\Annotation\Id';
 
     /**
      * @const string
      */
-    const META_ID_ANNOTATION = 'Sineflow\ElasticsearchBundle\Annotation\Id';
+    const META_PARENT_ID_ANNOTATION = 'Sineflow\ElasticsearchBundle\Annotation\ParentId';
+
+    /**
+     * @const string
+     */
+    const META_SCORE_ANNOTATION = 'Sineflow\ElasticsearchBundle\Annotation\Score';
 
     /**
      * @const string
@@ -156,6 +161,7 @@ class DocumentParser
         foreach ($this->getDocumentPropertiesReflection($documentReflection) as $propertyName => $property) {
             $propertyAnnotation = $this->getPropertyAnnotationData($property);
             $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, self::META_ID_ANNOTATION);
+            $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, self::META_PARENT_ID_ANNOTATION);
             $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, self::META_SCORE_ANNOTATION);
 
             // Ignore class properties without any recognized annotation
@@ -192,6 +198,15 @@ class DocumentParser
 
                 case self::META_ID_ANNOTATION:
                     $propertyAnnotation->name = '_id';
+                    $propertyAnnotation->type = 'string';
+                    $propertyMetadata[$propertyAnnotation->name] = [
+                        'propertyName' => $propertyName,
+                        'type' => $propertyAnnotation->type,
+                    ];
+                    break;
+
+                case self::META_PARENT_ID_ANNOTATION:
+                    $propertyAnnotation->name = '_parent';
                     $propertyAnnotation->type = 'string';
                     $propertyMetadata[$propertyAnnotation->name] = [
                         'propertyName' => $propertyName,
@@ -289,6 +304,7 @@ class DocumentParser
             'Property',
             'Object',
             'Id',
+            'ParentId',
             'Score',
         ];
 
