@@ -65,6 +65,7 @@ class MetaFieldsTest extends AbstractElasticsearchTestCase
     public function testCreateChildDocument()
     {
         $im = $this->getIndexManager('qanda');
+        $esVersion = $im->getConnection()->getClient()->info()['version']['number'];
 
         $answer = new Answer();
         $answer->id = 'NEWID';
@@ -95,7 +96,13 @@ class MetaFieldsTest extends AbstractElasticsearchTestCase
         /** @var Answer $doc */
         $doc = $res->current();
 
-        $this->assertEquals('2', $doc->parentId, 'Parent document id is wrong');
+        if (version_compare($esVersion, '2.0', '>=')) {
+            $this->assertEquals('2', $doc->parentId, 'Parent document id is wrong');
+        } else {
+            // In ES versions before 2.0, _parent is not returned by default and thus not populated in the entity
+            // @see https://github.com/elastic/elasticsearch/issues/8068
+            $this->assertEquals(null, $doc->parentId, 'Parent document id is wrong');
+        }
     }
 
     public function testParentChildSearch()
