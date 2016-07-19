@@ -196,6 +196,13 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $doc = $imWithoutAliases->getRepository('AcmeBarBundle:Product')->getById(555);
         $this->assertInstanceOf(Product::class, $doc);
         $this->assertEquals('Acme title', $doc->title);
+
+        // Test persisting properties with null values
+        $product->title = null;
+        $imWithoutAliases->persist($product);
+        $imWithoutAliases->getConnection()->commit();
+        $doc = $imWithoutAliases->getRepository('AcmeBarBundle:Product')->getById(555);
+        $this->assertEquals(null, $doc->title, 'Null property value was not persisted');
     }
 
     public function testPersistForManagerWithAliasesWithoutAutocommit()

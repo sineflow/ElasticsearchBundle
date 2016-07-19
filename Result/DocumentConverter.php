@@ -16,12 +16,12 @@ class DocumentConverter
     /**
      * @var DocumentMetadataCollector
      */
-    private $metadataCollector;
+    protected $metadataCollector;
 
     /**
      * @var string
      */
-    private $languageSeparator;
+    protected $languageSeparator;
 
     /**
      * Constructor.
