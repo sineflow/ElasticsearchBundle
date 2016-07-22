@@ -57,13 +57,13 @@ class ElasticsearchProvider extends AbstractProvider
     public function getDocuments()
     {
         // Build a scan search request
-        $params = array(
+        $params = [
             'search_type' => 'scan',
             'scroll' => $this->scrollTime,
             'size' => $this->chunkSize,
             'index' => $this->sourceIndexManager->getLiveIndex(),
-            'type' => $this->metadataCollector->getDocumentMetadata($this->sourceDocumentClass)->getType()
-        );
+            'type' => $this->metadataCollector->getDocumentMetadata($this->sourceDocumentClass)->getType(),
+        ];
 
         // Get the scroll ID
         $docs = $this->sourceIndexManager->getConnection()->getClient()->search($params);
@@ -73,10 +73,10 @@ class ElasticsearchProvider extends AbstractProvider
         while (\true) {
             // Execute a scroll request
             $response = $this->sourceIndexManager->getConnection()->getClient()->scroll(
-                array(
+                [
                     'scroll_id' => $scrollId,
-                    'scroll' => $this->scrollTime
-                )
+                    'scroll' => $this->scrollTime,
+                ]
             );
             if (count($response['hits']['hits']) > 0) {
                 foreach ($response['hits']['hits'] as $hit) {
@@ -92,7 +92,6 @@ class ElasticsearchProvider extends AbstractProvider
                 break;
             }
         }
-
     }
 
     /**
@@ -106,7 +105,7 @@ class ElasticsearchProvider extends AbstractProvider
         $params = [
             'index' => $this->sourceIndexManager->getLiveIndex(),
             'type' => $this->metadataCollector->getDocumentMetadata($this->sourceDocumentClass)->getType(),
-            'id' => $id
+            'id' => $id,
         ];
         $doc = $this->sourceIndexManager->getConnection()->getClient()->get($params);
         $result = $doc['_source'];

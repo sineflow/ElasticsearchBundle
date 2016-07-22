@@ -167,7 +167,7 @@ class Finder
 
         $params = [
             'scroll_id' => $scrollId,
-            'scroll' => $scrollTime
+            'scroll' => $scrollTime,
         ];
 
         $raw = $client->scroll($params);
@@ -204,7 +204,6 @@ class Finder
         $raw = $client->count($params);
 
         return $raw['count'];
-
     }
 
     /**

@@ -106,9 +106,9 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
                     [
                         'add' => [
                             'index' => 'sineflow-esb-test-temp',
-                            'alias' => $imWithAliases->getWriteAlias()
+                            'alias' => $imWithAliases->getWriteAlias(),
                         ],
-                    ]
+                    ],
                 ],
             ],
         ];
@@ -271,7 +271,6 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases->persistRaw('AcmeFooBundle:NonExisting', [
             'bla' => 'blu'
         ]);
-
     }
 
     public function testUpdateWithCorrectParams()
@@ -298,7 +297,6 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases->update('AcmeFooBundle:Customer', 'non-existing-id', [
             'name' => 'Alicia'
         ]);
-
     }
 
     public function testDelete()
