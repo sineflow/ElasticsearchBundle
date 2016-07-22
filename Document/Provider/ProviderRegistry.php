@@ -28,14 +28,35 @@ class ProviderRegistry implements ContainerAwareInterface
     }
 
     /**
-     * Registers a provider for the specified type entity.
+     * Registers a provider service for the specified type entity.
      *
      * @param string $documentClass The short path to the type entity (e.g AppBundle:MyType)
-     * @param string $providerId
+     * @param string $providerId    The provider service id
      */
     public function addProvider($documentClass, $providerId)
     {
         $this->providers[$documentClass] = $providerId;
+    }
+
+    /**
+     * Unsets registered provider for the specified type entity.
+     *
+     * @param string $documentClass The short path to the type entity (e.g AppBundle:MyType)
+     */
+    public function removeProvider($documentClass)
+    {
+        unset($this->providers[$documentClass]);
+    }
+
+    /**
+     * Gets registered provider service id for the specified type entity.
+     *
+     * @param string $documentClass The short path to the type entity (e.g AppBundle:MyType)
+     * @return string|null
+     */
+    public function getProviderId($documentClass)
+    {
+        return isset($this->providers[$documentClass]) ? $this->providers[$documentClass] : null;
     }
 
     /**
@@ -48,7 +69,12 @@ class ProviderRegistry implements ContainerAwareInterface
     public function getProviderInstance($documentClass)
     {
         if (isset($this->providers[$documentClass])) {
-            return $this->container->get($this->providers[$documentClass]);
+            $provider = $this->container->get($this->providers[$documentClass]);
+            if (!$provider instanceof ProviderInterface) {
+                throw new \InvalidArgumentException(sprintf('Registered provider "%s" must implement ProviderInterface.', $this->providers[$documentClass]));
+            }
+
+            return $provider;
         }
 
         // Return default self-provider, if no specific one was registered
