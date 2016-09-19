@@ -313,6 +313,11 @@ class Finder
             foreach ($data['hits']['hits'] as $item) {
                 $output[$item['_id']] = array_map('reset', $item['fields']);
             }
+        } else {
+            // If empty fields param was supplied (meaning no fields are returned)
+            foreach ($data['hits']['hits'] as $item) {
+                $output[$item['_id']] = null;
+            }
         }
 
         return $output;
