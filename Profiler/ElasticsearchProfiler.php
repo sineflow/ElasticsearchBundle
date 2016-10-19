@@ -31,7 +31,7 @@ class ElasticsearchProfiler implements DataCollectorInterface
     private $count = 0;
 
     /**
-     * @var float Time all queries took.
+     * @var float Time all queries took in ms.
      */
     private $time = .0;
 
@@ -73,7 +73,7 @@ class ElasticsearchProfiler implements DataCollectorInterface
      */
     public function getTime()
     {
-        return round($this->time * 100, 2);
+        return round($this->time * 1000, 2);
     }
 
     /**
@@ -169,12 +169,12 @@ class ElasticsearchProfiler implements DataCollectorInterface
             $senseRequest .= '?'.$parsedUrl['query'];
         }
         if ($queryBody) {
-            $senseRequest .= "\n" . trim($queryBody, " '");
+            $senseRequest .= "\n".trim($queryBody, " '");
         }
 
         $this->queries[$route][] = array_merge(
             [
-                'time' => $record['context']['duration'] * 100,
+                'time' => $record['context']['duration'] * 1000,
                 'curlRequest' => $rawRequest,
                 'senseRequest' => $senseRequest,
                 'backtrace' => $record['extra']['backtrace'],
