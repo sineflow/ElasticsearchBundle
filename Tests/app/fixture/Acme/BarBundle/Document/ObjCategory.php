@@ -8,7 +8,7 @@ use Sineflow\ElasticsearchBundle\Document\ObjectInterface;
 /**
  * Category document for testing.
  *
- * @ES\Object
+ * @ES\DocObject
  */
 class ObjCategory implements ObjectInterface
 {

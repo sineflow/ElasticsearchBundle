@@ -4,8 +4,13 @@ namespace Sineflow\ElasticsearchBundle\Mapping;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\Reader;
+use Sineflow\ElasticsearchBundle\Annotation\DocObject;
 use Sineflow\ElasticsearchBundle\Annotation\Document;
+use Sineflow\ElasticsearchBundle\Annotation\Id;
+use Sineflow\ElasticsearchBundle\Annotation\Object;
+use Sineflow\ElasticsearchBundle\Annotation\ParentId;
 use Sineflow\ElasticsearchBundle\Annotation\Property;
+use Sineflow\ElasticsearchBundle\Annotation\Score;
 use Sineflow\ElasticsearchBundle\LanguageProvider\LanguageProviderInterface;
 
 /**
@@ -13,31 +18,6 @@ use Sineflow\ElasticsearchBundle\LanguageProvider\LanguageProviderInterface;
  */
 class DocumentParser
 {
-    /**
-     * @const string
-     */
-    const PROPERTY_ANNOTATION = 'Sineflow\ElasticsearchBundle\Annotation\Property';
-
-    /**
-     * @const string
-     */
-    const META_ID_ANNOTATION = 'Sineflow\ElasticsearchBundle\Annotation\Id';
-
-    /**
-     * @const string
-     */
-    const META_PARENT_ID_ANNOTATION = 'Sineflow\ElasticsearchBundle\Annotation\ParentId';
-
-    /**
-     * @const string
-     */
-    const META_SCORE_ANNOTATION = 'Sineflow\ElasticsearchBundle\Annotation\Score';
-
-    /**
-     * @const string
-     */
-    const DOCUMENT_ANNOTATION = 'Sineflow\ElasticsearchBundle\Annotation\Document';
-
     /**
      * @var Reader Used to read document annotations.
      */
@@ -107,7 +87,7 @@ class DocumentParser
         $metadata = [];
 
         /** @var Document $classAnnotation */
-        $classAnnotation = $this->reader->getClassAnnotation($documentReflection, self::DOCUMENT_ANNOTATION);
+        $classAnnotation = $this->reader->getClassAnnotation($documentReflection, Document::class);
 
         if ($classAnnotation !== null) {
             if ($classAnnotation->parent !== null) {
@@ -160,9 +140,9 @@ class DocumentParser
         /** @var \ReflectionProperty $property */
         foreach ($this->getDocumentPropertiesReflection($documentReflection) as $propertyName => $property) {
             $propertyAnnotation = $this->getPropertyAnnotationData($property);
-            $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, self::META_ID_ANNOTATION);
-            $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, self::META_PARENT_ID_ANNOTATION);
-            $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, self::META_SCORE_ANNOTATION);
+            $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, Id::class);
+            $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, ParentId::class);
+            $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, Score::class);
 
             // Ignore class properties without any recognized annotation
             if ($propertyAnnotation === null) {
@@ -170,7 +150,7 @@ class DocumentParser
             }
 
             switch (get_class($propertyAnnotation)) {
-                case self::PROPERTY_ANNOTATION:
+                case Property::class:
                     $propertyMetadata[$propertyAnnotation->name] = [
                         'propertyName' => $propertyName,
                         'type' => $propertyAnnotation->type,
@@ -196,7 +176,7 @@ class DocumentParser
                     }
                     break;
 
-                case self::META_ID_ANNOTATION:
+                case Id::class:
                     $propertyAnnotation->name = '_id';
                     $propertyAnnotation->type = 'string';
                     $propertyMetadata[$propertyAnnotation->name] = [
@@ -205,7 +185,7 @@ class DocumentParser
                     ];
                     break;
 
-                case self::META_PARENT_ID_ANNOTATION:
+                case ParentId::class:
                     $propertyAnnotation->name = '_parent';
                     $propertyAnnotation->type = 'string';
                     $propertyMetadata[$propertyAnnotation->name] = [
@@ -214,7 +194,7 @@ class DocumentParser
                     ];
                     break;
 
-                case self::META_SCORE_ANNOTATION:
+                case Score::class:
                     $propertyAnnotation->name = '_score';
                     $propertyAnnotation->type = 'float';
                     $propertyMetadata[$propertyAnnotation->name] = [
@@ -264,7 +244,7 @@ class DocumentParser
     private function getDocumentType(\ReflectionClass $documentReflection)
     {
         /** @var Document $classAnnotation */
-        $classAnnotation = $this->reader->getClassAnnotation($documentReflection, self::DOCUMENT_ANNOTATION);
+        $classAnnotation = $this->reader->getClassAnnotation($documentReflection, Document::class);
 
         // If an Elasticsearch type is not defined in the entity annotation, use the lowercased class name as such
         return empty($classAnnotation->type) ? strtolower($documentReflection->getShortName()) : $classAnnotation->type;
@@ -279,7 +259,7 @@ class DocumentParser
      */
     private function getPropertyAnnotationData($property)
     {
-        $annotation = $this->reader->getPropertyAnnotation($property, self::PROPERTY_ANNOTATION);
+        $annotation = $this->reader->getPropertyAnnotation($property, Property::class);
 
         return $annotation;
     }
@@ -302,6 +282,7 @@ class DocumentParser
         $annotations = [
             'Document',
             'Property',
+            'DocObject',
             'Object',
             'Id',
             'ParentId',
@@ -439,7 +420,10 @@ class DocumentParser
      */
     private function getRelationMapping(\ReflectionClass $documentReflection, $indexAnalyzers = [])
     {
-        if ($this->reader->getClassAnnotation($documentReflection, 'Sineflow\ElasticsearchBundle\Annotation\Object')) {
+        if ($this->reader->getClassAnnotation($documentReflection, DocObject::class)) {
+            return ['properties' => $this->getProperties($documentReflection, $indexAnalyzers)];
+        }
+        if ($this->reader->getClassAnnotation($documentReflection, Object::class)) {
             return ['properties' => $this->getProperties($documentReflection, $indexAnalyzers)];
         }
 

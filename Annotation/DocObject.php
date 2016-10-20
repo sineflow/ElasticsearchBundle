@@ -7,9 +7,7 @@ namespace Sineflow\ElasticsearchBundle\Annotation;
  *
  * @Annotation
  * @Target("CLASS")
- *
- * @deprecated to be removed in version 1.0 due to Object not being allowed class name since PHP7. Use DocObject instead
  */
-final class Object
+final class DocObject
 {
 }

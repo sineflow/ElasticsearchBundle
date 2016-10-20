@@ -8,7 +8,7 @@ use Sineflow\ElasticsearchBundle\Document\ObjectInterface;
 /**
  * Tag document for testing.
  *
- * @ES\Object
+ * @ES\DocObject
  */
 class ObjTag implements ObjectInterface
 {

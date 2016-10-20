@@ -175,7 +175,7 @@ class Answer
 
 **WARNING**: If using Elasticsearch 1.x, the parent property value will NOT be populated when retrieving documents, as Elasticsearch does not return it by default! 
 
-## Object class annotation
+## DocObject class annotation
 
 Object classes are almost the same as document classes:
 
@@ -187,7 +187,7 @@ use Sineflow\ElasticsearchBundle\Document\ObjectInterface;
 use Sineflow\ElasticsearchBundle\Annotation as ES;
 
 /**
- * @ES\Object
+ * @ES\DocObject
  */
 class ObjAlias implements ObjectInterface
 {
@@ -200,7 +200,7 @@ class ObjAlias implements ObjectInterface
 }
 ```
 
-The difference with document classes is that the class must implement `ObjectInterface` and be annotated as `@ES\Object`. The mapping of the object properties follows the same rules as the one for the document properties.
+The difference with document classes is that the class must implement `ObjectInterface` and be annotated as `@ES\DocObject`. The mapping of the object properties follows the same rules as the one for the document properties.
 
 
 More info about mapping is in the [elasticsearch mapping documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html)
