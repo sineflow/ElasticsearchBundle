@@ -23,6 +23,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
                     [
                         '_id' => '1',
                         'title' => 'Foo Product',
+                        'price' => 10,
                         'category' => [
                             'title' => 'Bar',
                             'tags' => [
@@ -47,6 +48,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
                     [
                         '_id' => '2',
                         'title' => 'Bar Product',
+                        'price' => 20,
                         'category' => null,
                         'related_categories' => [
                             [
@@ -77,6 +79,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $paginator = $this->getContainer()->get('knp_paginator');
 
         $query = ['query' => ['match_all' => []], 'sort' => ['_uid' => ['order' =>'asc']]];
+        $query['aggs'] = ['avg_price' => ['avg' => ['field' => 'price']]];
 
         // Test object results
 
@@ -89,6 +92,8 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $this->assertCount(2, $pagination);
         $this->assertInstanceOf(Product::class, $pagination->offsetGet(0));
         $this->assertEquals(3, $pagination->offsetGet(0)->id);
+        $this->assertEquals(15, $pagination->getCustomParameter('aggregations')['avg_price']['value']);
+        $this->assertInternalType('array', $pagination->getCustomParameter('suggestions'));
 
         // Test array results
 
@@ -100,6 +105,8 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
 
         $this->assertEquals(3, $pagination->key());
         $this->assertEquals('3rd Product', $pagination->current()['title']);
+        $this->assertNull($pagination->getCustomParameter('aggregations'));
+        $this->assertNull($pagination->getCustomParameter('suggestions'));
 
         // Test raw results
 
@@ -111,6 +118,8 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
 
         $this->assertEquals(3, $pagination->current()['_id']);
         $this->assertEquals('3rd Product', $pagination->current()['_source']['title']);
+        $this->assertEquals(15, $pagination->getCustomParameter('aggregations')['avg_price']['value']);
+        $this->assertInternalType('array', $pagination->getCustomParameter('suggestions'));
     }
 
     /**

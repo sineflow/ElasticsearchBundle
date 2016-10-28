@@ -5,6 +5,7 @@ namespace Sineflow\ElasticsearchBundle\Subscriber;
 use Knp\Component\Pager\Event\ItemsEvent;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Finder\Adapter\KnpPaginatorAdapter;
+use Sineflow\ElasticsearchBundle\Result\DocumentIterator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -27,6 +28,16 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
     }
 
     /**
+     * @return array
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            'knp_pager.items' => array('items', 1),
+        );
+    }
+
+    /**
      * @param ItemsEvent $event
      */
     public function items(ItemsEvent $event)
@@ -40,7 +51,10 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
             $resultsType = $event->target->getResultsType();
             switch ($resultsType) {
                 case Finder::RESULTS_OBJECT:
+                    /** @var DocumentIterator $results */
                     $event->items = iterator_to_array($results);
+                    $event->setCustomPaginationParameter('aggregations', $results->getAggregations());
+                    $event->setCustomPaginationParameter('suggestions', $results->getSuggestions());
                     break;
 
                 case Finder::RESULTS_ARRAY:
@@ -49,6 +63,8 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
 
                 case Finder::RESULTS_RAW:
                     $event->items = $results['hits']['hits'];
+                    $event->setCustomPaginationParameter('aggregations', isset($results['aggregations']) ? $results['aggregations'] : []);
+                    $event->setCustomPaginationParameter('suggestions', isset($results['suggestions']) ? $results['suggestions'] : []);
                     break;
 
                 default:
@@ -81,15 +97,5 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
         }
 
         return [$sortField, $sortDirection];
-    }
-
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
-    {
-        return array(
-            'knp_pager.items' => array('items', 1),
-        );
     }
 }

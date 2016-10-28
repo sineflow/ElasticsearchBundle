@@ -78,20 +78,23 @@ $recordsPerPage = 10;
 $finder = $this->get('sfes.finder');
 $results = $finder->find(
     ['AppBundle:Product'], 
-    $searchQuery, 
-    Finder::RESULTS_ARRAY | Finder::ADAPTER_KNP
+    $searchQuery,
+    Finder::RESULTS_OBJECT | Finder::ADAPTER_KNP
 );
 $paginator = $this->get('knp_paginator');
-$pagination = $paginator->paginate(
+$paginatedResults = $paginator->paginate(
     $results,
     $page,
     $recordsPerPage
 );
 
 return $this->render('template.twig', array(
-    'pagination' => $pagination,
+    'paginatedResults' => $paginatedResults,
+    'aggregations' => $paginatedResults->getCustomParameter('aggregations'),
+    'suggestions' => $paginatedResults->getCustomParameter('suggestions'),
 ));
 ```
+> **IMPORTANT:** Getting aggregations and suggestions is not supported for **Finder::RESULTS_ARRAY** results and you'd get NULL returned
 
 ## Using scan&scroll to retrieve documents
 
