@@ -572,23 +572,23 @@ class IndexManager
         switch (true) {
             case $document instanceof DocumentInterface:
                 if (get_class($document) !== $documentMetadata->getClassName()) {
-                    throw new \RuntimeException(sprintf('Document must be "%s", but "%s" was returned from data provider', $documentMetadata->getClassName(), get_class($document)));
+                    throw new Exception(sprintf('Document must be "%s", but "%s" was returned from data provider', $documentMetadata->getClassName(), get_class($document)));
                 }
                 $this->persist($document);
                 break;
 
             case is_array($document):
                 if (!isset($document['_id'])) {
-                    throw new \RuntimeException(sprintf('The returned document array must include an "_id" field: (%s)', serialize($document)));
+                    throw new Exception(sprintf('The returned document array must include an "_id" field: (%s)', serialize($document)));
                 }
                 if ($document['_id'] != $id) {
-                    throw new \RuntimeException(sprintf('The document id must be "%s", but "%s" was returned from data provider', $id, $document['_id']));
+                    throw new Exception(sprintf('The document id must be "%s", but "%s" was returned from data provider', $id, $document['_id']));
                 }
                 $this->persistRaw($documentClass, $document);
                 break;
 
             default:
-                throw new \RuntimeException('Document must be either a DocumentInterface instance or an array with raw data');
+                throw new Exception('Document must be either a DocumentInterface instance or an array with raw data');
         }
 
         if ($this->getConnection()->isAutocommit()) {

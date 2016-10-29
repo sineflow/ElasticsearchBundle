@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Command;
 
+use Sineflow\ElasticsearchBundle\Exception\InvalidIndexManagerException;
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -30,23 +31,29 @@ abstract class AbstractManagerAwareCommand extends ContainerAwareCommand
      *
      * @return IndexManager
      *
-     * @throws \RuntimeException If index manager was not found.
+     * @throws InvalidIndexManagerException If index manager was not found.
      */
     protected function getManager($name)
     {
         $id = $this->getIndexManagerId($name);
 
-        if ($this->getContainer()->has($id)) {
-            return $this->getContainer()->get($id);
+        if (!$this->getContainer()->has($id)) {
+            throw new InvalidIndexManagerException(
+                sprintf(
+                    'Index manager named `%s` not found. Available: `%s`.',
+                    $name,
+                    implode('`, `', array_keys($this->getContainer()->getParameter('sfes.indices')))
+                )
+            );
         }
 
-        throw new \RuntimeException(
-            sprintf(
-                'Index manager named `%s` not found. Available: `%s`.',
-                $name,
-                implode('`, `', array_keys($this->getContainer()->getParameter('sfes.indices')))
-            )
-        );
+        $indexManager = $this->getContainer()->get($id);
+
+        if (!$indexManager instanceof IndexManager) {
+            throw new InvalidIndexManagerException(sprintf('Manager must be instance of "%s", "%s" given', IndexManager::class, get_class($indexManager)));
+        }
+
+        return $indexManager;
     }
 
     /**

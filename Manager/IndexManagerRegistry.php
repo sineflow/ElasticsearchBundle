@@ -3,6 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Manager;
 
 use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
+use Sineflow\ElasticsearchBundle\Exception\InvalidIndexManagerException;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -47,15 +48,22 @@ class IndexManagerRegistry implements ContainerAwareInterface
      *
      * @param string $name
      * @return IndexManager
+     * @throws InvalidIndexManagerException If service does not exist or is the wrong class
      */
     public function get($name)
     {
         $serviceName = sprintf('sfes.index.%s', $name);
         if (!$this->container->has($serviceName)) {
-            throw new \RuntimeException(sprintf('No manager is defined for "%s" index', $name));
+            throw new InvalidIndexManagerException(sprintf('No manager is defined for "%s" index', $name));
         }
 
-        return $this->container->get($serviceName);
+        $indexManager = $this->container->get($serviceName);
+
+        if (!$indexManager instanceof IndexManager) {
+            throw new InvalidIndexManagerException(sprintf('Manager must be instance of "%s", "%s" given', IndexManager::class, get_class($indexManager)));
+        }
+
+        return $indexManager;
     }
 
     /**

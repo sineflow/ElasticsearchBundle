@@ -63,3 +63,6 @@ services:
             - AcmeFooBundle:Order
         tags:
             - { name: sfes.provider, type: "AcmeFooBundle:Order" }
+
+    sfes.index.blah: # some index manager service that is not actually an index manager
+        class: Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\LanguageProvider
