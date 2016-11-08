@@ -72,23 +72,30 @@ final class Property implements DumperInterface
                 throw new \InvalidArgumentException('Available index analyzers missing');
             }
 
-            // Replace {lang} in any analyzers with the respective language
-            // If no analyzer is defined for a certain language, replace {lang} with 'default'
+            // Replace {lang} in any string option with the respective language
             array_walk($result, function (&$value, $key, $settings) {
-                if (in_array($key, ['analyzer', 'index_analyzer', 'search_analyzer']) && false !== strpos($value, self::LANGUAGE_PLACEHOLDER)) {
-                    // Get the names of all available analyzers in the index
-                    $indexAnalyzers = array_keys($settings['indexAnalyzers']);
+                if (is_string($value) && false !== strpos($value, self::LANGUAGE_PLACEHOLDER)) {
+                    if (in_array($key, ['analyzer', 'index_analyzer', 'search_analyzer'])) {
+                        // Replace {lang} in any analyzers with the respective language
+                        // If no analyzer is defined for a certain language, replace {lang} with 'default'
 
-                    // Make sure a default analyzer is defined, even if we don't need it right now
-                    // because, if a new language is added and we don't have an analyzer for it, ES mapping would fail
-                    $defaultAnalyzer = str_replace(self::LANGUAGE_PLACEHOLDER, self::DEFAULT_LANG_SUFFIX, $value);
-                    if (!in_array($defaultAnalyzer, $indexAnalyzers)) {
-                        throw new \LogicException(sprintf('There must be a default language analyzer "%s" defined for index', $defaultAnalyzer));
-                    }
+                        // Get the names of all available analyzers in the index
+                        $indexAnalyzers = array_keys($settings['indexAnalyzers']);
 
-                    $value = str_replace(self::LANGUAGE_PLACEHOLDER, $settings['language'], $value);
-                    if (!in_array($value, $indexAnalyzers)) {
-                        $value = $defaultAnalyzer;
+                        // Make sure a default analyzer is defined, even if we don't need it right now
+                        // because, if a new language is added and we don't have an analyzer for it, ES mapping would fail
+                        $defaultAnalyzer = str_replace(self::LANGUAGE_PLACEHOLDER, self::DEFAULT_LANG_SUFFIX, $value);
+                        if (!in_array($defaultAnalyzer, $indexAnalyzers)) {
+                            throw new \LogicException(sprintf('There must be a default language analyzer "%s" defined for index', $defaultAnalyzer));
+                        }
+
+                        $value = str_replace(self::LANGUAGE_PLACEHOLDER, $settings['language'], $value);
+                        if (!in_array($value, $indexAnalyzers)) {
+                            $value = $defaultAnalyzer;
+                        }
+                    } else {
+                        // If it's any other option, just replace with the respective language
+                        $value = str_replace(self::LANGUAGE_PLACEHOLDER, $settings['language'], $value);
                     }
                 }
             }, $settings);
