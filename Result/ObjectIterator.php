@@ -18,6 +18,11 @@ class ObjectIterator implements \Countable, \Iterator
     private $documentConverter;
 
     /**
+     * @var array
+     */
+    private $objects;
+
+    /**
      * Constructor.
      *
      * @param DocumentConverter $documentConverter
