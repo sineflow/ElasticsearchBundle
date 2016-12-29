@@ -38,17 +38,18 @@ class MLProperty
     }
 
     /**
-     * Gets value based on passed language, if value is missing returns default value
+     * Gets value based on passed language, falling back on the default language, by default
      *
      * @param string $language
+     * @param bool   $fallbackToDefault If set and value for the requested language is missing, return default language value
      *
      * @return null|string
      */
-    public function getValue($language)
+    public function getValue($language, $fallbackToDefault = true)
     {
         if (isset($this->values[$language])) {
             return $this->values[$language];
-        } elseif (isset($this->values[Property::DEFAULT_LANG_SUFFIX])) {
+        } elseif ($fallbackToDefault && isset($this->values[Property::DEFAULT_LANG_SUFFIX])) {
             return $this->values[Property::DEFAULT_LANG_SUFFIX];
         } else {
             return null;

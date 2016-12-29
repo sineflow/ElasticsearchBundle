@@ -167,7 +167,7 @@ class DocumentConverter
                     if ($propertyMetadata['multiple']) {
                         // Verify value is traversable
                         if (!(is_array($value) || (is_object($value) && $value instanceof \Traversable))) {
-                            throw new \InvalidArgumentException(sprintf('Value of "%s" is not traversable, although field is set to "multiple"'));
+                            throw new \InvalidArgumentException(sprintf('Value of "%s" is not traversable, although field is set to "multiple"', $propertyMetadata['propertyName']));
                         }
 
                         foreach ($value as $item) {
