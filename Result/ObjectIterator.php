@@ -2,6 +2,8 @@
 
 namespace Sineflow\ElasticsearchBundle\Result;
 
+use Sineflow\ElasticsearchBundle\Document\ObjectInterface;
+
 /**
  * ObjectIterator class.
  */
@@ -45,7 +47,7 @@ class ObjectIterator implements \Countable, \Iterator
     }
 
     /**
-     * @return DocumentInterface
+     * @return ObjectInterface
      */
     public function current()
     {
