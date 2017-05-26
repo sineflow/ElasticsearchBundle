@@ -6,7 +6,10 @@ use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Sineflow\ElasticsearchBundle\DTO\BulkQueryItem;
+use Sineflow\ElasticsearchBundle\Event\Events;
+use Sineflow\ElasticsearchBundle\Event\PostCommitEvent;
 use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * This class interacts with elasticsearch using injected client.
@@ -47,6 +50,11 @@ class ConnectionManager
      * @var bool
      */
     private $autocommit;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
     /**
      * Construct.
@@ -127,6 +135,22 @@ class ConnectionManager
     }
 
     /**
+     * @return EventDispatcherInterface
+     */
+    public function getEventDispatcher()
+    {
+        return $this->eventDispatcher;
+    }
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher($eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
      * Adds query to bulk queries container.
      *
      * @param string $operation One of: index, update, delete, create.
@@ -139,6 +163,16 @@ class ConnectionManager
     public function addBulkOperation($operation, $index, $type, array $query)
     {
         $this->bulkQueries[] = new BulkQueryItem($operation, $index, $type, $query);
+    }
+
+    /**
+     * Returns the number of bulk operations currently queued
+     *
+     * @return int
+     */
+    public function getBulkOperationsCount()
+    {
+        return count($this->bulkQueries);
     }
 
     /**
@@ -202,6 +236,10 @@ class ConnectionManager
             $e = new BulkRequestException(sprintf('Bulk request failed with %s error(s)', $errorCount));
             $e->setBulkResponseItems($response['items']);
             throw $e;
+        }
+
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(Events::POST_COMMIT, new PostCommitEvent($response));
         }
     }
 

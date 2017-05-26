@@ -28,7 +28,7 @@ class AddIndexManagersPass implements CompilerPassInterface
             $connectionService = sprintf('sfes.connection.%s', $indexSettings['connection']);
             if (!$container->hasDefinition($connectionService)) {
                 throw new InvalidConfigurationException(
-                    'There is no ES connection with name ' . $indexSettings['connection']
+                    'There is no ES connection with name '.$indexSettings['connection']
                 );
             }
 
@@ -39,7 +39,7 @@ class AddIndexManagersPass implements CompilerPassInterface
                     $indexManagerClass,
                     $indexManagerName,
                     $container->getDefinition($connectionService),
-                    $indexSettings
+                    $indexSettings,
                 ]
             );
 

@@ -10,7 +10,7 @@ parameters:
 services:
     sfes.document_converter:
         class: Sineflow\ElasticsearchBundle\Result\DocumentConverter
-        arguments: ['@sfes.document_metadata_collector', %sfes.mlproperty.language_separator%]
+        arguments: ['@sfes.document_metadata_collector', '%sfes.mlproperty.language_separator%']
 
     sfes.provider_registry:
         class: Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry
@@ -19,7 +19,14 @@ services:
 
     sfes.index_manager_factory:
         class: Sineflow\ElasticsearchBundle\Manager\IndexManagerFactory
-        arguments: ['@sfes.document_metadata_collector', '@sfes.provider_registry', '@sfes.finder', '@sfes.document_converter', %sfes.mlproperty.language_separator%]
+        arguments:
+            - '@sfes.document_metadata_collector'
+            - '@sfes.provider_registry'
+            - '@sfes.finder'
+            - '@sfes.document_converter'
+            - '%sfes.mlproperty.language_separator%'
+        calls:
+            - [setEventDispatcher, ['@event_dispatcher']]
         public: false
 
     sfes.index_manager_registry:
@@ -83,7 +90,9 @@ services:
 
     sfes.connection_factory:
         class: Sineflow\ElasticsearchBundle\Manager\ConnectionManagerFactory
-        arguments: [%kernel.debug%, '@sfes.logger.trace', '@sfes.logger.log']
+        arguments: ['%kernel.debug%', '@sfes.logger.trace', '@sfes.logger.log']
+        calls:
+            - [setEventDispatcher, ['@event_dispatcher']]
 
     sfes.profiler:
         class: Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler
@@ -98,3 +107,9 @@ services:
         arguments: ['@request_stack']
         tags:
             - { name: knp_paginator.subscriber }
+
+    sfes.subscriber.entity_tracker_subscriber:
+        class: Sineflow\ElasticsearchBundle\Subscriber\EntityTrackerSubscriber
+        arguments: ['@sfes.document_metadata_collector']
+        tags:
+            - { name: kernel.event_subscriber }
