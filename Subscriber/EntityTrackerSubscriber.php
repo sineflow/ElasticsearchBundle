@@ -74,7 +74,7 @@ class EntityTrackerSubscriber implements EventSubscriberInterface
             }
         }
 
-        // Unset the array to avoid any memory leaks
-        unset($this->entitiesData);
+        // Clear the array to avoid any memory leaks
+        $this->entitiesData = [];
     }
 }
