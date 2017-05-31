@@ -51,7 +51,9 @@ class EntityTrackerSubscriber implements EventSubscriberInterface
     public function onPrePersist(PrePersistEvent $prePersistEvent)
     {
         // Track entity only if it has an @Id field
-        $propertiesMetadata = $this->documentMetadataCollector->getObjectPropertiesMetadata(get_class($prePersistEvent->getDocument()));
+        $propertiesMetadata = $this->documentMetadataCollector->getObjectPropertiesMetadata(
+            get_class($prePersistEvent->getDocument())
+        );
         if (isset($propertiesMetadata['_id'])) {
             $bulkOperationIndex = $prePersistEvent->getBulkOperationIndex();
             $this->entitiesData[$bulkOperationIndex]['entity'] = $prePersistEvent->getDocument();
@@ -67,10 +69,11 @@ class EntityTrackerSubscriber implements EventSubscriberInterface
         foreach ($this->entitiesData as $bulkOperationIndex => $entityData) {
             $idValue = current($postCommitEvent->getBulkResponse()['items'][$bulkOperationIndex])['_id'];
             $idPropertyMetadata = $entityData['metadata']['_id'];
+            $entity = $entityData['entity'];
             if ($idPropertyMetadata['propertyAccess'] == DocumentMetadata::PROPERTY_ACCESS_PRIVATE) {
-                ($entityData['entity'])->{$idPropertyMetadata['methods']['setter']}($idValue);
+                $entity->{$idPropertyMetadata['methods']['setter']}($idValue);
             } else {
-                ($entityData['entity'])->{$idPropertyMetadata['propertyName']} = $idValue;
+                $entity->{$idPropertyMetadata['propertyName']} = $idValue;
             }
         }
 
