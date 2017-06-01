@@ -7,6 +7,8 @@ use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\Document\Provider\ProviderInterface;
 use Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry;
 use Sineflow\ElasticsearchBundle\Document\Repository\Repository;
+use Sineflow\ElasticsearchBundle\Event\Events;
+use Sineflow\ElasticsearchBundle\Event\PrePersistEvent;
 use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
 use Sineflow\ElasticsearchBundle\Exception\Exception;
 use Sineflow\ElasticsearchBundle\Exception\IndexRebuildingException;
@@ -14,6 +16,7 @@ use Sineflow\ElasticsearchBundle\Exception\NoReadAliasException;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Sineflow\ElasticsearchBundle\Result\DocumentConverter;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Manager class.
@@ -56,7 +59,7 @@ class IndexManager
     protected $indexMapping;
 
     /**
-     * @var RepositoryInterface[]
+     * @var Repository[]
      */
     protected $repositories = [];
 
@@ -74,6 +77,11 @@ class IndexManager
      * @var string The alias where data should be written to
      */
     protected $writeAlias = null;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
 
     /**
      * @param string                    $managerName
@@ -108,6 +116,22 @@ class IndexManager
         if (true === $this->useAliases) {
             $this->writeAlias .= '_write';
         }
+    }
+
+    /**
+     * @return EventDispatcherInterface
+     */
+    public function getEventDispatcher()
+    {
+        return $this->eventDispatcher;
+    }
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher($eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -248,12 +272,12 @@ class IndexManager
      */
     private function getUniqueIndexName()
     {
-        $indexName = $baseName = $this->getBaseIndexName() . '_' . date('YmdHis');
+        $indexName = $baseName = $this->getBaseIndexName().'_'.date('YmdHis');
 
         $i = 1;
         // Keep trying other names until there is no such existing index or alias
         while ($this->getConnection()->existsIndexOrAlias(array('index' => $indexName))) {
-            $indexName = $baseName . '_' . $i;
+            $indexName = $baseName.'_'.$i;
             $i++;
         }
 
@@ -474,9 +498,9 @@ class IndexManager
                         [
                             'remove' => [
                                 'index' => $oldIndex,
-                                'alias' => $this->writeAlias
+                                'alias' => $this->writeAlias,
                             ],
-                        ]
+                        ],
                     ],
                 ],
             ];
@@ -655,7 +679,6 @@ class IndexManager
         }
     }
 
-
     /**
      * Adds document to a bulk request for the next commit.
      * Depending on the connection autocommit mode, the update may be committed right away.
@@ -664,6 +687,11 @@ class IndexManager
      */
     public function persist(DocumentInterface $document)
     {
+        if ($this->eventDispatcher) {
+            $bulkOperationIndex = $this->getConnection()->getBulkOperationsCount();
+            $this->eventDispatcher->dispatch(Events::PRE_PERSIST, new PrePersistEvent($document, $bulkOperationIndex));
+        }
+
         $documentArray = $this->documentConverter->convertToArray($document);
         $this->persistRaw(get_class($document), $documentArray);
     }

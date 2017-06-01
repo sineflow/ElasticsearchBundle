@@ -6,6 +6,7 @@ use Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Sineflow\ElasticsearchBundle\Result\DocumentConverter;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Factory for index manager services
@@ -38,6 +39,11 @@ class IndexManagerFactory
     private $languageSeparator;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
      * @param DocumentMetadataCollector $metadataCollector
      * @param ProviderRegistry          $providerRegistry
      * @param Finder                    $finder
@@ -51,12 +57,27 @@ class IndexManagerFactory
         DocumentConverter $documentConverter,
         $languageSeparator
     ) {
-    
         $this->metadataCollector = $metadataCollector;
         $this->providerRegistry = $providerRegistry;
         $this->finder = $finder;
         $this->documentConverter = $documentConverter;
         $this->languageSeparator = $languageSeparator;
+    }
+
+    /**
+     * @return EventDispatcherInterface
+     */
+    public function getEventDispatcher()
+    {
+        return $this->eventDispatcher;
+    }
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher($eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -72,7 +93,7 @@ class IndexManagerFactory
         ConnectionManager $connection,
         array $indexSettings
     ) {
-    
+        /** @var IndexManager $manager */
         $manager = new $managerClass(
             $managerName,
             $connection,
@@ -83,6 +104,8 @@ class IndexManagerFactory
             $indexSettings,
             $this->languageSeparator
         );
+
+        $manager->setEventDispatcher($this->eventDispatcher);
 
         return $manager;
     }
