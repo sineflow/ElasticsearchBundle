@@ -2,10 +2,8 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\AddIndexManagersPass;
 use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\MappingPass;
 use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\RegisterDataProvidersPass;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
@@ -33,7 +31,7 @@ class RegisterDataProvidersPassTest extends \PHPUnit_Framework_TestCase
                                 'type' => 'AppBundle:MyType',
                             ],
                     ],
-                'app.es.data_provider.mytype2' =>
+                    'app.es.data_provider.mytype2' =>
                     [
                         0 =>
                             [
@@ -122,7 +120,7 @@ class RegisterDataProvidersPassTest extends \PHPUnit_Framework_TestCase
                             [
                                 'type' => 'AppBundle:MyType1',
                             ],
-                        1 =>
+                            1 =>
                             [
                                 'type' => 'AppBundle:MyType2',
                             ],

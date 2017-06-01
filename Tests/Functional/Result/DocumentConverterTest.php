@@ -100,15 +100,15 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
                         [
                             'title' => 'Bar',
                         ],
-                    'related_categories' =>
-                    [
+                        'related_categories' =>
+                        [
                         0 =>
                             [
                                 'title' => 'Acme',
                             ],
-                    ],
-                    'ml_info-en' => 'info in English',
-                    'ml_info-fr' => 'info in French',
+                        ],
+                        'ml_info-en' => 'info in English',
+                        'ml_info-fr' => 'info in French',
                 ],
         );
 
@@ -139,16 +139,16 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
                         [
                             0 => 'Foo Product',
                         ],
-                    'related_categories.title' =>
+                        'related_categories.title' =>
                         [
                             0 => 'Acme',
                             1 => 'Bar',
                         ],
-                    'category.title' =>
+                        'category.title' =>
                         [
                             0 => 'Bar',
                         ],
-                    'ml_info-en' =>
+                        'ml_info-en' =>
                         [
                             0 => 'info in English',
                         ],

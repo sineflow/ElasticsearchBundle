@@ -174,7 +174,7 @@ class FinderTest extends AbstractElasticsearchTestCase
                     0 => 'sineflow-esb-test',
                     1 => 'sineflow-esb-test-bar',
                 ],
-            'type' =>
+                'type' =>
                 [
                     0 => 'customer',
                     1 => 'product',

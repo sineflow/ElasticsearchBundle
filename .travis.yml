@@ -29,7 +29,6 @@ install:
   - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
   - ./elasticsearch-${ES_VERSION}/bin/elasticsearch > /dev/null 2>&1 &
   - composer install --dev --no-interaction
-  - vendor/bin/phpcs --version
 
 script:
   - vendor/bin/phpunit --coverage-clover=Tests/app/build/clover.xml

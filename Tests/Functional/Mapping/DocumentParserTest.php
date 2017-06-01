@@ -42,7 +42,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                 [
                     'type' => 'standard',
                 ],
-            'en_analyzer' =>
+                'en_analyzer' =>
                 [
                     'type' => 'standard',
                 ],
@@ -63,18 +63,18 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                             'type' => 'string',
                                             'index' => 'not_analyzed',
                                         ],
-                                    'title' =>
+                                        'title' =>
                                         [
                                             'type' => 'string',
                                         ],
                                 ],
-                            'type' => 'string',
+                                'type' => 'string',
                         ],
-                    'description' =>
+                        'description' =>
                         [
                             'type' => 'string',
                         ],
-                    'category' =>
+                        'category' =>
                         [
                             'type' => 'object',
                             'properties' =>
@@ -83,12 +83,12 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                         [
                                             'type' => 'integer',
                                         ],
-                                    'title' =>
+                                        'title' =>
                                         [
                                             'index' => 'not_analyzed',
                                             'type' => 'string',
                                         ],
-                                    'tags' =>
+                                        'tags' =>
                                         [
                                             'type' => 'object',
                                             'properties' =>
@@ -101,7 +101,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                         ],
                                 ],
                         ],
-                    'related_categories' =>
+                        'related_categories' =>
                         [
                             'type' => 'object',
                             'properties' =>
@@ -110,12 +110,12 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                         [
                                             'type' => 'integer',
                                         ],
-                                    'title' =>
+                                        'title' =>
                                         [
                                             'index' => 'not_analyzed',
                                             'type' => 'string',
                                         ],
-                                    'tags' =>
+                                        'tags' =>
                                         [
                                             'type' => 'object',
                                             'properties' =>
@@ -128,38 +128,38 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                         ],
                                 ],
                         ],
-                    'price' =>
+                        'price' =>
                         [
                             'type' => 'float',
                         ],
-                    'location' =>
+                        'location' =>
                         [
                             'type' => 'geo_point',
                         ],
-                    'limited' =>
+                        'limited' =>
                         [
                             'type' => 'boolean',
                         ],
-                    'released' =>
+                        'released' =>
                         [
                             'type' => 'date',
                         ],
-                    'ml_info-en' =>
+                        'ml_info-en' =>
                         [
                             'analyzer' => 'en_analyzer',
                             'type' => 'string',
                         ],
-                    'ml_info-fr' =>
+                        'ml_info-fr' =>
                         [
                             'analyzer' => 'default_analyzer',
                             'type' => 'string',
                         ],
-                    'ml_info-default' =>
+                        'ml_info-default' =>
                         [
                             'type' => 'string',
                             'index' => 'not_analyzed',
                         ],
-                    'pieces_count' =>
+                        'pieces_count' =>
                         [
                             'fields' =>
                                 [
@@ -169,14 +169,14 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                             'analyzer' => 'whitespace',
                                         ],
                                 ],
-                            'type' => 'string',
+                                'type' => 'string',
                         ],
                 ],
-            'fields' =>
+                'fields' =>
                 [
                     'dynamic' => 'strict',
                 ],
-            'propertiesMetadata' =>
+                'propertiesMetadata' =>
                 [
                     'title' =>
                         [
@@ -185,14 +185,14 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                             'multilanguage' => null,
                             'propertyAccess' => 1,
                         ],
-                    'description' =>
+                        'description' =>
                         [
                             'propertyName' => 'description',
                             'type' => 'string',
                             'multilanguage' => null,
                             'propertyAccess' => 1,
                         ],
-                    'category' =>
+                        'category' =>
                         [
                             'propertyName' => 'category',
                             'type' => 'object',
@@ -207,14 +207,14 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                             'multilanguage' => null,
                                             'propertyAccess' => 1,
                                         ],
-                                    'title' =>
+                                        'title' =>
                                         [
                                             'propertyName' => 'title',
                                             'type' => 'string',
                                             'multilanguage' => null,
                                             'propertyAccess' => 1,
                                         ],
-                                    'tags' =>
+                                        'tags' =>
                                         [
                                             'propertyName' => 'tags',
                                             'type' => 'object',
@@ -230,14 +230,14 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                                             'propertyAccess' => 1,
                                                         ],
                                                 ],
-                                            'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjTag',
-                                            'propertyAccess' => 1,
+                                                'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjTag',
+                                                'propertyAccess' => 1,
                                         ],
                                 ],
-                            'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjCategory',
-                            'propertyAccess' => 1,
+                                'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjCategory',
+                                'propertyAccess' => 1,
                         ],
-                    'related_categories' =>
+                        'related_categories' =>
                         [
                             'propertyName' => 'relatedCategories',
                             'type' => 'object',
@@ -252,14 +252,14 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                             'multilanguage' => null,
                                             'propertyAccess' => 1,
                                         ],
-                                    'title' =>
+                                        'title' =>
                                         [
                                             'propertyName' => 'title',
                                             'type' => 'string',
                                             'multilanguage' => null,
                                             'propertyAccess' => 1,
                                         ],
-                                    'tags' =>
+                                        'tags' =>
                                         [
                                             'propertyName' => 'tags',
                                             'type' => 'object',
@@ -275,76 +275,76 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                                             'propertyAccess' => 1,
                                                         ],
                                                 ],
-                                            'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjTag',
-                                            'propertyAccess' => 1,
+                                                'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjTag',
+                                                'propertyAccess' => 1,
                                         ],
                                 ],
-                            'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjCategory',
-                            'propertyAccess' => 1,
+                                'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjCategory',
+                                'propertyAccess' => 1,
                         ],
-                    'price' =>
+                        'price' =>
                         [
                             'propertyName' => 'price',
                             'type' => 'float',
                             'multilanguage' => null,
                             'propertyAccess' => 1,
                         ],
-                    'location' =>
+                        'location' =>
                         [
                             'propertyName' => 'location',
                             'type' => 'geo_point',
                             'multilanguage' => null,
                             'propertyAccess' => 1,
                         ],
-                    'limited' =>
+                        'limited' =>
                         [
                             'propertyName' => 'limited',
                             'type' => 'boolean',
                             'multilanguage' => null,
                             'propertyAccess' => 1,
                         ],
-                    'released' =>
+                        'released' =>
                         [
                             'propertyName' => 'released',
                             'type' => 'date',
                             'multilanguage' => null,
                             'propertyAccess' => 1,
                         ],
-                    'ml_info' =>
+                        'ml_info' =>
                         [
                             'propertyName' => 'mlInfo',
                             'type' => 'string',
                             'multilanguage' => true,
                             'propertyAccess' => 1,
                         ],
-                    'pieces_count' =>
+                        'pieces_count' =>
                         [
                             'propertyName' => 'tokenPiecesCount',
                             'type' => 'string',
                             'multilanguage' => null,
                             'propertyAccess' => 1,
                         ],
-                    '_id' =>
+                        '_id' =>
                         [
                             'propertyName' => 'id',
                             'type' => 'string',
                             'propertyAccess' => 1,
                         ],
-                    '_score' =>
+                        '_score' =>
                         [
                             'propertyName' => 'score',
                             'type' => 'float',
                             'propertyAccess' => 1,
                         ],
                 ],
-            'objects' =>
+                'objects' =>
                 [
                     0 => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjTag',
                     1 => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjCategory',
                 ],
-            'repositoryClass' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\Repository\\ProductRepository',
-            'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\Product',
-            'shortClassName' => 'AcmeBarBundle:Product',
+                'repositoryClass' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\Repository\\ProductRepository',
+                'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\Product',
+                'shortClassName' => 'AcmeBarBundle:Product',
         ];
 
         $this->assertEquals($expected, $res);
