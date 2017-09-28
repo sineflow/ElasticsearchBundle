@@ -72,8 +72,8 @@ final class Property implements DumperInterface
                 throw new \InvalidArgumentException('Available index analyzers missing');
             }
 
-            // Replace {lang} in any string option with the respective language
-            array_walk($result, function (&$value, $key, $settings) {
+            // Recursively replace {lang} in any string option with the respective language
+            array_walk_recursive($result, function (&$value, $key, $settings) {
                 if (is_string($value) && false !== strpos($value, self::LANGUAGE_PLACEHOLDER)) {
                     if (in_array($key, ['analyzer', 'index_analyzer', 'search_analyzer'])) {
                         // Replace {lang} in any analyzers with the respective language

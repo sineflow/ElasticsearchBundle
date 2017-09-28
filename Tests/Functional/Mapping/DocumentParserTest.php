@@ -147,11 +147,27 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                         'ml_info-en' =>
                         [
                             'analyzer' => 'en_analyzer',
+                            'fields'   =>
+                                [
+                                    'ngram' =>
+                                        [
+                                            'type'     => 'string',
+                                            'analyzer' => 'en_analyzer',
+                                        ],
+                                ],
                             'type' => 'string',
                         ],
                         'ml_info-fr' =>
                         [
                             'analyzer' => 'default_analyzer',
+                            'fields'   =>
+                                [
+                                    'ngram' =>
+                                        [
+                                            'type'     => 'string',
+                                            'analyzer' => 'default_analyzer',
+                                        ],
+                                ],
                             'type' => 'string',
                         ],
                         'ml_info-default' =>

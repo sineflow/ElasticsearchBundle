@@ -85,6 +85,12 @@ class Product extends AbstractDocument
      *  multilanguage=true,
      *  options={
      *      "analyzer":"{lang}_analyzer",
+     *      "fields": {
+     *          "ngram": {
+     *              "type": "string",
+     *              "analyzer":"{lang}_analyzer"
+     *          }
+     *      }
      *  }
      * )
      */
