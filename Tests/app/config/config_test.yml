@@ -4,6 +4,7 @@ parameters:
 
 # Framework Configuration
 framework:
+    translator: { fallbacks: [en] }
     secret: "SUPER-TOP-SECRET"
     test: ~
     router:

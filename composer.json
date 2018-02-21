@@ -11,9 +11,9 @@
         }
     ],
     "require": {
-        "php": ">=5.5",
+        "php": ">=5.5.9",
         "psr/log": "~1.0",
-        "symfony/symfony": "~2.7||>=3.0 <3.3",
+        "symfony/symfony": "~2.7||~3.0",
         "doctrine/annotations": "~1.2",
         "doctrine/inflector": "~1.0",
         "doctrine/cache": "~1.4",
@@ -21,7 +21,7 @@
     },
     "require-dev": {
         "monolog/monolog": "~1.0",
-        "knplabs/knp-paginator-bundle": "~2.5",
+        "knplabs/knp-paginator-bundle": "~2.7",
         "mikey179/vfsStream": "~1.4",
         "phpunit/phpunit": "~4.4",
         "squizlabs/php_codesniffer": "3.*",
