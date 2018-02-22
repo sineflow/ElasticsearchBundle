@@ -122,4 +122,3 @@ while (false !== ($matches = $scanScrollAdapter->getNextScrollResults())) {
 ```
 > You can optionally specify the chunk `size` and `scroll` time as additional params to the find() method. The defaults are `500` and `2m` 
 > **Tip:** The **Finder::ADAPTER_SCANSCROLL** works with any type of results, but you would usually want speed when you use it, so the most efficient way would be to get the raw results.
- 
