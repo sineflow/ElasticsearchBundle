@@ -53,7 +53,7 @@ class AddIndexManagersPass implements CompilerPassInterface
             $container->setDefinition(
                 sprintf('sfes.index.%s', $indexManagerName),
                 $indexManagerDefinition
-            );
+            )->setPublic(true);
         }
     }
 }
