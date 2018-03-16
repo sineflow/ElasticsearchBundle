@@ -20,7 +20,7 @@ class Product extends AbstractDocument
     /**
      * @var string
      *
-     * @ES\Property(name="title", type="string")
+     * @ES\Property(name="title", type="text")
      */
     public $title;
 }
@@ -87,7 +87,7 @@ Sometimes, you may have a field that is available in more than one language. Thi
     /**
      * @ES\Property(
      *  name="name",
-     *  type="string",
+     *  type="text",
      *  multilanguage=true,
      *  options={
      *      "analyzer":"{lang}_analyzer",
@@ -194,7 +194,7 @@ class ObjAlias implements ObjectInterface
     /**
      * @var string
      *
-     * @ES\Property(name="title", type="string")
+     * @ES\Property(name="title", type="text")
      */
     public $title;
 }

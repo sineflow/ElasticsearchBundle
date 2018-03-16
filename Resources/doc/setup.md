@@ -75,7 +75,7 @@ class Customer extends AbstractDocument
     /**
      * @var string
      *
-     * @ES\Property(name="name", type="string")
+     * @ES\Property(name="text", type="text")
      */
     public $name;
 }

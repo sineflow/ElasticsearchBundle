@@ -17,7 +17,7 @@ use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
 class Product extends AbstractDocument
 {
     /**
-     * @ES\Property(type="string", name="title")
+     * @ES\Property(type="text", name="title")
      */
     public $title;
 }
