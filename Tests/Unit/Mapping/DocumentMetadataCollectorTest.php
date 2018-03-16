@@ -79,7 +79,7 @@ class DocumentMetadataCollectorTest extends \PHPUnit_Framework_TestCase
                             '_id' =>
                             array (
                                 'propertyName' => 'id',
-                                'type' => 'string',
+                                'type' => 'keyword',
                                 'propertyAccess' => 1,
                             ),
                             '_score' =>

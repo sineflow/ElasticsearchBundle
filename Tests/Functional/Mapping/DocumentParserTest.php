@@ -60,19 +60,19 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                 [
                                     'raw' =>
                                         [
-                                            'type' => 'string',
+                                            'type' => 'keyword',
                                             'index' => 'not_analyzed',
                                         ],
                                         'title' =>
                                         [
-                                            'type' => 'string',
+                                            'type' => 'text',
                                         ],
                                 ],
-                                'type' => 'string',
+                                'type' => 'text',
                         ],
                         'description' =>
                         [
-                            'type' => 'string',
+                            'type' => 'text',
                         ],
                         'category' =>
                         [
@@ -86,7 +86,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                         'title' =>
                                         [
                                             'index' => 'not_analyzed',
-                                            'type' => 'string',
+                                            'type' => 'keyword',
                                         ],
                                         'tags' =>
                                         [
@@ -95,7 +95,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                                 [
                                                     'tagname' =>
                                                         [
-                                                            'type' => 'string',
+                                                            'type' => 'text',
                                                         ],
                                                 ],
                                         ],
@@ -113,7 +113,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                         'title' =>
                                         [
                                             'index' => 'not_analyzed',
-                                            'type' => 'string',
+                                            'type' => 'keyword',
                                         ],
                                         'tags' =>
                                         [
@@ -122,7 +122,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                                 [
                                                     'tagname' =>
                                                         [
-                                                            'type' => 'string',
+                                                            'type' => 'text',
                                                         ],
                                                 ],
                                         ],
@@ -151,11 +151,11 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                 [
                                     'ngram' =>
                                         [
-                                            'type'     => 'string',
+                                            'type'     => 'text',
                                             'analyzer' => 'en_analyzer',
                                         ],
                                 ],
-                            'type' => 'string',
+                            'type' => 'text',
                         ],
                         'ml_info-fr' =>
                         [
@@ -164,15 +164,15 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                 [
                                     'ngram' =>
                                         [
-                                            'type'     => 'string',
+                                            'type'     => 'text',
                                             'analyzer' => 'default_analyzer',
                                         ],
                                 ],
-                            'type' => 'string',
+                            'type' => 'text',
                         ],
                         'ml_info-default' =>
                         [
-                            'type' => 'string',
+                            'type' => 'keyword',
                             'index' => 'not_analyzed',
                         ],
                         'pieces_count' =>
@@ -185,7 +185,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                             'analyzer' => 'whitespace',
                                         ],
                                 ],
-                                'type' => 'string',
+                                'type' => 'text',
                         ],
                 ],
                 'fields' =>
@@ -197,14 +197,14 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                     'title' =>
                         [
                             'propertyName' => 'title',
-                            'type' => 'string',
+                            'type' => 'text',
                             'multilanguage' => null,
                             'propertyAccess' => 1,
                         ],
                         'description' =>
                         [
                             'propertyName' => 'description',
-                            'type' => 'string',
+                            'type' => 'text',
                             'multilanguage' => null,
                             'propertyAccess' => 1,
                         ],
@@ -226,7 +226,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                         'title' =>
                                         [
                                             'propertyName' => 'title',
-                                            'type' => 'string',
+                                            'type' => 'text',
                                             'multilanguage' => null,
                                             'propertyAccess' => 1,
                                         ],
@@ -241,7 +241,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                                     'tagname' =>
                                                         [
                                                             'propertyName' => 'tagName',
-                                                            'type' => 'string',
+                                                            'type' => 'text',
                                                             'multilanguage' => null,
                                                             'propertyAccess' => 1,
                                                         ],
@@ -271,7 +271,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                         'title' =>
                                         [
                                             'propertyName' => 'title',
-                                            'type' => 'string',
+                                            'type' => 'text',
                                             'multilanguage' => null,
                                             'propertyAccess' => 1,
                                         ],
@@ -286,7 +286,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                                     'tagname' =>
                                                         [
                                                             'propertyName' => 'tagName',
-                                                            'type' => 'string',
+                                                            'type' => 'text',
                                                             'multilanguage' => null,
                                                             'propertyAccess' => 1,
                                                         ],
@@ -329,21 +329,21 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                         'ml_info' =>
                         [
                             'propertyName' => 'mlInfo',
-                            'type' => 'string',
+                            'type' => 'text',
                             'multilanguage' => true,
                             'propertyAccess' => 1,
                         ],
                         'pieces_count' =>
                         [
                             'propertyName' => 'tokenPiecesCount',
-                            'type' => 'string',
+                            'type' => 'text',
                             'multilanguage' => null,
                             'propertyAccess' => 1,
                         ],
                         '_id' =>
                         [
                             'propertyName' => 'id',
-                            'type' => 'string',
+                            'type' => 'keyword',
                             'propertyAccess' => 1,
                         ],
                         '_score' =>

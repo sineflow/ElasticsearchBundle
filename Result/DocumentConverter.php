@@ -101,11 +101,11 @@ class DocumentConverter
                 continue;
             }
 
-            if ($propertyMetadata['type'] === 'string' && !empty($propertyMetadata['multilanguage'])) {
+            if (in_array($propertyMetadata['type'], ['keyword', 'text']) && !empty($propertyMetadata['multilanguage'])) {
                 $objectValue = null;
                 foreach ($array as $fieldName => $value) {
-                    $prefixLength = strlen($esField . $this->languageSeparator);
-                    if (substr($fieldName, 0, $prefixLength) === $esField . $this->languageSeparator) {
+                    $prefixLength = strlen($esField.$this->languageSeparator);
+                    if (substr($fieldName, 0, $prefixLength) === $esField.$this->languageSeparator) {
                         if (!$objectValue) {
                             $objectValue = new MLProperty();
                         }

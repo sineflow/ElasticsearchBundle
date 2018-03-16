@@ -213,7 +213,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         // Simulate state during rebuilding when write alias points to more than 1 index
         $settings = array (
             'index' => 'sineflow-esb-test-temp',
-            'body' => ['mappings' => ['customer' => ['properties' => ['name' => ['type' => 'string']]]]],
+            'body' => ['mappings' => ['customer' => ['properties' => ['name' => ['type' => 'keyword']]]]],
         );
         $imWithAliases->getConnection()->getClient()->indices()->create($settings);
         $setAliasParams = [
@@ -307,7 +307,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         // Simulate state during rebuilding when write alias points to more than 1 index
         $settings = array (
             'index' => 'sineflow-esb-test-temp',
-            'body' => ['mappings' => ['customer' => ['properties' => ['name' => ['type' => 'string']]]]],
+            'body' => ['mappings' => ['customer' => ['properties' => ['name' => ['type' => 'keyword']]]]],
         );
         $imWithAliases->getConnection()->getClient()->indices()->create($settings);
         $setAliasParams = [
@@ -366,7 +366,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         // Simulate state during rebuilding when write alias points to more than 1 index
         $settings = array (
             'index' => 'sineflow-esb-test-temp',
-            'body' => ['mappings' => ['customer' => ['properties' => ['name' => ['type' => 'string']]]]],
+            'body' => ['mappings' => ['customer' => ['properties' => ['name' => ['type' => 'keyword']]]]],
         );
         $imWithAliases->getConnection()->getClient()->indices()->create($settings);
         $setAliasParams = [

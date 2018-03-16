@@ -178,7 +178,7 @@ class DocumentParser
 
                 case Id::class:
                     $propertyAnnotation->name = '_id';
-                    $propertyAnnotation->type = 'string';
+                    $propertyAnnotation->type = 'keyword';
                     $propertyMetadata[$propertyAnnotation->name] = [
                         'propertyName' => $propertyName,
                         'type' => $propertyAnnotation->type,
@@ -187,7 +187,7 @@ class DocumentParser
 
                 case ParentId::class:
                     $propertyAnnotation->name = '_parent';
-                    $propertyAnnotation->type = 'string';
+                    $propertyAnnotation->type = 'keyword';
                     $propertyMetadata[$propertyAnnotation->name] = [
                         'propertyName' => $propertyName,
                         'type' => $propertyAnnotation->type,
@@ -349,8 +349,8 @@ class DocumentParser
 
             // If it is a multi-language property
             if (true === $propertyAnnotation->multilanguage) {
-                if ($propertyAnnotation->type != 'string') {
-                    throw new \InvalidArgumentException(sprintf('"%s" property in %s is declared as multilanguage, so can only be of type "string"', $propertyAnnotation->name, $documentReflection->getName()));
+                if (!in_array($propertyAnnotation->type, ['keyword', 'text'])) {
+                    throw new \InvalidArgumentException(sprintf('"%s" property in %s is declared as multilanguage, so can only be of type "keyword" or "text"', $propertyAnnotation->name, $documentReflection->getName()));
                 }
                 if (!$this->languageProvider) {
                     throw new \InvalidArgumentException('There must be a service tagged as "sfes.language_provider" in order to use multilanguage properties');
@@ -361,7 +361,7 @@ class DocumentParser
                 // TODO: The application should decide whether it wants to use a default field at all and set its mapping on a global base (or per property?)
                 // The custom mapping from the application should be set here, using perhaps some kind of decorator
                 $mapping[$propertyAnnotation->name.$this->languageSeparator.Property::DEFAULT_LANG_SUFFIX] = [
-                    'type' => 'string',
+                    'type' => 'keyword',
                     'index' => 'not_analyzed',
                 ];
             } else {
