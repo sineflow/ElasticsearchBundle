@@ -7,7 +7,6 @@ use Doctrine\Common\Annotations\Reader;
 use Sineflow\ElasticsearchBundle\Annotation\DocObject;
 use Sineflow\ElasticsearchBundle\Annotation\Document;
 use Sineflow\ElasticsearchBundle\Annotation\Id;
-use Sineflow\ElasticsearchBundle\Annotation\Object;
 use Sineflow\ElasticsearchBundle\Annotation\ParentId;
 use Sineflow\ElasticsearchBundle\Annotation\Property;
 use Sineflow\ElasticsearchBundle\Annotation\Score;
@@ -420,9 +419,6 @@ class DocumentParser
     private function getRelationMapping(\ReflectionClass $documentReflection, $indexAnalyzers = [])
     {
         if ($this->reader->getClassAnnotation($documentReflection, DocObject::class)) {
-            return ['properties' => $this->getProperties($documentReflection, $indexAnalyzers)];
-        }
-        if ($this->reader->getClassAnnotation($documentReflection, Object::class)) {
             return ['properties' => $this->getProperties($documentReflection, $indexAnalyzers)];
         }
 
