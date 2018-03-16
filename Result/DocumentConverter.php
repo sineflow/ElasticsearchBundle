@@ -101,7 +101,7 @@ class DocumentConverter
                 continue;
             }
 
-            if (in_array($propertyMetadata['type'], ['keyword', 'text']) && !empty($propertyMetadata['multilanguage'])) {
+            if (in_array($propertyMetadata['type'], ['string', 'keyword', 'text']) && !empty($propertyMetadata['multilanguage'])) {
                 $objectValue = null;
                 foreach ($array as $fieldName => $value) {
                     $prefixLength = strlen($esField.$this->languageSeparator);

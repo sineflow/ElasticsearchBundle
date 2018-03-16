@@ -25,7 +25,7 @@ class ObjCategory implements ObjectInterface
 
     /**
      * @var string
-     * @ES\Property(type="keyword", name="title", options={"index"="not_analyzed"})
+     * @ES\Property(type="keyword", name="title")
      */
     public $title;
 

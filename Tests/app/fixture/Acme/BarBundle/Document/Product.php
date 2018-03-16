@@ -26,7 +26,7 @@ class Product extends AbstractDocument
      *  name="title",
      *  options={
      *    "fields"={
-     *        "raw"={"type"="keyword", "index"="not_analyzed"},
+     *        "raw"={"type"="keyword"},
      *        "title"={"type"="text"}
      *    }
      *  }

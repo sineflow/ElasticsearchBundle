@@ -349,8 +349,8 @@ class DocumentParser
 
             // If it is a multi-language property
             if (true === $propertyAnnotation->multilanguage) {
-                if (!in_array($propertyAnnotation->type, ['keyword', 'text'])) {
-                    throw new \InvalidArgumentException(sprintf('"%s" property in %s is declared as multilanguage, so can only be of type "keyword" or "text"', $propertyAnnotation->name, $documentReflection->getName()));
+                if (!in_array($propertyAnnotation->type, ['string', 'keyword', 'text'])) {
+                    throw new \InvalidArgumentException(sprintf('"%s" property in %s is declared as multilanguage, so can only be of type "keyword", "text" or the deprecated "string"', $propertyAnnotation->name, $documentReflection->getName()));
                 }
                 if (!$this->languageProvider) {
                     throw new \InvalidArgumentException('There must be a service tagged as "sfes.language_provider" in order to use multilanguage properties');
@@ -362,7 +362,6 @@ class DocumentParser
                 // The custom mapping from the application should be set here, using perhaps some kind of decorator
                 $mapping[$propertyAnnotation->name.$this->languageSeparator.Property::DEFAULT_LANG_SUFFIX] = [
                     'type' => 'keyword',
-                    'index' => 'not_analyzed',
                 ];
             } else {
                 $mapping[$propertyAnnotation->name] = $this->getPropertyMapping($propertyAnnotation, null, $indexAnalyzers);

@@ -61,7 +61,6 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                     'raw' =>
                                         [
                                             'type' => 'keyword',
-                                            'index' => 'not_analyzed',
                                         ],
                                         'title' =>
                                         [
@@ -85,7 +84,6 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                         ],
                                         'title' =>
                                         [
-                                            'index' => 'not_analyzed',
                                             'type' => 'keyword',
                                         ],
                                         'tags' =>
@@ -112,7 +110,6 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                         ],
                                         'title' =>
                                         [
-                                            'index' => 'not_analyzed',
                                             'type' => 'keyword',
                                         ],
                                         'tags' =>
@@ -173,7 +170,6 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                         'ml_info-default' =>
                         [
                             'type' => 'keyword',
-                            'index' => 'not_analyzed',
                         ],
                         'pieces_count' =>
                         [
