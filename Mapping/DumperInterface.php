@@ -10,9 +10,9 @@ interface DumperInterface
     /**
      * Dumps properties into array.
      *
-     * @param array $options Options to configure dump output
+     * @param array $settings Options to configure dump output
      *
      * @return array
      */
-    public function dump(array $options = []);
+    public function dump(array $settings = []);
 }
