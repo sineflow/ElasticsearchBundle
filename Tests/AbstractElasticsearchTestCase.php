@@ -2,10 +2,8 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests;
 
-use Elasticsearch\Common\Exceptions\ElasticsearchException;
 use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base test which creates unique connection to test with.
@@ -20,41 +18,9 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
     /**
      * {@inheritdoc}
      */
-    public function runTest()
-    {
-        if ($this->getNumberOfRetries() < 1) {
-            return parent::runTest();
-        }
-
-        foreach (range(1, $this->getNumberOfRetries()) as $try) {
-            try {
-                return parent::runTest();
-            } catch (ElasticsearchException $e) {
-                // If error was from elasticsearch re-setup tests and retry.
-                if ($try !== $this->getNumberOfRetries()) {
-                    $this->tearDown();
-                    $this->setUp();
-                }
-            }
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp()
     {
         $this->getContainer();
-    }
-
-    /**
-     * Returns number of retries tests should execute.
-     *
-     * @return int
-     */
-    protected function getNumberOfRetries()
-    {
-        return 3;
     }
 
     /**
