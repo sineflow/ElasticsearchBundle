@@ -2,12 +2,13 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\Mapping;
 
+use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
 
 /**
  * Class DocumentLocatorTest
  */
-class DocumentLocatorTest extends \PHPUnit_Framework_TestCase
+class DocumentLocatorTest extends TestCase
 {
     /**
      * @var DocumentLocator

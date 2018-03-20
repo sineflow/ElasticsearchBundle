@@ -131,7 +131,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
         $paginator = $this->getContainer()->get('knp_paginator');
 
-        $query = ['query' => ['match_all' => []]];
+        $query = ['query' => ['match_all' => (object) []]];
 
         $adapter = $repo->find($query, Finder::ADAPTER_KNP);
         $paginator->paginate($adapter);

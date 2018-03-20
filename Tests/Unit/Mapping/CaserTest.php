@@ -2,9 +2,10 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\Mapping;
 
+use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\Mapping\Caser;
 
-class CaserTest extends \PHPUnit_Framework_TestCase
+class CaserTest extends TestCase
 {
     public function providerForCamel()
     {

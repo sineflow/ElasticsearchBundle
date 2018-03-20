@@ -282,7 +282,6 @@ class DocumentParser
             'Document',
             'Property',
             'DocObject',
-            'Object',
             'Id',
             'ParentId',
             'Score',
@@ -377,7 +376,7 @@ class DocumentParser
             'indexAnalyzers' => $indexAnalyzers,
         ]);
 
-        // Object.
+        // Inner/nested object
         if (in_array($propertyAnnotation->type, ['object', 'nested']) && !empty($propertyAnnotation->objectName)) {
             $propertyMapping = array_replace_recursive($propertyMapping, $this->getObjectMapping($propertyAnnotation->objectName, $indexAnalyzers));
         }

@@ -17,7 +17,19 @@ This bundle was initially based on the Elasticsearch bundle by ONGR.io, however 
 ## Documentation
 
 Installation instructions and documentation of the bundle can be found [here](Resources/doc/index.md).
- 
+
+## Version matrix
+
+| Elasticsearch version | ElasticsearchBundle version |
+| --------------------- | --------------------------- |
+| >= 6.0                | not supported yet           |
+| >= 5.0, < 6.0         | ~5.x                        |
+| >= 2.0, < 5.0         | >= 0.9, < 1.0               |
+
+## Breaking changes in version 5
+- Finder::ADAPTER_SCANSCROLL renamed to Finder::ADAPTER_SCROLL
+- class ScanScrollAdapter renamed to ScrollAdapter
+
 ## License
 
 This bundle is licensed under the MIT license. Please, see the complete license in the [LICENSE](LICENSE) file.

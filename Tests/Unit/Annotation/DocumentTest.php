@@ -2,12 +2,13 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\Annotation;
 
+use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\Annotation\Document;
 
 /**
  * Class DocumentTest
  */
-class DocumentTest extends \PHPUnit_Framework_TestCase
+class DocumentTest extends TestCase
 {
     /**
      * Tests if values are dumped correctly

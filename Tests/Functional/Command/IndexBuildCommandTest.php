@@ -3,9 +3,10 @@
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Command;
 
 use Sineflow\ElasticsearchBundle\Command\IndexBuildCommand;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
 
+/**
+ * Class IndexBuildCommandTest
+ */
 class IndexBuildCommandTest extends AbstractCommandTestCase
 {
     /**
@@ -34,7 +35,7 @@ class IndexBuildCommandTest extends AbstractCommandTestCase
         );
 
         // Test if the command output matches the expected output or not
-        $this->assertStringMatchesFormat($expectedOutput . '%a', $commandTester->getDisplay());
+        $this->assertStringMatchesFormat($expectedOutput.'%a', $commandTester->getDisplay());
 
         $manager->dropIndex();
     }

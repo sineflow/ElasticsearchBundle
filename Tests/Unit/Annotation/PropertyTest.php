@@ -2,12 +2,13 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\Annotation;
 
+use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\Annotation\Property;
 
 /**
  * Class PropertyTest
  */
-class PropertyTest extends \PHPUnit_Framework_TestCase
+class PropertyTest extends TestCase
 {
     /**
      * Tests if values are dumped correctly for mapping.

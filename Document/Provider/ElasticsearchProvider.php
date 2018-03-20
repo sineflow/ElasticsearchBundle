@@ -16,12 +16,12 @@ class ElasticsearchProvider extends AbstractProvider
     protected $metadataCollector;
 
     /**
-     * @var The index manager of the data source
+     * @var string The index manager of the data source
      */
     protected $sourceIndexManager;
 
     /**
-     * @var The type the data is coming from
+     * @var string The type the data is coming from
      */
     protected $sourceDocumentClass;
 
@@ -58,11 +58,11 @@ class ElasticsearchProvider extends AbstractProvider
     {
         // Build a scan search request
         $params = [
-            'search_type' => 'scan',
             'scroll' => $this->scrollTime,
             'size' => $this->chunkSize,
             'index' => $this->sourceIndexManager->getLiveIndex(),
             'type' => $this->metadataCollector->getDocumentMetadata($this->sourceDocumentClass)->getType(),
+            'body' => ['sort' => ['_doc']],
         ];
 
         // Get the scroll ID

@@ -2,12 +2,13 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\DTO;
 
+use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\DTO\BulkQueryItem;
 
 /**
  * Class BulkQueryItemTest
  */
-class BulkQueryItemTest extends \PHPUnit_Framework_TestCase
+class BulkQueryItemTest extends TestCase
 {
     /**
      * @return array

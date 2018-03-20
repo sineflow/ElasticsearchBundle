@@ -2,12 +2,13 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\DTO;
 
+use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\DTO\TypesToDocumentClasses;
 
 /**
  * Class TypesToDocumentClassesTest
  */
-class TypesToDocumentClassesTest extends \PHPUnit_Framework_TestCase
+class TypesToDocumentClassesTest extends TestCase
 {
 
     public function testGetSet()
