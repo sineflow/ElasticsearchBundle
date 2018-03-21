@@ -5,6 +5,7 @@ namespace Sineflow\ElasticsearchBundle\Tests\Unit\DependencyInjection\Compiler;
 use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\AddIndexManagersPass;
 use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\MappingPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * Unit tests for AddConnectionsPass.
@@ -81,7 +82,7 @@ class AddIndexManagersPassTest extends \PHPUnit_Framework_TestCase
             ->withConsecutive(
                 [$this->equalTo('sfes.index.test')]
             )
-            ->willReturn(null);
+            ->willReturn(new Definition());
 
         $compilerPass = new AddIndexManagersPass();
         $compilerPass->process($containerMock);
