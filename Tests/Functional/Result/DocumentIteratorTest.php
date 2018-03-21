@@ -82,7 +82,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
         $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
 
         /** @var DocumentIterator $iterator */
-        $iterator = $repo->find(['query' => ['match_all' => []], 'size' => 3, 'sort' => ['_uid' => ['order' =>'asc']]], Finder::RESULTS_OBJECT);
+        $iterator = $repo->find(['query' => ['match_all' => (object) []], 'size' => 3, 'sort' => ['_uid' => ['order' =>'asc']]], Finder::RESULTS_OBJECT);
 
         $this->assertInstanceOf(DocumentIterator::class, $iterator);
 
@@ -121,7 +121,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
         $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
 
         /** @var DocumentIterator $iterator */
-        $iterator = $repo->find(['query' => ['match_all' => []], 'size' => 3, 'sort' => ['_uid' => ['order' =>'asc']]], Finder::RESULTS_OBJECT);
+        $iterator = $repo->find(['query' => ['match_all' => (object) []], 'size' => 3, 'sort' => ['_uid' => ['order' =>'asc']]], Finder::RESULTS_OBJECT);
 
         $i = 0;
         $expected = [
@@ -147,7 +147,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
         /** @var Repository $repo */
         $repo = $this->getIndexManager('foo')->getRepository('AcmeFooBundle:Customer');
         /** @var DocumentIterator $iterator */
-        $iterator = $repo->find(['query' => ['match_all' => []]], Finder::RESULTS_OBJECT);
+        $iterator = $repo->find(['query' => ['match_all' => (object) []]], Finder::RESULTS_OBJECT);
 
         $this->assertNull($iterator->current());
     }
@@ -162,14 +162,14 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
 
         /** @var DocumentIterator $iterator */
         $iterator = $repo->find([
-            'query' => ['match_all' => []],
+            'query' => ['match_all' => (object) []],
             'aggs' => [
                 'my_count' => [
                     'value_count' => [
-                        'field' => 'title'
-                    ]
-                ]
-            ]
+                        'field' => 'title.raw',
+                    ],
+                ],
+            ],
         ], Finder::RESULTS_OBJECT);
 
         $aggregations = $iterator->getAggregations();
@@ -187,7 +187,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
 
         /** @var DocumentIterator $iterator */
         $iterator = $repo->find([
-            'query' => ['match_all' => []],
+            'query' => ['match_all' => (object) []],
             'suggest' => [
                 'title-suggestions' => [
                     'text' => ['prodcut foot'],

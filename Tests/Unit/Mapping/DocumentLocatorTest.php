@@ -21,9 +21,10 @@ class DocumentLocatorTest extends TestCase
     }
 
     /**
+     * Data provider
      * @return array
      */
-    public function getTestResolveClassNameData()
+    public function getTestResolveClassNameDataProvider()
     {
         $out = [
             [
@@ -37,16 +38,17 @@ class DocumentLocatorTest extends TestCase
             [
                 'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product',
                 'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product',
-            ]
+            ],
         ];
 
         return $out;
     }
 
     /**
+     * Data provider
      * @return array
      */
-    public function testGetShortClassNameData()
+    public function getShortClassNameDataProvider()
     {
         $out = [
             [
@@ -60,16 +62,17 @@ class DocumentLocatorTest extends TestCase
             [
                 'AcmeBarBundle:Product',
                 'AcmeBarBundle:Product',
-            ]
+            ],
         ];
 
         return $out;
     }
 
     /**
+     * Data provider
      * @return array
      */
-    public function testGetShortClassNameExceptionsData()
+    public function getShortClassNameExceptionsDataProvider()
     {
         $out = [
             [
@@ -80,12 +83,12 @@ class DocumentLocatorTest extends TestCase
             ],
             [
                 'Blah',
-            ]
+            ],
         ];
-
 
         return $out;
     }
+
     /**
      * Tests setAllDocumentDir and getAllDocumentDir
      */
@@ -109,7 +112,7 @@ class DocumentLocatorTest extends TestCase
      * @param string $className
      * @param string $expectedClassName
      *
-     * @dataProvider getTestResolveClassNameData
+     * @dataProvider getTestResolveClassNameDataProvider
      */
     public function testResolveClassName($className, $expectedClassName)
     {
@@ -120,7 +123,7 @@ class DocumentLocatorTest extends TestCase
      * @param string $className
      * @param string $expectedShortClassName
      *
-     * @dataProvider testGetShortClassNameData
+     * @dataProvider getShortClassNameDataProvider
      */
     public function testGetShortClassName($className, $expectedShortClassName)
     {
@@ -130,8 +133,8 @@ class DocumentLocatorTest extends TestCase
     /**
      * @param string $className
      *
-     * @dataProvider testGetShortClassNameExceptionsData
-     * @expectedException UnexpectedValueException
+     * @dataProvider getShortClassNameExceptionsDataProvider
+     * @expectedException \UnexpectedValueException
      */
     public function testGetShortClassNameExceptions($className)
     {
@@ -145,7 +148,7 @@ class DocumentLocatorTest extends TestCase
     {
         return [
             'AcmeFooBundle' => 'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\AcmeFooBundle',
-            'AcmeBarBundle' => 'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\AcmeBarBundle'
+            'AcmeBarBundle' => 'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\AcmeBarBundle',
         ];
     }
 }

@@ -14,7 +14,7 @@ $product = $repo->getById(5); // 5 is the _id of the document in Elasticsearch
 $repo = $this->get('sfes.index.product')->getRepository('AppBundle:Product');
 $searchBody = [
     'query' => [
-        'match_all' => []
+        'match_all' => (object) []
     ]
 ];
 $products = $repo->find($searchBody);
@@ -45,7 +45,7 @@ It is convenient to search in a single type as shown above, but sometime you may
 $finder = $this->get('sfes.finder');
 $searchBody = [
     'query' => [
-        'match_all' => []
+        'match_all' => (object) []
     ]
 ];
 $finder->find(['AppBundle:Product', 'AppBundle:Deals'], $searchBody);

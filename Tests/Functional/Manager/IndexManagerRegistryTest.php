@@ -21,10 +21,10 @@ class IndexManagerRegistryTest extends AbstractContainerAwareTestCase
         $im = $registry->get('foo');
         $this->assertInstanceOf(IndexManager::class, $im);
 
-        $this->setExpectedException(InvalidIndexManagerException::class);
+        $this->expectException(InvalidIndexManagerException::class);
         $im = $registry->get('blah');
 
-        $this->setExpectedException(InvalidIndexManagerException::class);
+        $this->expectException(InvalidIndexManagerException::class);
         $im = $registry->get('nonexisting');
     }
 

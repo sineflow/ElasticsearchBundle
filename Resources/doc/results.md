@@ -16,7 +16,7 @@ In addition to that, the **DocumentIterator** itself has some extra methods:
 $repo = $this->get('sfes.index.product')->getRepository('AppBundle:Product');
 $searchBody = [
     'query' => [
-        'match_all' => []
+        'match_all' => (object) []
     ]
 ];
 $products = $repo->find($searchBody);
