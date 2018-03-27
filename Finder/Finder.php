@@ -117,16 +117,16 @@ class Finder
 
         $client = $this->getConnection($documentClasses)->getClient();
 
-        $indicesAndTypes = $this->getTargetIndicesAndTypes($documentClasses);
+        $params = $this->getTargetIndicesAndTypes($documentClasses);
 
-        $params = array_merge($indicesAndTypes, [
-            'body' => $searchBody,
-        ]);
-
-        // Add any additional params specified, without overwriting the current ones
+        // Add any additional params specified, overwriting the current ones
+        // This allows for overriding the target index or type if necessary
         if (!empty($additionalRequestParams)) {
-            $params = array_merge($additionalRequestParams, $params);
+            $params = array_replace_recursive($params, $additionalRequestParams);
         }
+
+        // Set the body here, as we don't want to allow overriding it with the $additionalRequestParams
+        $params['body'] = $searchBody;
 
         // Execute a scroll request
         if (($resultsType & self::BITMASK_RESULT_ADAPTERS) === self::ADAPTER_SCROLL) {

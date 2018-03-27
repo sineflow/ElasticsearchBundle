@@ -29,6 +29,7 @@ Installation instructions and documentation of the bundle can be found [here](Re
 ## Breaking changes in version 5
 - Finder::ADAPTER_SCANSCROLL renamed to Finder::ADAPTER_SCROLL
 - class ScanScrollAdapter renamed to ScrollAdapter
+- Object annotation removed in favour of DocObject
 
 ## License
 

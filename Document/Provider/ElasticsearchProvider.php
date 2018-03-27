@@ -2,6 +2,8 @@
 
 namespace Sineflow\ElasticsearchBundle\Document\Provider;
 
+use Sineflow\ElasticsearchBundle\Finder\Adapter\ScrollAdapter;
+use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 
@@ -56,40 +58,24 @@ class ElasticsearchProvider extends AbstractProvider
      */
     public function getDocuments()
     {
-        // Build a scan search request
-        $params = [
-            'scroll' => $this->scrollTime,
-            'size' => $this->chunkSize,
-            'index' => $this->sourceIndexManager->getLiveIndex(),
-            'type' => $this->metadataCollector->getDocumentMetadata($this->sourceDocumentClass)->getType(),
-            'body' => ['sort' => ['_doc']],
-        ];
+        $repo = $this->sourceIndexManager->getRepository($this->sourceDocumentClass);
 
-        // Get the scroll ID
-        $docs = $this->sourceIndexManager->getConnection()->getClient()->search($params);
-        $scrollId = $docs['_scroll_id'];
+        /** @var ScrollAdapter $scrollAdapter */
+        $scrollAdapter = $repo->find(
+            ['sort' => ['_doc']],
+            Finder::RESULTS_RAW | Finder::ADAPTER_SCROLL,
+            [
+                'index' => $this->sourceIndexManager->getLiveIndex(),
+                'size' => $this->chunkSize,
+                'scroll' => $this->scrollTime,
+            ]
+        );
 
-        // Loop while there are results
-        while (\true) {
-            // Execute a scroll request
-            $response = $this->sourceIndexManager->getConnection()->getClient()->scroll(
-                [
-                    'scroll_id' => $scrollId,
-                    'scroll' => $this->scrollTime,
-                ]
-            );
-            if (count($response['hits']['hits']) > 0) {
-                foreach ($response['hits']['hits'] as $hit) {
-                    $doc = $hit['_source'];
-                    $doc['_id'] = $hit['_id'];
-                    yield $doc;
-                }
-
-                // Get the new scroll_id
-                $scrollId = $response['_scroll_id'];
-            } else {
-                // No more data
-                break;
+        while (false !== ($matches = $scrollAdapter->getNextScrollResults())) {
+            foreach ($matches['hits']['hits'] as $hit) {
+                $doc = $hit['_source'];
+                $doc['_id'] = $hit['_id'];
+                yield $doc;
             }
         }
     }
