@@ -40,6 +40,33 @@
 
 {% endblock %}
 
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        {{ include('@SineflowElasticsearch/Profiler/elasticsearch.css.twig') }}
+    </style>
+
+    <script type="text/javascript">//<![CDATA[
+        function expandQuery(link) {
+            var sections = link.children,
+                target = link.getAttribute('data-target-id');
+            if (document.getElementById(target).className != 'hide') {
+                document.getElementById(target).style.display = 'none';
+                document.getElementById(target).className = 'hide';
+                sections[0].style.display = 'inline';
+                sections[1].style.display = 'none';
+            } else {
+                document.getElementById(target).className = 'show';
+                document.getElementById(target).style.display = 'inline';
+                sections[0].style.display = 'none';
+                sections[1].style.display = 'inline';
+            }
+            return false;
+        }
+        //]]></script>
+{% endblock %}
+
 {% block menu %}
     {% set profiler_markup_version = profiler_markup_version|default(1) %}
 
@@ -90,10 +117,10 @@
                         <td nowrap="nowrap">{{ '%0.3f'|format(query.time) }}&nbsp;ms</td>
                         <td>
                             <div onclick="return expandQuery(this);" title="Expand query" data-target-id="sensecode-{{ i ~q }}" style="cursor: pointer;">
-                                <img alt="+" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}" style="display: inline;" />
-                                <img alt="-" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}" style="display: none;" />
+                                <span class="sf-icon" style="display: inline;">{{ include('@SineflowElasticsearch/images/icon-plus-square-o.svg') }}</span>
+                                <span class="sf-icon" style="display: none;">{{ include('@SineflowElasticsearch/images/icon-minus-square-o.svg') }}</span>
                                 <span id="smallsensecode-{{ i ~ q }}">
-                                    <strong>Sense:</strong>
+                                    <strong>Query:</strong>
                                     <small>
                                         {{ query.senseRequest|length > 50 ? query.senseRequest|slice(0, 100) ~ ' ...' : query.senseRequest }}
                                     </small>
@@ -104,10 +131,10 @@
                             </code>
 
                             <div onclick="return expandQuery(this);" title="Expand query" data-target-id="curlcode-{{ i ~q }}" style="cursor: pointer;">
-                                <img alt="+" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}" style="display: inline;" />
-                                <img alt="-" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}" style="display: none;" />
+                                <span class="sf-icon" style="display: inline;">{{ include('@SineflowElasticsearch/images/icon-plus-square-o.svg') }}</span>
+                                <span class="sf-icon" style="display: none;">{{ include('@SineflowElasticsearch/images/icon-minus-square-o.svg') }}</span>
                                 <span id="smallcurlcode-{{ i ~ q }}">
-                                    <strong>Request:</strong>
+                                    <strong>CLI Request:</strong>
                                     <small>
                                         {{ query.curlRequest|length > 50 ? query.curlRequest|slice(0, 100) ~ ' ...' : query.curlRequest }}
                                     </small>
@@ -119,8 +146,8 @@
 
 
                             <div onclick="return expandQuery(this);" title="Expand query" data-target-id="backtrace-{{ i ~q }}" style="cursor: pointer;">
-                                <img alt="+" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}" style="display: inline;" />
-                                <img alt="-" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}" style="display: none;" />
+                                <span class="sf-icon" style="display: inline;">{{ include('@SineflowElasticsearch/images/icon-plus-square-o.svg') }}</span>
+                                <span class="sf-icon" style="display: none;">{{ include('@SineflowElasticsearch/images/icon-minus-square-o.svg') }}</span>
                                 <span id="smallbacktrace-{{ i ~ q }}">
                                     <strong>Backtrace:</strong>
                                     <small>
@@ -166,59 +193,4 @@ To enable it, set 'sfes.profiler_backtrace_enabled' to true.</pre>
         </p>
     {% endif %}
 
-    <script type="text/javascript">//<![CDATA[
-        function expandQuery(link) {
-            var sections = link.children,
-                    target = link.getAttribute('data-target-id');
-            console.log(sections);
-            if (document.getElementById(target).className != 'hide') {
-                document.getElementById(target).style.display = 'none';
-                document.getElementById(target).className = 'hide';
-                sections[0].style.display = 'inline';
-                sections[1].style.display = 'none';
-            } else {
-                document.getElementById(target).className = 'show';
-                document.getElementById(target).style.display = 'inline';
-                sections[0].style.display = 'none';
-                sections[1].style.display = 'inline';
-            }
-            return false;
-        }
-        //]]></script>
-    <style>
-        code {
-            display: none;
-        }
-        code pre {
-            padding: 5px;
-            background-color: #DCDCDC;
-        }
-
-        ul.queries li h3 {
-            margin: 0px 0px 7px;
-        }
-
-        ul.queries hr {
-            border: 0;
-            height: 0;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        ul h3 i {
-            font-style: normal;
-            font-weight: 400;
-            color: #313131
-        }
-
-        ul.queries li ul li {
-            background-color: #f6f6f6;
-            padding: 10px;
-            margin: 0px 0px 5px 10px;
-        }
-
-        ul.queries li ul li div > div {
-            margin: 5px 0px;
-        }
-    </style>
 {% endblock %}
