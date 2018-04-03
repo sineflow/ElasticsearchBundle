@@ -125,8 +125,6 @@ class Repository
      * Depending on the connection autocommit mode, the removal may be committed right away.
      *
      * @param string $id Document ID to remove.
-     *
-     * @return array
      */
     public function delete($id)
     {
@@ -138,7 +136,7 @@ class Repository
      *
      * @param string $id     Document id to update.
      * @param array  $fields Fields array to update (ignored if script is specified).
-     * @param string $script Groovy script to update fields.
+     * @param string $script Script to update fields.
      * @param array  $params Additional parameters to pass to the client.
      */
     public function update($id, array $fields = [], $script = null, array $params = [])

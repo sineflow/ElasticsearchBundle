@@ -626,8 +626,6 @@ class IndexManager
      *
      * @param string $documentClass The document class in short notation (i.e. AppBundle:Product)
      * @param string $id            Document ID to remove.
-     *
-     * @return array
      */
     public function delete($documentClass, $id)
     {
@@ -651,7 +649,7 @@ class IndexManager
      * @param string $documentClass The document class in short notation (i.e. AppBundle:Product)
      * @param string $id            Document id to update.
      * @param array  $fields        Fields array to update (ignored if script is specified).
-     * @param string $script        Groovy script to update fields.
+     * @param string $script        Script to update fields.
      * @param array  $params        Additional parameters to pass to the client.
      */
     public function update($documentClass, $id, array $fields = [], $script = null, array $params = [])
