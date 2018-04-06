@@ -31,34 +31,38 @@ class BulkQueryItem
     private $query;
 
     /**
-     * @var int
-     */
-    private $id;
-
-    /**
      * @var array
      */
-    private $parent;
+    private $metaParams;
 
     /**
-     * @param string $operation One of: index, update, delete, create.
-     * @param string $index     Elasticsearch index name.
-     * @param string $type      Elasticsearch type name.
-     * @param array  $query     Bulk item data/params.
+     * @param string $operation  One of: index, update, delete, create.
+     * @param string $index      Elasticsearch index name.
+     * @param string $type       Elasticsearch type name.
+     * @param array  $query      Bulk item query (aka optional_source in the ES docs)
+     * @param array  $metaParams Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
      */
-    public function __construct($operation, $index, $type, array $query)
+    public function __construct($operation, $index, $type, array $query, array $metaParams = [])
     {
         if (!in_array($operation, ['index', 'create', 'update', 'delete'])) {
-            throw new InvalidArgumentException('Wrong bulk operation selected');
+            throw new InvalidArgumentException(sprintf('Invalid bulk operation "%s" specified', $operation));
         }
 
         $this->operation = $operation;
         $this->index = $index;
         $this->type = $type;
-        $this->id = isset($query['_id']) ? $query['_id'] : null;
-        $this->parent = isset($query['_parent']) ? $query['_parent'] : null;
-        unset($query['_id'], $query['_parent']);
+
+        // in case some meta param is specified as part of the query and not in $metaParams, move it there
+        // (this happens when converting a document entity to an array)
+        foreach (['_id', '_parent'] as $metaParam) {
+            if (isset($query[$metaParam])) {
+                $metaParams[$metaParam] = $query[$metaParam];
+                unset($query[$metaParam]);
+            }
+        }
+
         $this->query = $query;
+        $this->metaParams = $metaParams;
     }
 
     /**
@@ -67,6 +71,14 @@ class BulkQueryItem
     public function getIndex()
     {
         return $this->index;
+    }
+
+    /**
+     * @return array
+     */
+    public function getQuery()
+    {
+        return $this->query;
     }
 
     /**
@@ -80,12 +92,11 @@ class BulkQueryItem
         $result = [];
 
         $result[] = [
-            $this->operation => array_filter(
+            $this->operation => array_merge(
+                $this->metaParams,
                 [
                     '_index' => $forceIndex ?: $this->index,
                     '_type' => $this->type,
-                    '_id' => $this->id,
-                    '_parent' => $this->parent
                 ]
             ),
         ];
