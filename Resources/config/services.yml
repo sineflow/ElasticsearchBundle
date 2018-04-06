@@ -79,7 +79,7 @@ services:
 
     sfes.logger.log_handler:
         class: Monolog\Handler\RotatingFileHandler
-        arguments: ['%sfes.logging.path%', 0, notice]
+        arguments: ['%sfes.logging.path%', 0, debug]
 
     sfes.logger.log:
         class: Monolog\Logger
