@@ -175,14 +175,6 @@ class ConnectionManager
     }
 
     /**
-     * @return BulkQueryItem[]
-     */
-    public function getBulkOperations()
-    {
-        return $this->bulkQueries;
-    }
-
-    /**
      * Optional setter to change bulk query params.
      *
      * @param array $params Possible keys:
