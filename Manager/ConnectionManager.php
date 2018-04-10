@@ -153,16 +153,15 @@ class ConnectionManager
     /**
      * Adds query to bulk queries container.
      *
-     * @param string $operation One of: index, update, delete, create.
-     * @param string $index     Elasticsearch index name.
-     * @param string $type      Elasticsearch type name.
-     * @param array  $query     Bulk item data/params.
-     *
-     * @throws InvalidArgumentException
+     * @param string $operation  One of: index, update, delete, create.
+     * @param string $index      Elasticsearch index name.
+     * @param string $type       Elasticsearch type name.
+     * @param array  $query      Bulk item query (aka optional_source in the ES docs)
+     * @param array  $metaParams Additional meta data params for the bulk item
      */
-    public function addBulkOperation($operation, $index, $type, array $query)
+    public function addBulkOperation($operation, $index, $type, array $query, array $metaParams = [])
     {
-        $this->bulkQueries[] = new BulkQueryItem($operation, $index, $type, $query);
+        $this->bulkQueries[] = new BulkQueryItem($operation, $index, $type, $query, $metaParams);
     }
 
     /**
@@ -173,6 +172,14 @@ class ConnectionManager
     public function getBulkOperationsCount()
     {
         return count($this->bulkQueries);
+    }
+
+    /**
+     * @return BulkQueryItem[]
+     */
+    public function getBulkOperations()
+    {
+        return $this->bulkQueries;
     }
 
     /**
@@ -204,14 +211,43 @@ class ConnectionManager
             return;
         }
 
+        $bulkRequest = $this->getBulkRequest();
+
+        $response = $this->getClient()->bulk($bulkRequest);
+        if ($forceRefresh) {
+            $this->refresh();
+        }
+
+        $this->bulkQueries = [];
+
+        if ($response['errors']) {
+            $errorCount = $this->logBulkRequestErrors($response['items']);
+            $e = new BulkRequestException(sprintf('Bulk request failed with %s error(s)', $errorCount));
+            $e->setBulkResponseItems($response['items'], $bulkRequest);
+            throw $e;
+        }
+
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(Events::POST_COMMIT, new PostCommitEvent($response));
+        }
+    }
+
+    /**
+     * Get the current bulk request queued for commit
+     *
+     * @return array
+     */
+    private function getBulkRequest()
+    {
         // Go through each bulk query item
         $bulkRequest = [];
         $cachedAliasIndices = [];
         foreach ($this->bulkQueries as $bulkQueryItem) {
-            // Check whether the target index is actually an alias pointing to more than one index
             if (isset($cachedAliasIndices[$bulkQueryItem->getIndex()])) {
                 $indices = $cachedAliasIndices[$bulkQueryItem->getIndex()];
             } else {
+                // Check whether the target index is actually an alias pointing to more than one index
+                // in which case, two separate bulk query operation will be set for each physical index
                 $indices = array_keys($this->getClient()->indices()->getAlias(['index' => $bulkQueryItem->getIndex()]));
                 $cachedAliasIndices[$bulkQueryItem->getIndex()] = $indices;
             }
@@ -224,29 +260,14 @@ class ConnectionManager
 
         $bulkRequest = array_merge($bulkRequest, $this->bulkParams);
 
-        $response = $this->getClient()->bulk($bulkRequest);
-        if ($forceRefresh) {
-            $this->refresh();
-        }
-
-        $this->bulkQueries = [];
-
-        if ($response['errors']) {
-            $errorCount = $this->logBulkRequestErrors($response['items']);
-            $e = new BulkRequestException(sprintf('Bulk request failed with %s error(s)', $errorCount));
-            $e->setBulkResponseItems($response['items']);
-            throw $e;
-        }
-
-        if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(Events::POST_COMMIT, new PostCommitEvent($response));
-        }
+        return $bulkRequest;
     }
 
     /**
      * Logs errors from a bulk request and return their count
      *
      * @param array $responseItems bulk response items
+     *
      * @return int The errors count
      */
     private function logBulkRequestErrors($responseItems)
