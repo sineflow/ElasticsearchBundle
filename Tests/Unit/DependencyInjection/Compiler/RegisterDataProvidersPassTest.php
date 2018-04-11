@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\MappingPass;
 use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\RegisterDataProvidersPass;
 use Symfony\Component\DependencyInjection\Definition;
@@ -10,7 +11,7 @@ use Symfony\Component\HttpKernel\Kernel;
 /**
  * Unit tests for AddConnectionsPass.
  */
-class RegisterDataProvidersPassTest extends \PHPUnit_Framework_TestCase
+class RegisterDataProvidersPassTest extends TestCase
 {
     public function setUp()
     {

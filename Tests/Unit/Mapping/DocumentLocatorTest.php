@@ -2,12 +2,13 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\Mapping;
 
+use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
 
 /**
  * Class DocumentLocatorTest
  */
-class DocumentLocatorTest extends \PHPUnit_Framework_TestCase
+class DocumentLocatorTest extends TestCase
 {
     /**
      * @var DocumentLocator
@@ -20,9 +21,10 @@ class DocumentLocatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Data provider
      * @return array
      */
-    public function getTestResolveClassNameData()
+    public function getTestResolveClassNameDataProvider()
     {
         $out = [
             [
@@ -36,16 +38,17 @@ class DocumentLocatorTest extends \PHPUnit_Framework_TestCase
             [
                 'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product',
                 'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product',
-            ]
+            ],
         ];
 
         return $out;
     }
 
     /**
+     * Data provider
      * @return array
      */
-    public function testGetShortClassNameData()
+    public function getShortClassNameDataProvider()
     {
         $out = [
             [
@@ -59,16 +62,17 @@ class DocumentLocatorTest extends \PHPUnit_Framework_TestCase
             [
                 'AcmeBarBundle:Product',
                 'AcmeBarBundle:Product',
-            ]
+            ],
         ];
 
         return $out;
     }
 
     /**
+     * Data provider
      * @return array
      */
-    public function testGetShortClassNameExceptionsData()
+    public function getShortClassNameExceptionsDataProvider()
     {
         $out = [
             [
@@ -79,12 +83,12 @@ class DocumentLocatorTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'Blah',
-            ]
+            ],
         ];
-
 
         return $out;
     }
+
     /**
      * Tests setAllDocumentDir and getAllDocumentDir
      */
@@ -108,7 +112,7 @@ class DocumentLocatorTest extends \PHPUnit_Framework_TestCase
      * @param string $className
      * @param string $expectedClassName
      *
-     * @dataProvider getTestResolveClassNameData
+     * @dataProvider getTestResolveClassNameDataProvider
      */
     public function testResolveClassName($className, $expectedClassName)
     {
@@ -119,7 +123,7 @@ class DocumentLocatorTest extends \PHPUnit_Framework_TestCase
      * @param string $className
      * @param string $expectedShortClassName
      *
-     * @dataProvider testGetShortClassNameData
+     * @dataProvider getShortClassNameDataProvider
      */
     public function testGetShortClassName($className, $expectedShortClassName)
     {
@@ -129,8 +133,8 @@ class DocumentLocatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $className
      *
-     * @dataProvider testGetShortClassNameExceptionsData
-     * @expectedException UnexpectedValueException
+     * @dataProvider getShortClassNameExceptionsDataProvider
+     * @expectedException \UnexpectedValueException
      */
     public function testGetShortClassNameExceptions($className)
     {
@@ -144,7 +148,7 @@ class DocumentLocatorTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'AcmeFooBundle' => 'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\AcmeFooBundle',
-            'AcmeBarBundle' => 'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\AcmeBarBundle'
+            'AcmeBarBundle' => 'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\AcmeBarBundle',
         ];
     }
 }

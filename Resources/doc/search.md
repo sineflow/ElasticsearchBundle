@@ -14,7 +14,7 @@ $product = $repo->getById(5); // 5 is the _id of the document in Elasticsearch
 $repo = $this->get('sfes.index.product')->getRepository('AppBundle:Product');
 $searchBody = [
     'query' => [
-        'match_all' => []
+        'match_all' => (object) []
     ]
 ];
 $products = $repo->find($searchBody);
@@ -45,7 +45,7 @@ It is convenient to search in a single type as shown above, but sometime you may
 $finder = $this->get('sfes.finder');
 $searchBody = [
     'query' => [
-        'match_all' => []
+        'match_all' => (object) []
     ]
 ];
 $finder->find(['AppBundle:Product', 'AppBundle:Deals'], $searchBody);
@@ -96,29 +96,29 @@ return $this->render('template.twig', array(
 ```
 > **IMPORTANT:** Getting aggregations and suggestions is not supported for **Finder::RESULTS_ARRAY** results and you'd get NULL returned
 
-## Using scan&scroll to retrieve documents
+## Using scroll to retrieve documents
 
-When you need to quickly retrieve a lot of documents fast and you don't care about the order you're getting them in, using [scan and scroll](https://www.elastic.co/guide/en/elasticsearch/guide/1.x/scan-scroll.html) is the most efficient way to go.
-You just need to pass the **Finder::ADAPTER_SCANSCROLL** flag to the search results type, regardless of whether you are using the find() method of the **sfes.finder** service, or a **Repository** instance.
-That will give you a ScanScrollAdapter object, instead of actual results.
+When you need to retrieve a lot of documents in the most efficient way, using the [Scroll](https://www.elastic.co/guide/en/elasticsearch/reference/5.6/search-request-scroll.html#scroll-search-context) API is the way to go.
+You just need to pass the **Finder::ADAPTER_SCROLL** flag to the search results type, regardless of whether you are using the find() method of the **sfes.finder** service, or a **Repository** instance.
+That will give you a ScrollAdapter object, instead of actual results.
 Then you can use the adapter's **getNextScrollResults()** method to get the next scroll results until there are no more.
 
 
 ```
 $finder = $this->get('sfes.finder');
-$scanScrollAdapter = $finder->find(
+$scrollAdapter = $finder->find(
     ['AppBundle:Product'], 
     $searchQuery, 
-    Finder::RESULTS_RAW | Finder::ADAPTER_SCANSCROLL, 
+    Finder::RESULTS_RAW | Finder::ADAPTER_SCROLL, 
     ['size' => 1000, 'scroll' => '5m']
 );
 
-while (false !== ($matches = $scanScrollAdapter->getNextScrollResults())) {
+while (false !== ($matches = $scrollAdapter->getNextScrollResults())) {
     foreach ($matches['hits']['hits'] as $rawDoc) {
         // Do stuff with the document 
         // ...
     }
 }
 ```
-> You can optionally specify the chunk `size` and `scroll` time as additional params to the find() method. The defaults are `500` and `2m` 
-> **Tip:** The **Finder::ADAPTER_SCANSCROLL** works with any type of results, but you would usually want speed when you use it, so the most efficient way would be to get the raw results.
+> You can optionally specify the chunk `size` and `scroll` time as additional params to the find() method. The defaults are `10` and `1m` 
+> **Tip:** The **Finder::ADAPTER_SCROLL** works with any type of results, but you would usually want speed when you use it, so the most efficient way would be to get the raw results.

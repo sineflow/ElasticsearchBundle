@@ -7,7 +7,6 @@ use Doctrine\Common\Annotations\Reader;
 use Sineflow\ElasticsearchBundle\Annotation\DocObject;
 use Sineflow\ElasticsearchBundle\Annotation\Document;
 use Sineflow\ElasticsearchBundle\Annotation\Id;
-use Sineflow\ElasticsearchBundle\Annotation\Object;
 use Sineflow\ElasticsearchBundle\Annotation\ParentId;
 use Sineflow\ElasticsearchBundle\Annotation\Property;
 use Sineflow\ElasticsearchBundle\Annotation\Score;
@@ -178,7 +177,7 @@ class DocumentParser
 
                 case Id::class:
                     $propertyAnnotation->name = '_id';
-                    $propertyAnnotation->type = 'string';
+                    $propertyAnnotation->type = 'keyword';
                     $propertyMetadata[$propertyAnnotation->name] = [
                         'propertyName' => $propertyName,
                         'type' => $propertyAnnotation->type,
@@ -187,7 +186,7 @@ class DocumentParser
 
                 case ParentId::class:
                     $propertyAnnotation->name = '_parent';
-                    $propertyAnnotation->type = 'string';
+                    $propertyAnnotation->type = 'keyword';
                     $propertyMetadata[$propertyAnnotation->name] = [
                         'propertyName' => $propertyName,
                         'type' => $propertyAnnotation->type,
@@ -283,7 +282,6 @@ class DocumentParser
             'Document',
             'Property',
             'DocObject',
-            'Object',
             'Id',
             'ParentId',
             'Score',
@@ -349,8 +347,8 @@ class DocumentParser
 
             // If it is a multi-language property
             if (true === $propertyAnnotation->multilanguage) {
-                if ($propertyAnnotation->type != 'string') {
-                    throw new \InvalidArgumentException(sprintf('"%s" property in %s is declared as multilanguage, so can only be of type "string"', $propertyAnnotation->name, $documentReflection->getName()));
+                if (!in_array($propertyAnnotation->type, ['string', 'keyword', 'text'])) {
+                    throw new \InvalidArgumentException(sprintf('"%s" property in %s is declared as multilanguage, so can only be of type "keyword", "text" or the deprecated "string"', $propertyAnnotation->name, $documentReflection->getName()));
                 }
                 if (!$this->languageProvider) {
                     throw new \InvalidArgumentException('There must be a service tagged as "sfes.language_provider" in order to use multilanguage properties');
@@ -361,8 +359,7 @@ class DocumentParser
                 // TODO: The application should decide whether it wants to use a default field at all and set its mapping on a global base (or per property?)
                 // The custom mapping from the application should be set here, using perhaps some kind of decorator
                 $mapping[$propertyAnnotation->name.$this->languageSeparator.Property::DEFAULT_LANG_SUFFIX] = [
-                    'type' => 'string',
-                    'index' => 'not_analyzed',
+                    'type' => 'keyword',
                 ];
             } else {
                 $mapping[$propertyAnnotation->name] = $this->getPropertyMapping($propertyAnnotation, null, $indexAnalyzers);
@@ -379,7 +376,7 @@ class DocumentParser
             'indexAnalyzers' => $indexAnalyzers,
         ]);
 
-        // Object.
+        // Inner/nested object
         if (in_array($propertyAnnotation->type, ['object', 'nested']) && !empty($propertyAnnotation->objectName)) {
             $propertyMapping = array_replace_recursive($propertyMapping, $this->getObjectMapping($propertyAnnotation->objectName, $indexAnalyzers));
         }
@@ -421,9 +418,6 @@ class DocumentParser
     private function getRelationMapping(\ReflectionClass $documentReflection, $indexAnalyzers = [])
     {
         if ($this->reader->getClassAnnotation($documentReflection, DocObject::class)) {
-            return ['properties' => $this->getProperties($documentReflection, $indexAnalyzers)];
-        }
-        if ($this->reader->getClassAnnotation($documentReflection, Object::class)) {
             return ['properties' => $this->getProperties($documentReflection, $indexAnalyzers)];
         }
 

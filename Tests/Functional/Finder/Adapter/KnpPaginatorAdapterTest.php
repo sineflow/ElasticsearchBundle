@@ -78,7 +78,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
         $paginator = $this->getContainer()->get('knp_paginator');
 
-        $query = ['query' => ['match_all' => []], 'sort' => ['_uid' => ['order' =>'asc']]];
+        $query = ['query' => ['match_all' => (object) []], 'sort' => ['_uid' => ['order' =>'asc']]];
         $query['aggs'] = ['avg_price' => ['avg' => ['field' => 'price']]];
 
         // Test object results
@@ -131,7 +131,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
         $paginator = $this->getContainer()->get('knp_paginator');
 
-        $query = ['query' => ['match_all' => []]];
+        $query = ['query' => ['match_all' => (object) []]];
 
         $adapter = $repo->find($query, Finder::ADAPTER_KNP);
         $paginator->paginate($adapter);

@@ -15,7 +15,7 @@ class Customer extends AbstractDocument
      *
      * @var string
      *
-     * @ES\Property(name="name", type="string", options={"index"="not_analyzed"})
+     * @ES\Property(name="name", type="keyword")
      */
     public $name;
 

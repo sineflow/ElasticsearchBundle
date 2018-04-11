@@ -1,7 +1,6 @@
 parameters:
     sfes.logging.path: "%kernel.logs_dir%/%kernel.environment%.sf_elasticsearch.log"
     sfes.profiler_backtrace_enabled: false
-    sfes.profiler.template: SineflowElasticsearchBundle:Profiler:profiler.html.twig
     sfes.mlproperty.language_separator: '-'
 
     sfes.provider_self.class: Sineflow\ElasticsearchBundle\Document\Provider\ElasticsearchProvider
@@ -80,7 +79,7 @@ services:
 
     sfes.logger.log_handler:
         class: Monolog\Handler\RotatingFileHandler
-        arguments: ['%sfes.logging.path%', 0, notice]
+        arguments: ['%sfes.logging.path%', 0, debug]
 
     sfes.logger.log:
         class: Monolog\Logger
@@ -100,7 +99,7 @@ services:
             - [setIndexManagers, ['%sfes.indices%']]
             - [addLogger, ['@sfes.logger.trace']]
         tags:
-            - {name: data_collector, template: '%sfes.profiler.template%', id: sfes.profiler}
+            - {name: data_collector, template: "@SineflowElasticsearch/Profiler/profiler.html.twig", id: sfes.profiler}
 
     sfes.subscriber.knp_paginate_query_subscriber:
         class: Sineflow\ElasticsearchBundle\Subscriber\KnpPaginateQuerySubscriber

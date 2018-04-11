@@ -626,8 +626,6 @@ class IndexManager
      *
      * @param string $documentClass The document class in short notation (i.e. AppBundle:Product)
      * @param string $id            Document ID to remove.
-     *
-     * @return array
      */
     public function delete($documentClass, $id)
     {
@@ -637,6 +635,7 @@ class IndexManager
             'delete',
             $this->writeAlias,
             $documentMetadata->getType(),
+            [],
             ['_id' => $id]
         );
 
@@ -651,27 +650,36 @@ class IndexManager
      * @param string $documentClass The document class in short notation (i.e. AppBundle:Product)
      * @param string $id            Document id to update.
      * @param array  $fields        Fields array to update (ignored if script is specified).
-     * @param string $script        Groovy script to update fields.
-     * @param array  $params        Additional parameters to pass to the client.
+     * @param string $script        Script to update fields.
+     * @param array  $queryParams   Additional params to pass with the payload (upsert, doc_as_upsert, _source, etc.)
+     * @param array  $metaParams    Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
      */
-    public function update($documentClass, $id, array $fields = [], $script = null, array $params = [])
+    public function update($documentClass, $id, array $fields = [], $script = null, array $queryParams = [], array $metaParams = [])
     {
         $documentMetadata = $this->metadataCollector->getDocumentMetadata($documentClass);
 
-        $query = array_filter(array_merge(
+        // Add the id of the updated document to the meta params for the bulk request
+        $metaParams = array_merge(
+            $metaParams,
             [
                 '_id' => $id,
+            ]
+        );
+
+        $query = array_filter(array_merge(
+            $queryParams,
+            [
                 'doc' => $fields,
                 'script' => $script,
-            ],
-            $params
+            ]
         ));
 
         $this->getConnection()->addBulkOperation(
             'update',
             $this->writeAlias,
             $documentMetadata->getType(),
-            $query
+            $query,
+            $metaParams
         );
 
         if ($this->getConnection()->isAutocommit()) {
@@ -683,9 +691,10 @@ class IndexManager
      * Adds document to a bulk request for the next commit.
      * Depending on the connection autocommit mode, the update may be committed right away.
      *
-     * @param DocumentInterface $document The document entity to index in ES
+     * @param DocumentInterface $document   The document entity to index in ES
+     * @param array             $metaParams Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
      */
-    public function persist(DocumentInterface $document)
+    public function persist(DocumentInterface $document, array $metaParams = [])
     {
         if ($this->eventDispatcher) {
             $bulkOperationIndex = $this->getConnection()->getBulkOperationsCount();
@@ -693,7 +702,7 @@ class IndexManager
         }
 
         $documentArray = $this->documentConverter->convertToArray($document);
-        $this->persistRaw(get_class($document), $documentArray);
+        $this->persistRaw(get_class($document), $documentArray, $metaParams);
     }
 
     /**
@@ -702,8 +711,9 @@ class IndexManager
      *
      * @param string $documentClass The document class in short notation (i.e. AppBundle:Product)
      * @param array  $documentArray The document to index in ES
+     * @param array  $metaParams    Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
      */
-    public function persistRaw($documentClass, array $documentArray)
+    public function persistRaw($documentClass, array $documentArray, array $metaParams = [])
     {
         $documentMetadata = $this->metadataCollector->getDocumentMetadata($documentClass);
 
@@ -711,7 +721,8 @@ class IndexManager
             'index',
             $this->writeAlias,
             $documentMetadata->getType(),
-            $documentArray
+            $documentArray,
+            $metaParams
         );
 
         if ($this->getConnection()->isAutocommit()) {

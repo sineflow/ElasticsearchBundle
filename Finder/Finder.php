@@ -4,7 +4,7 @@ namespace Sineflow\ElasticsearchBundle\Finder;
 
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Sineflow\ElasticsearchBundle\DTO\TypesToDocumentClasses;
-use Sineflow\ElasticsearchBundle\Finder\Adapter\ScanScrollAdapter;
+use Sineflow\ElasticsearchBundle\Finder\Adapter\ScrollAdapter;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
@@ -24,10 +24,9 @@ class Finder
 
     const BITMASK_RESULT_ADAPTERS = 192;
     const ADAPTER_KNP = 64;
-    const ADAPTER_SCANSCROLL = 128;
+    const ADAPTER_SCROLL = 128;
 
-    const SCROLL_TIME = '2m';
-    const SCAN_CHUNK_SIZE = '500';
+    const SCROLL_TIME = '1m';
 
     /**
      * @var DocumentMetadataCollector
@@ -118,29 +117,28 @@ class Finder
 
         $client = $this->getConnection($documentClasses)->getClient();
 
-        $indicesAndTypes = $this->getTargetIndicesAndTypes($documentClasses);
+        $params = $this->getTargetIndicesAndTypes($documentClasses);
 
-        $params = array_merge($indicesAndTypes, [
-            'body' => $searchBody,
-        ]);
-
-        // Add any additional params specified, without overwriting the current ones
+        // Add any additional params specified, overwriting the current ones
+        // This allows for overriding the target index or type if necessary
         if (!empty($additionalRequestParams)) {
-            $params = array_merge($additionalRequestParams, $params);
+            $params = array_replace_recursive($params, $additionalRequestParams);
         }
 
-        // Execute a Scan(&Scroll) request
-        if (($resultsType & self::BITMASK_RESULT_ADAPTERS) === self::ADAPTER_SCANSCROLL) {
-            $params['search_type'] = 'scan';
+        // Set the body here, as we don't want to allow overriding it with the $additionalRequestParams
+        $params['body'] = $searchBody;
+
+        // Execute a scroll request
+        if (($resultsType & self::BITMASK_RESULT_ADAPTERS) === self::ADAPTER_SCROLL) {
             // Set default scroll and size, unless custom ones were provided through $additionalRequestParams
-            $params = array_merge([
+            $params = array_replace_recursive([
                 'scroll' => self::SCROLL_TIME,
-                'size' => self::SCAN_CHUNK_SIZE,
+                'body' => ['sort' => ['_doc']],
             ], $params);
 
-            $scrollId = $client->search($params)['_scroll_id'];
+            $rawResults = $client->search($params);
 
-            return new ScanScrollAdapter($this, $documentClasses, $scrollId, $resultsType);
+            return new ScrollAdapter($this, $documentClasses, $rawResults, $resultsType, $params['scroll']);
         }
 
         $raw = $client->search($params);
@@ -236,6 +234,40 @@ class Finder
     }
 
     /**
+     * Parse raw search result into an object iterator, array or as-is, depending on results type
+     *
+     * @param array    $raw             The raw results as received from Elasticsearch
+     * @param int      $resultsType     Bitmask value determining how the results are returned
+     * @param string[] $documentClasses The ES entity classes that may be returned from the search
+     *
+     * @return array|DocumentIterator
+     */
+    public function parseResult($raw, $resultsType, array $documentClasses = null)
+    {
+        switch ($resultsType & self::BITMASK_RESULT_TYPES) {
+            case self::RESULTS_OBJECT:
+                if (empty($documentClasses)) {
+                    throw new \InvalidArgumentException('$documentClasses must be specified when retrieving results as objects');
+                }
+
+                return new DocumentIterator(
+                    $raw,
+                    $this->documentConverter,
+                    $this->getTypesToDocumentClasses($documentClasses)
+                );
+
+            case self::RESULTS_ARRAY:
+                return $this->convertToNormalizedArray($raw);
+
+            case self::RESULTS_RAW:
+                return $raw;
+
+            default:
+                throw new \InvalidArgumentException('Wrong results type selected');
+        }
+    }
+
+    /**
      * Returns a mapping of live indices and types to the document classes in short notation that represent them
      *
      * @param string[] $documentClasses
@@ -262,32 +294,6 @@ class Finder
         }
 
         return $typesToDocumentClasses;
-    }
-
-
-    private function parseResult($raw, $resultsType, array $documentClasses = null)
-    {
-        switch ($resultsType & self::BITMASK_RESULT_TYPES) {
-            case self::RESULTS_OBJECT:
-                if (empty($documentClasses)) {
-                    throw new \InvalidArgumentException('$documentClasses must be specified when retrieving results as objects');
-                }
-
-                return new DocumentIterator(
-                    $raw,
-                    $this->documentConverter,
-                    $this->getTypesToDocumentClasses($documentClasses)
-                );
-
-            case self::RESULTS_ARRAY:
-                return $this->convertToNormalizedArray($raw);
-
-            case self::RESULTS_RAW:
-                return $raw;
-
-            default:
-                throw new \InvalidArgumentException('Wrong results type selected');
-        }
     }
 
     /**

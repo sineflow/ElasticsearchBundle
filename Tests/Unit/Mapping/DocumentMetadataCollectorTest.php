@@ -3,12 +3,13 @@
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\Mapping;
 
 use Doctrine\Common\Cache\CacheProvider;
+use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadata;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentParser;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 
-class DocumentMetadataCollectorTest extends \PHPUnit_Framework_TestCase
+class DocumentMetadataCollectorTest extends TestCase
 {
     /**
      * @var DocumentMetadataCollector
@@ -79,7 +80,7 @@ class DocumentMetadataCollectorTest extends \PHPUnit_Framework_TestCase
                             '_id' =>
                             array (
                                 'propertyName' => 'id',
-                                'type' => 'string',
+                                'type' => 'keyword',
                                 'propertyAccess' => 1,
                             ),
                             '_score' =>

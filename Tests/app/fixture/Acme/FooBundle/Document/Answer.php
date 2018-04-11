@@ -23,7 +23,7 @@ class Answer extends AbstractDocument
     /**
      * @var string
      *
-     * @ES\Property(name="text", type="string")
+     * @ES\Property(name="text", type="text")
      */
     public $text;
 }

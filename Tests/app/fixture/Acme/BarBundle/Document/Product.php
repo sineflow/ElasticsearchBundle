@@ -22,12 +22,12 @@ class Product extends AbstractDocument
     /**
      * @var string
      * @ES\Property(
-     *  type="string",
+     *  type="text",
      *  name="title",
      *  options={
      *    "fields"={
-     *        "raw"={"type"="string", "index"="not_analyzed"},
-     *        "title"={"type"="string"}
+     *        "raw"={"type"="keyword"},
+     *        "title"={"type"="text"}
      *    }
      *  }
      * )
@@ -36,7 +36,7 @@ class Product extends AbstractDocument
 
     /**
      * @var string
-     * @ES\Property(type="string", name="description")
+     * @ES\Property(type="text", name="description")
      */
     public $description;
 
@@ -81,13 +81,13 @@ class Product extends AbstractDocument
      *
      * @ES\Property(
      *  name="ml_info",
-     *  type="string",
+     *  type="text",
      *  multilanguage=true,
      *  options={
      *      "analyzer":"{lang}_analyzer",
      *      "fields": {
      *          "ngram": {
-     *              "type": "string",
+     *              "type": "text",
      *              "analyzer":"{lang}_analyzer"
      *          }
      *      }
@@ -100,7 +100,7 @@ class Product extends AbstractDocument
      * @var int
      *
      * @ES\Property(
-     *     type="string",
+     *     type="text",
      *     name="pieces_count",
      *     options={
      *        "fields"={

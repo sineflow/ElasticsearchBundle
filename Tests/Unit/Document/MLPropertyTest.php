@@ -2,12 +2,13 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\Document;
 
+use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\Document\MLProperty;
 
 /**
  * Class MLPropertyTest
  */
-class MLPropertyTest extends \PHPUnit_Framework_TestCase
+class MLPropertyTest extends TestCase
 {
     /**
      * Tests if value is set and returned correctly

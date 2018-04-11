@@ -2,14 +2,13 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Finder\Adapter;
 
-use Knp\Bundle\PaginatorBundle\Pagination\SlidingPagination;
 use Sineflow\ElasticsearchBundle\Document\Repository\Repository;
-use Sineflow\ElasticsearchBundle\Finder\Adapter\ScanScrollAdapter;
+use Sineflow\ElasticsearchBundle\Finder\Adapter\ScrollAdapter;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product;
 
-class ScanScrollAdapterTest extends AbstractElasticsearchTestCase
+class ScrollAdapterTest extends AbstractElasticsearchTestCase
 {
     /**
      * {@inheritdoc}
@@ -29,7 +28,7 @@ class ScanScrollAdapterTest extends AbstractElasticsearchTestCase
                     ],
                     [
                         '_id' => '3',
-                        'title' => '3rd Product',
+                        'title' => '3rd product',
                     ],
                     [
                         '_id' => 'aaa',
@@ -63,15 +62,14 @@ class ScanScrollAdapterTest extends AbstractElasticsearchTestCase
         $query = ['query' => ['term' => ['title' => ['value' => 'product']]]];
 
         // Test object results
+        /** @var ScrollAdapter $scrollAdapter */
+        $scrollAdapter = $repo->find($query, Finder::RESULTS_OBJECT | Finder::ADAPTER_SCROLL, ['size' => 2]);
 
-        /** @var ScanScrollAdapter $scanScrollAdapter */
-        $scanScrollAdapter = $repo->find($query, Finder::RESULTS_OBJECT | Finder::ADAPTER_SCANSCROLL, ['size' => 2]);
-
-        $this->assertInstanceOf(ScanScrollAdapter::class, $scanScrollAdapter);
+        $this->assertInstanceOf(ScrollAdapter::class, $scrollAdapter);
 
         $i = 0;
         $scrolls = 0;
-        while (false !== ($matches = $scanScrollAdapter->getNextScrollResults())) {
+        while (false !== ($matches = $scrollAdapter->getNextScrollResults())) {
             foreach ($matches as $doc) {
                 $this->assertInstanceOf(Product::class, $doc);
                 $i++;
@@ -79,58 +77,59 @@ class ScanScrollAdapterTest extends AbstractElasticsearchTestCase
             $scrolls++;
         }
         $this->assertEquals(6, $i, 'Total matching documents iterated');
-        $this->assertEquals(6, $scanScrollAdapter->getTotalHits(), 'Total hits returned by scroll');
-        // The number of documents in each scroll should be 4 ([the size given to find()] * [number of shards for the index])
-        // So 6 matching results should be retrieved in 2 scrolls
-        $this->assertEquals(2, $scrolls, 'Total number of scrolls');
+        $this->assertEquals(6, $scrollAdapter->getTotalHits(), 'Total hits returned by scroll');
+        $this->assertEquals(3, $scrolls, 'Total number of scrolls');
+
 
         // Test array results
+        /** @var ScrollAdapter $scrollAdapter */
+        $scrollAdapter = $repo->find($query, Finder::RESULTS_ARRAY | Finder::ADAPTER_SCROLL, ['size' => 3, 'scroll' => '3m']);
 
-        /** @var ScanScrollAdapter $scanScrollAdapter */
-        $scanScrollAdapter = $repo->find($query, Finder::RESULTS_ARRAY | Finder::ADAPTER_SCANSCROLL, ['size' => 2]);
-
-        $this->assertInstanceOf(ScanScrollAdapter::class, $scanScrollAdapter);
+        $this->assertInstanceOf(ScrollAdapter::class, $scrollAdapter);
 
         $i = 0;
         $scrolls = 0;
         $prevId = null;
-        while (false !== ($matches = $scanScrollAdapter->getNextScrollResults())) {
+        while (false !== ($matches = $scrollAdapter->getNextScrollResults())) {
             foreach ($matches as $id => $doc) {
                 $this->assertInternalType('array', $doc);
                 $this->assertArrayHasKey('title', $doc, 'Document array returned');
-                $this->assertNotEquals($prevId, $id, 'Document return is not the same as the previous one');
+                $this->assertNotEquals($prevId, $id, 'Document returned is the same as the previous one');
                 $i++;
                 $prevId = $id;
             }
             $scrolls++;
         }
         $this->assertEquals(6, $i, 'Total matching documents iterated');
-        $this->assertEquals(6, $scanScrollAdapter->getTotalHits(), 'Total hits returned by scroll');
+        $this->assertEquals(6, $scrollAdapter->getTotalHits(), 'Total hits returned by scroll');
         $this->assertEquals(2, $scrolls, 'Total number of scrolls');
 
         // Test raw results
 
-        /** @var ScanScrollAdapter $scanScrollAdapter */
-        $scanScrollAdapter = $repo->find($query, Finder::RESULTS_RAW | Finder::ADAPTER_SCANSCROLL, ['size' => 2]);
+        $query = ['query' => ['term' => ['title' => ['value' => 'product']]], 'sort' => ['_uid']];
 
-        $this->assertInstanceOf(ScanScrollAdapter::class, $scanScrollAdapter);
+        /** @var ScrollAdapter $scrollAdapter */
+        $scrollAdapter = $repo->find($query, Finder::RESULTS_RAW | Finder::ADAPTER_SCROLL, ['size' => 4]);
+
+        $this->assertInstanceOf(ScrollAdapter::class, $scrollAdapter);
 
         $i = 0;
         $scrolls = 0;
         $prevId = null;
-        while (false !== ($matches = $scanScrollAdapter->getNextScrollResults())) {
+        while (false !== ($matches = $scrollAdapter->getNextScrollResults())) {
             $this->assertArrayHasKey('hits', $matches, 'Raw results returned');
             foreach ($matches['hits']['hits'] as $doc) {
                 $this->assertInternalType('array', $doc);
                 $this->assertArrayHasKey('_id', $doc, 'Document array returned');
-                $this->assertNotEquals($prevId, $id, 'Document return is not the same as the previous one');
+                $this->assertEquals('product#'.$doc['_id'], $doc['sort'][0], 'The correct sort order is not applied');
+                $this->assertNotEquals($prevId, $doc['_id'], 'Document returned is the same as the previous one');
                 $i++;
                 $prevId = $doc['_id'];
             }
             $scrolls++;
         }
         $this->assertEquals(6, $i, 'Total matching documents iterated');
-        $this->assertEquals(6, $scanScrollAdapter->getTotalHits(), 'Total hits returned by scroll');
+        $this->assertEquals(6, $scrollAdapter->getTotalHits(), 'Total hits returned by scroll');
         $this->assertEquals(2, $scrolls, 'Total number of scrolls');
     }
 }

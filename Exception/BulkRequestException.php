@@ -9,12 +9,16 @@ class BulkRequestException extends Exception
 {
     private $bulkResponseItems = [];
 
+    private $bulkRequest = [];
+
     /**
      * @param string $bulkResponseItems
+     * @param array  $bulkRequest
      */
-    public function setBulkResponseItems($bulkResponseItems)
+    public function setBulkResponseItems($bulkResponseItems, array $bulkRequest)
     {
         $this->bulkResponseItems = $bulkResponseItems;
+        $this->bulkRequest = $bulkRequest;
     }
 
     /**
@@ -23,5 +27,13 @@ class BulkRequestException extends Exception
     public function getBulkResponseItems()
     {
         return $this->bulkResponseItems;
+    }
+
+    /**
+     * @return array
+     */
+    public function getBulkRequest()
+    {
+        return $this->bulkRequest;
     }
 }

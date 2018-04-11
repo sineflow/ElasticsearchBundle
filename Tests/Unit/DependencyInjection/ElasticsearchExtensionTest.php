@@ -2,18 +2,14 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\DependencyInjection;
 
+use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\DependencyInjection\SineflowElasticsearchExtension;
-use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
-use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Parameter;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Unit tests for ElasticsearchExtension.
  */
-class ElasticsearchExtensionTest extends \PHPUnit_Framework_TestCase
+class ElasticsearchExtensionTest extends TestCase
 {
     /**
      * @return array
