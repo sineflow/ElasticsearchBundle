@@ -22,6 +22,7 @@
     "require-dev": {
         "monolog/monolog": "~1.0",
         "knplabs/knp-paginator-bundle": "~2.7",
+        "doctrine/orm": "~2.5",
         "mikey179/vfsStream": "~1.6",
         "phpunit/phpunit": "~6.0",
         "squizlabs/php_codesniffer": "3.*",
@@ -29,7 +30,8 @@
     },
     "suggest": {
         "monolog/monolog": "Allows for client-level logging and tracing",
-        "knplabs/knp-paginator-bundle": "Allows for search results to be paginated"
+        "knplabs/knp-paginator-bundle": "Allows for search results to be paginated",
+        "doctrine/orm": "Allows for using Doctrine as source for rebuilding indices"
     },
     "autoload": {
         "psr-4": { "Sineflow\\ElasticsearchBundle\\": "" }
