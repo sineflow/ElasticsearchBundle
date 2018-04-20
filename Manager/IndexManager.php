@@ -464,7 +464,7 @@ class IndexManager
                         $this->persist($document);
                     }
                     // Send the bulk request every X documents, so it doesn't get too big
-                    if ($i % $batchSize == 0) {
+                    if (0 === $i % $batchSize) {
                         $this->getConnection()->commit();
                     }
                     $i++;

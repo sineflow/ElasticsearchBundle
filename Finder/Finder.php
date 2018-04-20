@@ -65,6 +65,7 @@ class Finder
      * @param string $documentClass In short notation (i.e AppBundle:Product)
      * @param string $id
      * @param int    $resultType
+     *
      * @return mixed
      */
     public function get($documentClass, $id, $resultType = self::RESULTS_OBJECT)
@@ -107,6 +108,7 @@ class Finder
      * @param int      $resultsType             Bitmask value determining how the results are returned
      * @param array    $additionalRequestParams Additional params to pass to the ES client's search() method
      * @param int      $totalHits               (out param) The total hits of the query response
+     *
      * @return mixed
      */
     public function find(array $documentClasses, array $searchBody, $resultsType = self::RESULTS_OBJECT, array $additionalRequestParams = [], &$totalHits = null)
@@ -157,6 +159,7 @@ class Finder
      * @param string $scrollTime      The time to keep the scroll window open
      * @param int    $resultsType     Bitmask value determining how the results are returned
      * @param int    $totalHits       (out param) The total hits of the query response
+     *
      * @return mixed
      */
     public function scroll(array $documentClasses, &$scrollId, $scrollTime = self::SCROLL_TIME, $resultsType = self::RESULTS_OBJECT, &$totalHits = null)
@@ -183,6 +186,7 @@ class Finder
      * @param array $documentClasses
      * @param array $searchBody
      * @param array $additionalRequestParams
+     *
      * @return int
      */
     public function count(array $documentClasses, array $searchBody = [], array $additionalRequestParams = [])
@@ -192,6 +196,10 @@ class Finder
         $params = $this->getTargetIndicesAndTypes($documentClasses);
 
         if (!empty($searchBody)) {
+            // Make sure sorting is not set in the query as it is not allowed for a count request
+            // ES2 didn't mind, but ES5 with throw an exception
+            unset($searchBody['sort']);
+
             $params['body'] = $searchBody;
         }
 
@@ -209,6 +217,7 @@ class Finder
      * based on the given document classes in short notation (AppBundle:Product)
      *
      * @param string[] $documentClasses
+     *
      * @return array
      */
     public function getTargetIndicesAndTypes(array $documentClasses)
@@ -271,6 +280,7 @@ class Finder
      * Returns a mapping of live indices and types to the document classes in short notation that represent them
      *
      * @param string[] $documentClasses
+     *
      * @return TypesToDocumentClasses
      */
     private function getTypesToDocumentClasses(array $documentClasses)
@@ -333,6 +343,7 @@ class Finder
      * Verify that all types are in indices using the same connection object and return that object
      *
      * @param array $documentClasses
+     *
      * @return ConnectionManager
      */
     private function getConnection(array $documentClasses)
@@ -341,7 +352,7 @@ class Finder
         foreach ($documentClasses as $documentClass) {
             $indexManagerName = $this->documentMetadataCollector->getDocumentClassIndex($documentClass);
             $indexManager = $this->indexManagerRegistry->get($indexManagerName);
-            if (!is_null($connection) && $indexManager->getConnection()->getConnectionName() != $connection->getConnectionName()) {
+            if (!is_null($connection) && $indexManager->getConnection()->getConnectionName() !== $connection->getConnectionName()) {
                 throw new \InvalidArgumentException(sprintf('All searched types must be in indices within the same connection'));
             }
             $connection = $indexManager->getConnection();

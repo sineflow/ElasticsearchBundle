@@ -5,6 +5,7 @@ namespace Sineflow\ElasticsearchBundle\Document\Provider;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
+use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 
 /**
  * Base doctrine document provider
@@ -65,6 +66,7 @@ abstract class AbstractDoctrineProvider extends AbstractProvider
      * Converts a Doctrine entity to Elasticsearch entity
      *
      * @param mixed $entity A doctrine entity object or data array
+     *
      * @return mixed An ES document entity object or document array
      */
     abstract protected function getAsDocument($entity);
@@ -74,6 +76,8 @@ abstract class AbstractDoctrineProvider extends AbstractProvider
      * The returned data can be either a document entity or an array ready for direct sending to ES
      *
      * @return \Generator<DocumentInterface|array>
+     *
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      */
     public function getDocuments()
     {
@@ -108,6 +112,7 @@ abstract class AbstractDoctrineProvider extends AbstractProvider
      * The returned data can be either a document entity or an array ready for direct sending to ES
      *
      * @param int|string $id
+     *
      * @return DocumentInterface|array
      */
     public function getDocument($id)
