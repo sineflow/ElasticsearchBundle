@@ -14,7 +14,7 @@ class IndexBuildCommandTest extends AbstractCommandTestCase
      */
     public function testExecute()
     {
-        $manager = $this->getIndexManager('foo');
+        $manager = $this->getIndexManager('customer');
 
         // Initialize command
         $commandName = 'sineflow:es:index:build';
@@ -31,7 +31,7 @@ class IndexBuildCommandTest extends AbstractCommandTestCase
         );
 
         $expectedOutput = sprintf(
-            'Built index for "foo"'
+            'Built index for "customer"'
         );
 
         // Test if the command output matches the expected output or not

@@ -18,7 +18,7 @@ class IndexManagerRegistryTest extends AbstractContainerAwareTestCase
         /** @var IndexManagerRegistry $registry */
         $registry = $this->getContainer()->get('sfes.index_manager_registry');
 
-        $im = $registry->get('foo');
+        $im = $registry->get('customer');
         $this->assertInstanceOf(IndexManager::class, $im);
 
         $this->expectException(InvalidIndexManagerException::class);

@@ -26,11 +26,16 @@ sineflow_elasticsearch:
                 refresh_interval: -1
                 number_of_replicas: 0
 
-        foo:
+        customer: # foo:
             extends: _base
-            name: sineflow-esb-test
+            name: sineflow-esb-test-customer
             types:
                 - AcmeFooBundle:Customer
+
+        order: # foo:
+            extends: _base
+            name: sineflow-esb-test-order
+            types:
                 - AcmeFooBundle:Order
 
         bar:

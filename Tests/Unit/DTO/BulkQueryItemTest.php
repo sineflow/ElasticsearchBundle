@@ -17,14 +17,13 @@ class BulkQueryItemTest extends TestCase
     {
         return [
             [
-                ['index', 'myindex', 'mytype', ['_id' => '3', '_parent' => 5, 'foo' => 'bar'], false],
+                ['index', 'myindex', 'mytype', ['_id' => '3', 'foo' => 'bar'], false],
                 [
                     [
                         'index' => [
                             '_index' => 'myindex',
                             '_type' => 'mytype',
-                            '_id' => 3,
-                            '_parent' => 5
+                            '_id' => 3
                         ]
                     ],
                     [
