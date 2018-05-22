@@ -54,7 +54,7 @@ class BulkQueryItem
 
         // in case some meta param is specified as part of the query and not in $metaParams, move it there
         // (this happens when converting a document entity to an array)
-        foreach (['_id', '_parent'] as $metaParam) {
+        foreach (['_id'] as $metaParam) {
             if (isset($query[$metaParam])) {
                 $metaParams[$metaParam] = $query[$metaParam];
                 unset($query[$metaParam]);

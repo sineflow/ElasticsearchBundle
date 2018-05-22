@@ -1,6 +1,6 @@
 parameters:
     elasticsearch_hosts:
-        - '127.0.0.1:9200'
+        - '192.168.56.115:9200'
 
 # Framework Configuration
 framework:
@@ -32,13 +32,6 @@ sineflow_elasticsearch:
             types:
                 - AcmeFooBundle:Customer
                 - AcmeFooBundle:Order
-
-        qanda:
-            extends: _base
-            name: sineflow-esb-test-qanda
-            types:
-                - AcmeFooBundle:Question
-                - AcmeFooBundle:Answer
 
         bar:
             connection: default

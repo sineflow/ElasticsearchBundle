@@ -40,12 +40,6 @@ The class representing a document must be annotated as `@ES\Document`. The follo
 repositoryClass="AppBundle\Document\Repository\ProductRepository"
 ```
 
-- `parent` Allows you to specify a parent type ([more info here](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-parent-field.html))
-```
-parent="AppBundle:ParentDoc"
-```
-This should be used in conjunction with the <a href="#parentid">@ES\ParentId</a> meta annotation
-
 - `options` Allows to specify any type option supported by Elasticsearch, such as [\_all](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-all-field.html), [dynamic_templates](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-templates.html), [dynamic_date_formats](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-field-mapping.html#date-detection), etc. 
 
 ### Property annotation
@@ -146,34 +140,6 @@ class Product
 }
 ```
 > Such property is already defined in `AbstractDocument`, so you can just extend it.
-
-#### <a name=parentid></a>@ES\ParentId
-
-When you need to have a parent-child relation between two types in your index, you'd need access to the `_parent` meta field of the document.
-To do that, you will need a class property with that annotation that can be used for both setting and getting the `_parent` value.
-
-```php
-use Sineflow\ElasticsearchBundle\Annotation as ES;
-
-/**
- * @ES\Document(
- *     type="answers",
- *     parent="AppBundle:Question"
- * );
- */
-class Answer
-{
-    /**
-     * @var string
-     *
-     * @ES\ParentId
-     */
-    public $parent;
-}
-```
-> Do not forget to also set the `parent` property of the `@ES\Document` annotation to specify the parent entity for that type. 
-
-**WARNING**: If using Elasticsearch 1.x, the parent property value will NOT be populated when retrieving documents, as Elasticsearch does not return it by default! 
 
 ## DocObject class annotation
 
