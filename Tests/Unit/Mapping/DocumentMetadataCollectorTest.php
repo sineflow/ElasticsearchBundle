@@ -119,12 +119,12 @@ class DocumentMetadataCollectorTest extends TestCase
                     'analysis' => [
                         'filter' => [
                             'test_filter' => [
-                                'type' => 'nGram'
+                                'type' => 'ngram'
                             ]
                         ],
                         'tokenizer' => [
                             'test_tokenizer' => [
-                                'type' => 'nGram'
+                                'type' => 'ngram'
                             ]
                         ],
                         'analyzer' => [
