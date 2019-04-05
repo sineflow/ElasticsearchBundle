@@ -127,7 +127,7 @@ class DocumentConverter
                 $objectValue = $array[$esField];
             }
 
-            if ($propertyMetadata['propertyAccess'] == DocumentMetadata::PROPERTY_ACCESS_PRIVATE) {
+            if ($propertyMetadata['propertyAccess'] === DocumentMetadata::PROPERTY_ACCESS_PRIVATE) {
                 $object->{$propertyMetadata['methods']['setter']}($objectValue);
             } else {
                 $object->{$propertyMetadata['propertyName']} = $objectValue;
@@ -154,7 +154,7 @@ class DocumentConverter
         $array = [];
 
         foreach ($propertiesMetadata as $name => $propertyMetadata) {
-            if ($propertyMetadata['propertyAccess'] == DocumentMetadata::PROPERTY_ACCESS_PRIVATE) {
+            if ($propertyMetadata['propertyAccess'] === DocumentMetadata::PROPERTY_ACCESS_PRIVATE) {
                 $value = $object->{$propertyMetadata['methods']['getter']}();
             } else {
                 $value = $object->{$propertyMetadata['propertyName']};
@@ -181,7 +181,7 @@ class DocumentConverter
                     $array[$name] = $new;
                 } elseif ($value instanceof MLProperty) {
                     foreach ($value->getValues() as $language => $langValue) {
-                        $array[$name . $this->languageSeparator . $language] = $langValue;
+                        $array[$name.$this->languageSeparator.$language] = $langValue;
                     }
                 } else {
                     $array[$name] = $value;
@@ -196,7 +196,7 @@ class DocumentConverter
      * Check if object is the correct type
      *
      * @param ObjectInterface $object
-     * @param array  $expectedClass
+     * @param array           $expectedClass
      *
      * @throws \InvalidArgumentException
      */

@@ -53,7 +53,7 @@ class DocumentMetadataCollector
     private $cache;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $debug;
 
@@ -68,6 +68,8 @@ class DocumentMetadataCollector
      * @param DocumentParser  $parser          For reading document annotations.
      * @param Cache           $cache           For caching documents metadata
      * @param bool            $debug
+     *
+     * @throws \ReflectionException
      */
     public function __construct(array $indexManagers, DocumentLocator $documentLocator, DocumentParser $parser, Cache $cache, $debug = false)
     {
@@ -75,7 +77,7 @@ class DocumentMetadataCollector
         $this->documentLocator = $documentLocator;
         $this->parser = $parser;
         $this->cache = $cache;
-        $this->debug = (boolean) $debug;
+        $this->debug = (bool) $debug;
 
         // Gets the time when the documents' folders were last modified
         $documentDirs = $this->documentLocator->getAllDocumentDirs();
@@ -110,6 +112,10 @@ class DocumentMetadataCollector
 
     /**
      * Retrieves the metadata for all documents in all indices
+     *
+     * @return array
+     *
+     * @throws \ReflectionException
      */
     private function fetchDocumentsMetadata()
     {
@@ -150,6 +156,7 @@ class DocumentMetadataCollector
      * Class can also be specified in short notation (e.g AppBundle:Product)
      *
      * @param string $documentClass
+     *
      * @return DocumentMetadata
      */
     public function getDocumentMetadata($documentClass)
@@ -170,8 +177,11 @@ class DocumentMetadataCollector
      * Class can also be specified in short notation (e.g AppBundle:ObjCategory)
      *
      * @param string $objectClass
+     *
      * @return array
-     * @throw Exception
+     *
+     * @throws Exception
+     * @throws \ReflectionException
      */
     public function getObjectPropertiesMetadata($objectClass)
     {
@@ -180,18 +190,18 @@ class DocumentMetadataCollector
         $objectClass = $this->documentLocator->getShortClassName($objectClass);
         if (isset($this->objectsMetadata[$objectClass])) {
             return $this->objectsMetadata[$objectClass];
-        } else {
-            // If we have it cached and up-to-date, get the data from cache
-            if ($this->cache->fetch('[C]'.self::OBJECTS_CACHE_KEY . $objectClass) > $this->documentsLastModifiedTime) {
-                $objectMetadata = $this->cache->fetch(self::OBJECTS_CACHE_KEY . $objectClass);
-            }
+        }
 
-            // Get the metadata the slow way and put it in the cache
-            if (!$objectMetadata) {
-                $objectMetadata = $this->parser->getPropertiesMetadata(new \ReflectionClass($this->documentLocator->resolveClassName($objectClass)));
-                $this->cache->save(self::OBJECTS_CACHE_KEY . $objectClass, $objectMetadata);
-                $this->cache->save('[C]'.self::OBJECTS_CACHE_KEY . $objectClass, time());
-            }
+        // If we have it cached and up-to-date, get the data from cache
+        if ($this->cache->fetch('[C]'.self::OBJECTS_CACHE_KEY.$objectClass) > $this->documentsLastModifiedTime) {
+            $objectMetadata = $this->cache->fetch(self::OBJECTS_CACHE_KEY.$objectClass);
+        }
+
+        // Get the metadata the slow way and put it in the cache
+        if (!$objectMetadata) {
+            $objectMetadata = $this->parser->getPropertiesMetadata(new \ReflectionClass($this->documentLocator->resolveClassName($objectClass)));
+            $this->cache->save(self::OBJECTS_CACHE_KEY.$objectClass, $objectMetadata);
+            $this->cache->save('[C]'.self::OBJECTS_CACHE_KEY.$objectClass, time());
         }
 
         if (!is_array($objectMetadata)) {
@@ -208,7 +218,9 @@ class DocumentMetadataCollector
      * Returns the metadata of the documents within the specified index
      *
      * @param string $indexManagerName
+     *
      * @return DocumentMetadata[]
+     *
      * @throws \InvalidArgumentException
      */
     public function getDocumentsMetadataForIndex($indexManagerName)
@@ -226,6 +238,7 @@ class DocumentMetadataCollector
      * Return mapping of document classes in short notation (i.e. AppBundle:Product) to ES types
      *
      * @param array $documentClasses Only return those classes if specified
+     *
      * @return array
      */
     public function getDocumentClassesTypes(array $documentClasses = [])
@@ -249,6 +262,7 @@ class DocumentMetadataCollector
      * Returns all document classes as keys and the corresponding index manager that manages them as values
      *
      * @param array $documentClasses Only return those classes if specified
+     *
      * @return array
      */
     public function getDocumentClassesIndices(array $documentClasses = [])
@@ -271,6 +285,7 @@ class DocumentMetadataCollector
      * Returns the index manager name that manages the given entity document class
      *
      * @param string $documentClass Either as a fully qualified class name or a short notation
+     *
      * @return string
      */
     public function getDocumentClassIndex($documentClass)
@@ -292,6 +307,8 @@ class DocumentMetadataCollector
      * @param array  $indexAnalyzers
      *
      * @return array
+     *
+     * @throws \ReflectionException
      */
     public function fetchMetadataFromClass($documentClassName, array $indexAnalyzers)
     {
