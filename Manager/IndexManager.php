@@ -56,7 +56,12 @@ class IndexManager
     /**
      * @var array
      */
-    protected $indexMapping;
+    protected $indexMapping = null;
+
+    /**
+     * @var array
+     */
+    private $indexSettings;
 
     /**
      * @var Repository[]
@@ -108,7 +113,7 @@ class IndexManager
         $this->finder = $finder;
         $this->documentConverter = $documentConverter;
         $this->useAliases = $indexSettings['use_aliases'];
-        $this->indexMapping = $this->getIndexMapping($managerName, $indexSettings);
+        $this->indexSettings = $indexSettings;
 
         $this->readAlias = $this->getBaseIndexName();
         $this->writeAlias = $this->getBaseIndexName();
@@ -135,18 +140,30 @@ class IndexManager
     }
 
     /**
-     * Returns mapping array for index
-     *
-     * @param string           $indexManagerName
-     * @param array            $indexSettings
      * @return array
      */
-    private function getIndexMapping($indexManagerName, array $indexSettings)
+    public function getIndexMapping()
     {
-        $index = ['index' => $indexSettings['name']];
+        if (is_null($this->indexMapping)) {
+            $this->indexMapping = $this->buildIndexMapping($this->managerName);
+        }
 
-        if (!empty($indexSettings['settings'])) {
-            $index['body']['settings'] = $indexSettings['settings'];
+        return $this->indexMapping;
+    }
+
+    /**
+     * Returns mapping array for index
+     *
+     * @param string $indexManagerName
+     *
+     * @return array
+     */
+    private function buildIndexMapping($indexManagerName)
+    {
+        $index = ['index' => $this->indexSettings['name']];
+
+        if (!empty($this->indexSettings['settings'])) {
+            $index['body']['settings'] = $this->indexSettings['settings'];
         }
 
         $mappings = [];
@@ -245,6 +262,7 @@ class IndexManager
      * Returns the data provider object for a type (provided in short class notation, e.g AppBundle:Product)
      *
      * @param string $documentClass The document class for the type
+     *
      * @return ProviderInterface
      */
     public function getDataProvider($documentClass)
@@ -264,11 +282,13 @@ class IndexManager
      */
     private function getBaseIndexName()
     {
-        return $this->indexMapping['index'];
+        return $this->indexSettings['name'];
     }
 
     /**
      * Return a name for a new index, which does not already exist
+     *
+     * @return string
      */
     private function getUniqueIndexName()
     {
@@ -288,6 +308,7 @@ class IndexManager
      * Returns the live physical index name, verifying that it exists
      *
      * @return string
+     *
      * @throws Exception If live index is not found
      */
     public function getLiveIndex()
@@ -321,7 +342,7 @@ class IndexManager
      */
     public function createIndex()
     {
-        $settings = $this->indexMapping;
+        $settings = $this->getIndexMapping();
 
         if (true === $this->getUseAliases()) {
             // Make sure the read and write aliases do not exist already as aliases or physical indices
@@ -421,7 +442,7 @@ class IndexManager
             }
 
             // Create a new index
-            $settings = $this->indexMapping;
+            $settings = $this->getIndexMapping();
             $oldIndex = $this->getLiveIndex();
             $newIndex = $this->getUniqueIndexName();
             $settings['index'] = $newIndex;
@@ -532,6 +553,7 @@ class IndexManager
      * Makes sure the index exists in Elasticsearch and its aliases (if using such) are properly set up
      *
      * @param bool|true $exceptionIfRebuilding
+     *
      * @throws NoReadAliasException     When read alias does not exist
      * @throws IndexRebuildingException When the index is rebuilding, according to the current aliases
      * @throws Exception                When any other problem with the index or aliases mappings exists
