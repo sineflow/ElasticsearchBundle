@@ -61,11 +61,18 @@ final class Property implements DumperInterface
      * Dumps property fields as array for index mapping
      *
      * @param array $settings
+     *
      * @return array
      */
     public function dump(array $settings = [])
     {
-        $result = array_merge((array) $this->options, ['type' => $this->type]);
+        $result = (array) $this->options;
+
+        // Although it is completely valid syntax to explicitly define objects as such in the mapping definition, ES does not do that by default.
+        // So, in order to ensure that the mapping for index creation would exactly match the mapping returned from the ES _mapping endpoint, we don't explicitly set 'object' data types
+        if ($this->type !== 'object') {
+            $result = array_merge($result, ['type' => $this->type]);
+        }
 
         if (isset($settings['language'])) {
             if (!isset($settings['indexAnalyzers'])) {
