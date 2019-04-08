@@ -75,7 +75,6 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                     ],
                     'category' =>
                     [
-                        'type' => 'object',
                         'properties' =>
                             [
                                 'id' =>
@@ -88,7 +87,6 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                     ],
                                     'tags' =>
                                     [
-                                        'type' => 'object',
                                         'properties' =>
                                             [
                                                 'tagname' =>
@@ -101,7 +99,6 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                     ],
                     'related_categories' =>
                     [
-                        'type' => 'object',
                         'properties' =>
                             [
                                 'id' =>
@@ -114,7 +111,6 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                     ],
                                     'tags' =>
                                     [
-                                        'type' => 'object',
                                         'properties' =>
                                             [
                                                 'tagname' =>
