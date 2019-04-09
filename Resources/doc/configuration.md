@@ -26,13 +26,13 @@ sineflow_elasticsearch:
                 analysis:
                     filter:
                         unigram_filter:
-                            type: nGram
+                            type: ngram
                             min_gram: 1
                             max_gram: 20
 
                     tokenizer:
                         email_tokenizer:
-                            type: nGram
+                            type: ngram
                             min_gram: 3
                             max_gram: 60
 

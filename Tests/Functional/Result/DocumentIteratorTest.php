@@ -145,7 +145,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
     public function testCurrentWithEmptyIterator()
     {
         /** @var Repository $repo */
-        $repo = $this->getIndexManager('foo')->getRepository('AcmeFooBundle:Customer');
+        $repo = $this->getIndexManager('customer')->getRepository('AcmeFooBundle:Customer');
         /** @var DocumentIterator $iterator */
         $iterator = $repo->find(['query' => ['match_all' => (object) []]], Finder::RESULTS_OBJECT);
 

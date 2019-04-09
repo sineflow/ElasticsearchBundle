@@ -26,19 +26,17 @@ sineflow_elasticsearch:
                 refresh_interval: -1
                 number_of_replicas: 0
 
-        foo:
+        customer: # foo:
             extends: _base
-            name: sineflow-esb-test
+            name: sineflow-esb-test-customer
             types:
                 - AcmeFooBundle:Customer
-                - AcmeFooBundle:Order
 
-        qanda:
+        order: # foo:
             extends: _base
-            name: sineflow-esb-test-qanda
+            name: sineflow-esb-test-order
             types:
-                - AcmeFooBundle:Question
-                - AcmeFooBundle:Answer
+                - AcmeFooBundle:Order
 
         bar:
             connection: default

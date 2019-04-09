@@ -18,7 +18,7 @@ class EntityTrackerSubscriberTest extends AbstractElasticsearchTestCase
     {
         $converter = $this->getContainer()->get('sfes.document_converter');
 
-        $imWithAliases = $this->getIndexManager('foo');
+        $imWithAliases = $this->getIndexManager('customer');
         $imWithAliases->getConnection()->setAutocommit(false);
 
         $rawCustomer = new Customer();

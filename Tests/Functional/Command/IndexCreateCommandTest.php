@@ -13,7 +13,7 @@ class IndexCreateCommandTest extends AbstractCommandTestCase
      */
     public function testExecute()
     {
-        $manager = $this->getIndexManager('foo');
+        $manager = $this->getIndexManager('customer');
 
         // Make sure we don't have pre-existing index
         $manager->dropIndex();
@@ -32,7 +32,7 @@ class IndexCreateCommandTest extends AbstractCommandTestCase
         );
 
         $expectedOutput = sprintf(
-            'Created index for "foo"'
+            'Created index for "customer"'
         );
 
         // Test if the command output matches the expected output or not
@@ -46,7 +46,7 @@ class IndexCreateCommandTest extends AbstractCommandTestCase
      */
     public function testExecuteWithExistingIndex()
     {
-        $manager = $this->getIndexManager('foo');
+        $manager = $this->getIndexManager('customer');
 
         // Make sure we don't have pre-existing index
         $manager->dropIndex();

@@ -23,13 +23,6 @@ final class Document implements DumperInterface
     public $repositoryClass;
 
     /**
-     * Document parent type.
-     *
-     * @var string
-     */
-    public $parent;
-
-    /**
      * Settings directly passed to Elasticsearch client as-is
      *
      * @var array

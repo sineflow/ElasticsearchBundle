@@ -35,7 +35,7 @@ class FinderTest extends AbstractElasticsearchTestCase
                     ],
                 ],
             ],
-            'foo' => [
+            'customer' => [
                 'AcmeFooBundle:Customer' => [
                     [
                         '_id' => 111,
@@ -56,7 +56,7 @@ class FinderTest extends AbstractElasticsearchTestCase
         parent::setUp();
 
         // Create and populate indices just once for all tests in this class
-        $this->getIndexManager('foo', !$this->hasCreatedIndexManager('foo'));
+        $this->getIndexManager('customer', !$this->hasCreatedIndexManager('customer'));
         $this->getIndexManager('bar', !$this->hasCreatedIndexManager('bar'));
     }
 
@@ -171,7 +171,7 @@ class FinderTest extends AbstractElasticsearchTestCase
         $this->assertEquals([
             'index' =>
                 [
-                    0 => 'sineflow-esb-test',
+                    0 => 'sineflow-esb-test-customer',
                     1 => 'sineflow-esb-test-bar',
                 ],
                 'type' =>

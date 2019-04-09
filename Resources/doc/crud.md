@@ -86,7 +86,7 @@ $repo->persistRaw($product);
 $im->getConnection()->commit();
 ```
 
-> **id** is a special field that comes from `AbstractDocument` and translates to **\_id** in Elasticsearch, just like **parent**, which translates to **\_parent**.
+> **id** is a special field that comes from `AbstractDocument` and translates to **\_id** in Elasticsearch.
 
 ## Update a document
 

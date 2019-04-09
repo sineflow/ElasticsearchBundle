@@ -70,7 +70,7 @@ class EntityTrackerSubscriber implements EventSubscriberInterface
             $idValue = current($postCommitEvent->getBulkResponse()['items'][$bulkOperationIndex])['_id'];
             $idPropertyMetadata = $entityData['metadata']['_id'];
             $entity = $entityData['entity'];
-            if ($idPropertyMetadata['propertyAccess'] == DocumentMetadata::PROPERTY_ACCESS_PRIVATE) {
+            if (DocumentMetadata::PROPERTY_ACCESS_PRIVATE === $idPropertyMetadata['propertyAccess']) {
                 $entity->{$idPropertyMetadata['methods']['setter']}($idValue);
             } else {
                 $entity->{$idPropertyMetadata['propertyName']} = $idValue;
