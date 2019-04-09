@@ -22,7 +22,7 @@ Installation instructions and documentation of the bundle can be found [here](Re
 
 | Elasticsearch version | ElasticsearchBundle version |
 | --------------------- | --------------------------- |
-| >= 6.0                | not supported yet           |
+| >= 6.0                | ~6.x                        |
 | >= 5.0, < 6.0         | ~5.x                        |
 | >= 2.0, < 5.0         | >= 0.9, < 1.0               |
 
