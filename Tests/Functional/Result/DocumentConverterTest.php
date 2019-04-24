@@ -3,6 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Result;
 
 use Sineflow\ElasticsearchBundle\Document\MLProperty;
+use Sineflow\ElasticsearchBundle\Exception\DocumentConversionException;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
 use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\ObjCategory;
 use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product;
@@ -25,6 +26,89 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         'ml_info' => 'should be skipped',
         'nonexisting' => 'should be skipped',
     ];
+
+    public function testAssignArrayToObjectWithNestedSingleValueInsteadOfArray()
+    {
+        $converter = $this->getContainer()->get('sfes.document_converter');
+        $metadataCollector = $this->getContainer()->get('sfes.document_metadata_collector');
+
+        // Raw doc with a single object value where an array of objects is expected according to metadata def
+        $rawDoc = [
+            '_id' => 'rawDocWithSingleObjValueInsteadOfArray',
+            'related_categories' => [
+                'id' => '123',
+                'title' => 'Acme',
+            ],
+        ];
+
+        $product = new Product();
+        $result = $converter->assignArrayToObject(
+            $rawDoc,
+            $product,
+            $metadataCollector->getDocumentMetadata('AcmeBarBundle:Product')->getPropertiesMetadata()
+        );
+        $category = $result->relatedCategories->current();
+
+        $this->assertEquals($category->id, 123);
+    }
+
+    public function testAssignArrayToObjectWithNestedSingleValueArrayInsteadOfSingleValue()
+    {
+        $converter = $this->getContainer()->get('sfes.document_converter');
+        $metadataCollector = $this->getContainer()->get('sfes.document_metadata_collector');
+
+        // Raw doc with array of single object where a single object value is expected according to metadata def
+        $rawDoc = [
+            '_id' => 'rawDocWithArrayValueInsteadOfSingleObject',
+            'category' => [
+                [
+                    'id' => '123',
+                    'title' => 'Acme',
+                ],
+            ],
+        ];
+
+        $product = new Product();
+        $result = $converter->assignArrayToObject(
+            $rawDoc,
+            $product,
+            $metadataCollector->getDocumentMetadata('AcmeBarBundle:Product')->getPropertiesMetadata()
+        );
+
+        $this->assertEquals($result->category->id, 123);
+    }
+
+    public function testAssignArrayToObjectWithNestedMultiValueArrayInsteadOfSingleValue()
+    {
+        $converter = $this->getContainer()->get('sfes.document_converter');
+        $metadataCollector = $this->getContainer()->get('sfes.document_metadata_collector');
+
+        // Raw doc with array of many objects where a single object value is expected according to metadata def
+        $rawDoc = [
+            '_id' => 'rawDocWithArrayValueInsteadOfSingleObject',
+            'category' => [
+                [
+                    'id' => '123',
+                    'title' => 'Acme',
+                ],
+                [
+                    'id' => '234',
+                    'title' => 'Ucme',
+                ],
+            ],
+        ];
+
+        $product = new Product();
+
+        $this->expectException(DocumentConversionException::class);
+        $this->expectExceptionMessage('Multiple objects found for a single object field `category`');
+
+        $converter->assignArrayToObject(
+            $rawDoc,
+            $product,
+            $metadataCollector->getDocumentMetadata('AcmeBarBundle:Product')->getPropertiesMetadata()
+        );
+    }
 
     public function testAssignArrayToObjectWithAllFieldsCorrectlySet()
     {

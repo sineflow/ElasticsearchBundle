@@ -5,6 +5,7 @@ namespace Sineflow\ElasticsearchBundle\Result;
 use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\Document\MLProperty;
 use Sineflow\ElasticsearchBundle\Document\ObjectInterface;
+use Sineflow\ElasticsearchBundle\Exception\DocumentConversionException;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadata;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 
@@ -114,11 +115,26 @@ class DocumentConverter
                     }
                 }
             } elseif (in_array($propertyMetadata['type'], ['object', 'nested'])) {
+                // ES doesn't mind having either single or multiple objects with the same mapping, but in this bundle we must specifically declare either.
+                // So we must make sure everything works for a 'multiple' definition where we actually have a single object and vice versa.
+                if ($propertyMetadata['multiple'] && key($array[$esField]) !== 0) {
+                    // field is declared multiple, but actual data is single object
+                    $data = [$array[$esField]];
+                } elseif (!$propertyMetadata['multiple'] && key($array[$esField]) === 0) {
+                    // field is declared as single object, but actual data is an array of objects
+                    if (count($array[$esField]) > 1) {
+                        throw new DocumentConversionException(sprintf('Multiple objects found for a single object field `%s`', $propertyMetadata['propertyName']));
+                    }
+                    $data = current($array[$esField]);
+                } else {
+                    $data = $array[$esField];
+                }
+
                 if ($propertyMetadata['multiple']) {
-                    $objectValue = new ObjectIterator($this, $array[$esField], $propertyMetadata);
+                    $objectValue = new ObjectIterator($this, $data, $propertyMetadata);
                 } else {
                     $objectValue = $this->assignArrayToObject(
-                        $array[$esField],
+                        $data,
                         new $propertyMetadata['className'](),
                         $propertyMetadata['propertiesMetadata']
                     );
