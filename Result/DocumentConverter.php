@@ -117,7 +117,7 @@ class DocumentConverter
             } elseif (in_array($propertyMetadata['type'], ['object', 'nested'])) {
                 // ES doesn't mind having either single or multiple objects with the same mapping, but in this bundle we must specifically declare either.
                 // So we must make sure everything works for a 'multiple' definition where we actually have a single object and vice versa.
-                if ($propertyMetadata['multiple'] && key($array[$esField]) !== 0) {
+                if ($propertyMetadata['multiple'] && is_string(key($array[$esField]))) {
                     // field is declared multiple, but actual data is single object
                     $data = [$array[$esField]];
                 } elseif (!$propertyMetadata['multiple'] && key($array[$esField]) === 0) {

@@ -4,6 +4,7 @@ namespace Sineflow\ElasticsearchBundle\Tests\Functional\Result;
 
 use Sineflow\ElasticsearchBundle\Document\MLProperty;
 use Sineflow\ElasticsearchBundle\Exception\DocumentConversionException;
+use Sineflow\ElasticsearchBundle\Result\ObjectIterator;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
 use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\ObjCategory;
 use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product;
@@ -154,6 +155,25 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         $this->assertNull($product->category);
         $this->assertNull($product->relatedCategories);
         $this->assertNull($product->mlInfo);
+    }
+
+    public function testAssignArrayToObjectWithEmptyMultipleNestedField()
+    {
+        $converter = $this->getContainer()->get('sfes.document_converter');
+        $metadataCollector = $this->getContainer()->get('sfes.document_metadata_collector');
+
+        $rawDoc = [
+            'related_categories' => [],
+        ];
+
+        $product = new Product();
+        $converter->assignArrayToObject(
+            $rawDoc,
+            $product,
+            $metadataCollector->getDocumentMetadata('AcmeBarBundle:Product')->getPropertiesMetadata()
+        );
+        $this->assertInstanceOf(ObjectIterator::class, $product->relatedCategories);
+        $this->assertSame(0, $product->relatedCategories->count());
     }
 
     /**
