@@ -8,6 +8,7 @@ use Sineflow\ElasticsearchBundle\Mapping\DumperInterface;
  * Annotation used to check mapping type during the parsing process.
  *
  * @Annotation
+ *
  * @Target("PROPERTY")
  */
 final class Property implements DumperInterface
@@ -34,6 +35,13 @@ final class Property implements DumperInterface
      * @var bool
      */
     public $multilanguage;
+
+    /**
+     * Override mapping for the 'default' language field of multilanguage properties
+     *
+     * @var array
+     */
+    public $multilanguageDefaultOptions;
 
     /**
      * The object name must be defined, if type is 'object' or 'nested'

@@ -97,6 +97,21 @@ class Product extends AbstractDocument
     public $mlInfo;
 
     /**
+     * @var MLProperty
+     *
+     * @ES\Property(
+     *  name="ml_more_info",
+     *  type="text",
+     *  multilanguage=true,
+     *  multilanguageDefaultOptions={
+     *     "type":"text",
+     *     "index":false,
+     *  }
+     * )
+     */
+    public $mlMoreInfo;
+
+    /**
      * @var int
      *
      * @ES\Property(

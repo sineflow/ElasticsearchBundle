@@ -166,6 +166,20 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                     'ml_info-default' =>
                     [
                         'type' => 'keyword',
+                        'ignore_above' => 256,
+                    ],
+                    'ml_more_info-en' =>
+                    [
+                        'type' => 'text',
+                    ],
+                    'ml_more_info-fr' =>
+                    [
+                        'type' => 'text',
+                    ],
+                    'ml_more_info-default' =>
+                    [
+                        'type' => 'text',
+                        'index' => false,
                     ],
                     'pieces_count' =>
                     [
@@ -319,12 +333,19 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                         'propertyAccess' => 1,
                     ],
                     'ml_info' =>
-                    [
-                        'propertyName' => 'mlInfo',
-                        'type' => 'text',
-                        'multilanguage' => true,
-                        'propertyAccess' => 1,
-                    ],
+                        [
+                            'propertyName' => 'mlInfo',
+                            'type' => 'text',
+                            'multilanguage' => true,
+                            'propertyAccess' => 1,
+                        ],
+                    'ml_more_info' =>
+                        [
+                            'propertyName' => 'mlMoreInfo',
+                            'type' => 'text',
+                            'multilanguage' => true,
+                            'propertyAccess' => 1,
+                        ],
                     'pieces_count' =>
                     [
                         'propertyName' => 'tokenPiecesCount',

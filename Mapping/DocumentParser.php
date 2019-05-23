@@ -130,7 +130,7 @@ class DocumentParser
             $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, Score::class);
 
             // Ignore class properties without any recognized annotation
-            if ($propertyAnnotation === null) {
+            if (null === $propertyAnnotation) {
                 continue;
             }
 
@@ -231,10 +231,11 @@ class DocumentParser
      *
      * @param \ReflectionProperty $property
      *
-     * @return Property
+     * @return Property|null
      */
     private function getPropertyAnnotationData($property)
     {
+        /** @var Property $annotation */
         $annotation = $this->reader->getPropertyAnnotation($property, Property::class);
 
         return $annotation;
@@ -332,10 +333,11 @@ class DocumentParser
                 foreach ($this->languageProvider->getLanguages() as $language) {
                     $mapping[$propertyAnnotation->name.$this->languageSeparator.$language] = $this->getPropertyMapping($propertyAnnotation, $language, $indexAnalyzers);
                 }
-                // TODO: The application should decide whether it wants to use a default field at all and set its mapping on a global base (or per property?)
+                // TODO: The application should decide whether it wants to use a default field at all and set its mapping on a global base
                 // The custom mapping from the application should be set here, using perhaps some kind of decorator
-                $mapping[$propertyAnnotation->name.$this->languageSeparator.Property::DEFAULT_LANG_SUFFIX] = [
+                $mapping[$propertyAnnotation->name.$this->languageSeparator.Property::DEFAULT_LANG_SUFFIX] = $propertyAnnotation->multilanguageDefaultOptions ?: [
                     'type' => 'keyword',
+                    'ignore_above' => 256,
                 ];
             } else {
                 $mapping[$propertyAnnotation->name] = $this->getPropertyMapping($propertyAnnotation, null, $indexAnalyzers);

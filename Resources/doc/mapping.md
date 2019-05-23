@@ -83,6 +83,10 @@ Sometimes, you may have a field that is available in more than one language. Thi
      *  name="name",
      *  type="text",
      *  multilanguage=true,
+     *  multilanguageDefaultOptions={
+     *     "type":"text",
+     *     "index":false
+     *  },
      *  options={
      *      "analyzer":"{lang}_analyzer",
      *  }
@@ -92,7 +96,10 @@ Sometimes, you may have a field that is available in more than one language. Thi
 ```
 > Note the use of `{lang}` placeholder in the options.
 
-When you have a property definition like that, there will not be a field `name` in your index, but instead there will be `name-en`, `name-fr`, `name-de`, etc. where the suffixes are taken from the available languages in your application. You may also use the special `{lang}` placeholder in the options array, as often you would need to specify different analyzers, depending on the language. For more information on how that works, see [multilanguage support](i18n.md).
+When you have a property definition like that, there will not be a field `name` in your index, but instead there will be `name-en`, `name-fr`, `name-de`, etc. where the suffixes are taken from the available languages in your application. 
+There will also be a field `name-default`, whose default mapping of `type:keyword;ignore_above:256` you can optionally override by specifying alternative `multilanguageDefaultOptions`.
+
+You may also use the special `{lang}` placeholder in the options array, as often you would need to specify different analyzers, depending on the language. For more information on how that works, see [multilanguage support](i18n.md).
 
 ### Meta property annotations
 
