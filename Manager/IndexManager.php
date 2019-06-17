@@ -719,8 +719,7 @@ class IndexManager
     public function persist(DocumentInterface $document, array $metaParams = [])
     {
         if ($this->eventDispatcher) {
-            $bulkOperationIndex = $this->getConnection()->getBulkOperationsCount();
-            $this->eventDispatcher->dispatch(Events::PRE_PERSIST, new PrePersistEvent($document, $bulkOperationIndex));
+            $this->eventDispatcher->dispatch(Events::PRE_PERSIST, new PrePersistEvent($document, $this->getConnection()));
         }
 
         $documentArray = $this->documentConverter->convertToArray($document);

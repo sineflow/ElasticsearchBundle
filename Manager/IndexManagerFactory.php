@@ -85,6 +85,7 @@ class IndexManagerFactory
      * @param string            $managerName
      * @param ConnectionManager $connection
      * @param array             $indexSettings
+     *
      * @return IndexManager
      */
     public function createManager(

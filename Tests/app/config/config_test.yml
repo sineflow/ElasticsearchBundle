@@ -18,6 +18,11 @@ sineflow_elasticsearch:
             logging: true
             bulk_batch_size: 100
 
+        backup_conn:
+            hosts: '%elasticsearch_hosts%'
+            profiling: false
+            logging: false
+
     indices:
         _base:
             connection: default
@@ -52,6 +57,12 @@ sineflow_elasticsearch:
                             type: standard
             types:
                 - AcmeBarBundle:Product
+
+        backup:
+            connection: backup_conn
+            name: sineflow-esb-backup
+            types:
+                - AcmeFooBundle:Log
 
 services:
     app.es.language_provider:

@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Event;
 
+use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -15,11 +16,18 @@ class PostCommitEvent extends Event
     private $bulkResponse;
 
     /**
-     * @param array $bulkResponse
+     * @var string
      */
-    public function __construct(array $bulkResponse)
+    private $connectionName;
+
+    /**
+     * @param array             $bulkResponse
+     * @param ConnectionManager $connectionManager
+     */
+    public function __construct(array $bulkResponse, ConnectionManager $connectionManager)
     {
         $this->bulkResponse = $bulkResponse;
+        $this->connectionName = $connectionManager->getConnectionName();
     }
 
     /**
@@ -28,5 +36,13 @@ class PostCommitEvent extends Event
     public function getBulkResponse()
     {
         return $this->bulkResponse;
+    }
+
+    /**
+     * @return string
+     */
+    public function getConnectionName()
+    {
+        return $this->connectionName;
     }
 }

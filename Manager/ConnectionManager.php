@@ -220,7 +220,7 @@ class ConnectionManager
         }
 
         if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(Events::POST_COMMIT, new PostCommitEvent($response));
+            $this->eventDispatcher->dispatch(Events::POST_COMMIT, new PostCommitEvent($response, $this));
         }
     }
 
@@ -329,7 +329,9 @@ class ConnectionManager
      *
      * $params['index'] = (list) A comma-separated list of indices/aliases to check (Required)
      * @param array $params Associative array of parameters
+     *
      * @return bool
+     *
      * @throws InvalidArgumentException
      */
     public function existsIndexOrAlias(array $params)
@@ -370,7 +372,9 @@ class ConnectionManager
      *
      * @param array $params
      * $params['name']               = (list) A comma-separated list of alias names to return (Required)
+     *
      * @return bool
+     *
      * @throws InvalidArgumentException
      */
     public function existsAlias(array $params)

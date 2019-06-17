@@ -47,6 +47,8 @@ class EntityTrackerSubscriber implements EventSubscriberInterface
 
     /**
      * @param PrePersistEvent $prePersistEvent
+     *
+     * @throws \ReflectionException
      */
     public function onPrePersist(PrePersistEvent $prePersistEvent)
     {
@@ -56,8 +58,8 @@ class EntityTrackerSubscriber implements EventSubscriberInterface
         );
         if (isset($propertiesMetadata['_id'])) {
             $bulkOperationIndex = $prePersistEvent->getBulkOperationIndex();
-            $this->entitiesData[$bulkOperationIndex]['entity'] = $prePersistEvent->getDocument();
-            $this->entitiesData[$bulkOperationIndex]['metadata'] = $propertiesMetadata;
+            $this->entitiesData[$prePersistEvent->getConnectionName()][$bulkOperationIndex]['entity'] = $prePersistEvent->getDocument();
+            $this->entitiesData[$prePersistEvent->getConnectionName()][$bulkOperationIndex]['metadata'] = $propertiesMetadata;
         }
     }
 
@@ -66,7 +68,13 @@ class EntityTrackerSubscriber implements EventSubscriberInterface
      */
     public function onPostCommit(PostCommitEvent $postCommitEvent)
     {
-        foreach ($this->entitiesData as $bulkOperationIndex => $entityData) {
+        // No need to do anything if there are no persisted entities for that connection
+        if (empty($this->entitiesData[$postCommitEvent->getConnectionName()])) {
+            return;
+        }
+
+        // Update the ids of persisted entity objects
+        foreach ($this->entitiesData[$postCommitEvent->getConnectionName()] as $bulkOperationIndex => $entityData) {
             $idValue = current($postCommitEvent->getBulkResponse()['items'][$bulkOperationIndex])['_id'];
             $idPropertyMetadata = $entityData['metadata']['_id'];
             $entity = $entityData['entity'];
@@ -78,6 +86,6 @@ class EntityTrackerSubscriber implements EventSubscriberInterface
         }
 
         // Clear the array to avoid any memory leaks
-        $this->entitiesData = [];
+        $this->entitiesData[$postCommitEvent->getConnectionName()] = [];
     }
 }

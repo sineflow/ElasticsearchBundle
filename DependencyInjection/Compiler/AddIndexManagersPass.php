@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Compiles elastic search data.
+ * Registers index manager service definitions
  */
 class AddIndexManagersPass implements CompilerPassInterface
 {
@@ -27,9 +27,7 @@ class AddIndexManagersPass implements CompilerPassInterface
             // Make sure the connection service definition exists
             $connectionService = sprintf('sfes.connection.%s', $indexSettings['connection']);
             if (!$container->hasDefinition($connectionService)) {
-                throw new InvalidConfigurationException(
-                    'There is no ES connection with name '.$indexSettings['connection']
-                );
+                throw new InvalidConfigurationException(sprintf('There is no ES connection with name %s', $indexSettings['connection']));
             }
 
             $indexManagerClass = $container->getParameter('sfes.index_manager.class');

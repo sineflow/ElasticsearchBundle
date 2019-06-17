@@ -20,7 +20,7 @@ class Customer extends AbstractDocument
     public $name;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ES\Property(name="active", type="boolean")
      */

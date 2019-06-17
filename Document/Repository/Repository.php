@@ -38,6 +38,11 @@ class Repository
     protected $metadata;
 
     /**
+     * @var DocumentMetadataCollector
+     */
+    protected $documentMetadataCollector;
+
+    /**
      * Constructor.
      *
      * @param IndexManager              $indexManager
@@ -90,6 +95,7 @@ class Repository
      * @param int   $resultsType             Bitmask value determining how the results are returned
      * @param array $additionalRequestParams Additional params to pass to the ES client's search() method
      * @param int   $totalHits               The total hits of the query response
+     *
      * @return mixed
      */
     public function find(array $searchBody, $resultsType = Finder::RESULTS_OBJECT, array $additionalRequestParams = [], &$totalHits = null)
@@ -102,6 +108,7 @@ class Repository
      *
      * @param array $searchBody
      * @param array $additionalRequestParams
+     *
      * @return int
      */
     public function count(array $searchBody = [], array $additionalRequestParams = [])

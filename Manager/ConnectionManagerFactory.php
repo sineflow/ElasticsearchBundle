@@ -23,7 +23,7 @@ class ConnectionManagerFactory
     private $tracer;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $kernelDebug;
 
@@ -31,6 +31,13 @@ class ConnectionManagerFactory
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
+
+    /**
+     * Array to keep track of already created connection managers, so the same instance is returned for subsequent service requests
+     *
+     * @var array ConnectionManager[]
+     */
+    private $connectionManagers = [];
 
     /**
      * @param boolean         $kernelDebug
@@ -63,10 +70,16 @@ class ConnectionManagerFactory
     /**
      * @param string $connectionName
      * @param array  $connectionSettings
+     *
      * @return ConnectionManager
      */
     public function createConnectionManager($connectionName, $connectionSettings)
     {
+        // If we already have a ConnectionManager instance for the required connection, do not create a new one
+        if (isset($this->connectionManagers[$connectionName])) {
+            return $this->connectionManagers[$connectionName];
+        }
+
         $clientBuilder = ClientBuilder::create();
 
         $clientBuilder->setHosts($connectionSettings['hosts']);
@@ -87,6 +100,8 @@ class ConnectionManagerFactory
 
         $connectionManager->setLogger($this->logger ?: new NullLogger());
         $connectionManager->setEventDispatcher($this->eventDispatcher);
+
+        $this->connectionManagers[$connectionName] = $connectionManager;
 
         return $connectionManager;
     }

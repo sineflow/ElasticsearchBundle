@@ -33,7 +33,7 @@ class AddConnectionsPass implements CompilerPassInterface
             $connectionDefinition->setFactory(
                 [
                     new Reference('sfes.connection_factory'),
-                    'createConnectionManager'
+                    'createConnectionManager',
                 ]
             );
 
@@ -42,7 +42,7 @@ class AddConnectionsPass implements CompilerPassInterface
                 $connectionDefinition
             );
 
-            if ($connectionName === 'default') {
+            if ('default' === $connectionName) {
                 $container->setAlias('sfes.connection', 'sfes.connection.default');
             }
         }
