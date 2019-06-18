@@ -421,25 +421,7 @@ class IndexManager
                 throw new Exception('Index rebuilding is not supported, unless you use aliases');
             }
 
-            try {
-                // Make sure the index and both aliases are properly set
-                $this->verifyIndexAndAliasesState();
-            } catch (NoReadAliasException $e) {
-                // Looks like the index doesn't exist, so try to create an empty one
-                $this->createIndex();
-                // Now again make sure that everything is setup correctly
-                $this->verifyIndexAndAliasesState();
-            } catch (IndexRebuildingException $e) {
-                if ($cancelExistingRebuild) {
-                    // Delete the partial indices currently being rebuilt
-                    foreach ($e->getIndices() as $partialIndex) {
-                        $this->getConnection()->getClient()->indices()->delete(['index' => $partialIndex]);
-                    }
-                } else {
-                    // Rethrow exception
-                    throw $e;
-                }
-            }
+            $this->prepareIndexForRebuilding($cancelExistingRebuild);
 
             // Create a new index
             $settings = $this->getIndexMapping();
@@ -605,10 +587,10 @@ class IndexManager
      * Rebuilds the data of a document and adds it to a bulk request for the next commit.
      * Depending on the connection autocommit mode, the change may be committed right away.
      *
-     * @param string $documentClass The document class in short notation (i.e. AppBundle:Product)
-     * @param int    $id
+     * @param string     $documentClass The document class in short notation (i.e. AppBundle:Product)
+     * @param string|int $id
      */
-    public function reindex($documentClass, $id)
+    public function reindex(string $documentClass, $id)
     {
         $documentMetadata = $this->metadataCollector->getDocumentMetadata($documentClass);
 
@@ -748,6 +730,47 @@ class IndexManager
 
         if ($this->getConnection()->isAutocommit()) {
             $this->getConnection()->commit();
+        }
+    }
+
+    /**
+     * Verify index and aliases state and try to recover if state is not ok
+     *
+     * @param bool   $cancelExistingRebuild
+     * @param string $retryForException     (internal) Set on recursive calls to the exception class thrown
+     */
+    private function prepareIndexForRebuilding($cancelExistingRebuild, $retryForException = null)
+    {
+        try {
+            // Make sure the index and both aliases are properly set
+            $this->verifyIndexAndAliasesState();
+
+        } catch (NoReadAliasException $e) {
+            // If this is a second attempt with the same exception, then we can't do anything more
+            if (get_class($e) === $retryForException) {
+                throw $e;
+            }
+
+            // It's likely that the index doesn't exist, so try to create an empty one
+            $this->createIndex();
+
+            // Now try again
+            $this->prepareIndexForRebuilding($cancelExistingRebuild, get_class($e));
+
+        } catch (IndexRebuildingException $e) {
+            // If we don't want to cancel the current rebuild or this is a second attempt with the same exception,
+            // then we can't do anything more
+            if (!$cancelExistingRebuild || (get_class($e) === $retryForException)) {
+                throw $e;
+            }
+
+            // Delete the partial indices currently being rebuilt
+            foreach ($e->getIndices() as $partialIndex) {
+                $this->getConnection()->getClient()->indices()->delete(['index' => $partialIndex]);
+            }
+
+            // Now try again
+            $this->prepareIndexForRebuilding($cancelExistingRebuild, get_class($e));
         }
     }
 }
