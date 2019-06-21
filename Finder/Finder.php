@@ -2,7 +2,6 @@
 
 namespace Sineflow\ElasticsearchBundle\Finder;
 
-use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Sineflow\ElasticsearchBundle\DTO\TypesToDocumentClasses;
 use Sineflow\ElasticsearchBundle\Finder\Adapter\ScrollAdapter;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
@@ -70,31 +69,32 @@ class Finder
      */
     public function get($documentClass, $id, $resultType = self::RESULTS_OBJECT)
     {
-        $client = $this->getConnection([$documentClass])->getClient();
-
         $allDocumentClassToIndexMappings = $this->documentMetadataCollector->getDocumentClassesIndices();
         $indexManagerName = $allDocumentClassToIndexMappings[$documentClass];
         $documentMetadata = $this->documentMetadataCollector->getDocumentMetadata($documentClass);
 
-        $params = [
+        $search = [
             'index' => $this->indexManagerRegistry->get($indexManagerName)->getReadAlias(),
             'type' => $documentMetadata->getType(),
-            'id' => $id,
+            'body' => ['query' => ['ids' => ['values' => [$id]]], 'version' => true],
         ];
+        $results = $this->getConnection([$documentClass])->getClient()->search($search);
 
-        try {
-            $raw = $client->get($params);
-        } catch (Missing404Exception $e) {
+        // The document id should not be duplicated across the indices pointed by the read alias,
+        // but in case it is, just return the first one we get
+        $rawDoc = $results['hits']['hits'][0] ?? null;
+
+        if (null === $rawDoc) {
             return null;
         }
 
         switch ($resultType & self::BITMASK_RESULT_TYPES) {
             case self::RESULTS_OBJECT:
-                return $this->documentConverter->convertToDocument($raw, $documentClass);
+                return $this->documentConverter->convertToDocument($rawDoc, $documentClass);
             case self::RESULTS_ARRAY:
-                return $this->convertToNormalizedArray($raw);
+                return $this->convertToNormalizedArray($rawDoc);
             case self::RESULTS_RAW:
-                return $raw;
+                return $rawDoc;
             default:
                 throw new \InvalidArgumentException('Wrong result type selected');
         }
@@ -287,7 +287,7 @@ class Finder
     {
         $typesToDocumentClasses = new TypesToDocumentClasses();
 
-        $documentClassToIndexMap = $this->documentMetadataCollector->getDocumentClassesIndices($documentClasses);
+        $documentClassToIndexManagerMap = $this->documentMetadataCollector->getDocumentClassesIndices($documentClasses);
         $documentClassToTypeMap = $this->documentMetadataCollector->getDocumentClassesTypes($documentClasses);
 
         $getLiveIndices = false;
@@ -297,10 +297,16 @@ class Finder
             $getLiveIndices = true;
         }
 
-        foreach ($documentClassToIndexMap as $documentClass => $indexManagerName) {
+        foreach ($documentClassToIndexManagerMap as $documentClass => $indexManagerName) {
             // Build mappings of indices and types to document class names, for the Converter
-            $liveIndex = $getLiveIndices ? $this->indexManagerRegistry->get($indexManagerName)->getLiveIndex() : null;
-            $typesToDocumentClasses->set($liveIndex, $documentClassToTypeMap[$documentClass], $documentClass);
+            if (!$getLiveIndices) {
+                $typesToDocumentClasses->set(null, $documentClassToTypeMap[$documentClass], $documentClass);
+            } else {
+                $readIndices = $this->indexManagerRegistry->get($indexManagerName)->getReadIndices();
+                foreach ($readIndices as $readIndex) {
+                    $typesToDocumentClasses->set($readIndex, $documentClassToTypeMap[$documentClass], $documentClass);
+                }
+            }
         }
 
         return $typesToDocumentClasses;

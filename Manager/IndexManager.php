@@ -11,8 +11,9 @@ use Sineflow\ElasticsearchBundle\Event\Events;
 use Sineflow\ElasticsearchBundle\Event\PrePersistEvent;
 use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
 use Sineflow\ElasticsearchBundle\Exception\Exception;
+use Sineflow\ElasticsearchBundle\Exception\IndexOrAliasNotFoundException;
 use Sineflow\ElasticsearchBundle\Exception\IndexRebuildingException;
-use Sineflow\ElasticsearchBundle\Exception\NoReadAliasException;
+use Sineflow\ElasticsearchBundle\Exception\InvalidLiveIndexException;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Sineflow\ElasticsearchBundle\Result\DocumentConverter;
@@ -305,31 +306,95 @@ class IndexManager
     }
 
     /**
-     * Returns the live physical index name, verifying that it exists
+     * @param string $alias
+     *
+     * @return array
+     *
+     * @throws IndexOrAliasNotFoundException
+     */
+    private function getIndicesForAlias(?string $alias)
+    {
+        if (true === $this->getUseAliases()) {
+            $aliases = $this->getConnection()->getAliases();
+            $indices = array_keys($aliases[$alias] ?? []);
+            if (!$indices) {
+                throw new IndexOrAliasNotFoundException($alias, true);
+            }
+        } else {
+            $indexName = $this->getBaseIndexName();
+            if (!$this->getConnection()->existsIndexOrAlias(['index' => $indexName])) {
+                throw new IndexOrAliasNotFoundException($indexName);
+            }
+            $indices = [$this->getBaseIndexName()];
+        }
+
+        return $indices;
+    }
+
+    /**
+     * Get and verify the existence of all indices pointed by the read alias (if using aliases),
+     * or the one actual index (if not using aliases)
+     *
+     * @return array
+     *
+     * @throws IndexOrAliasNotFoundException
+     */
+    public function getReadIndices()
+    {
+        return $this->getIndicesForAlias($this->readAlias);
+    }
+
+    /**
+     * Get and verify the existence of all indices pointed by the write alias (if using aliases),
+     * or the one actual index (if not using aliases)
+     *
+     * @return array
+     *
+     * @throws IndexOrAliasNotFoundException
+     */
+    private function getWriteIndices()
+    {
+        return $this->getIndicesForAlias($this->writeAlias);
+    }
+
+    /**
+     * Returns the physical index name of the live (aka "hot") index - the one both read and write aliases point to.
+     * And verify that it exists
      *
      * @return string
      *
-     * @throws Exception If live index is not found
+     * @throws IndexOrAliasNotFoundException If there are no indices for the read or write alias
+     * @throws InvalidLiveIndexException     If live index is not found or there are more than one
      */
     public function getLiveIndex()
     {
         $indexName = null;
 
-        // Get indices namespace of ES client
-        $indices = $this->getConnection()->getClient()->indices();
-
         if (true === $this->getUseAliases()) {
-            if ($this->getConnection()->existsAlias(['name' => $this->readAlias])) {
-                $indexName = key($indices->getAlias(['name' => $this->readAlias]));
-            } else {
-                throw new Exception(sprintf('Index alias "%s" not found', $this->readAlias));
-            }
-        } else {
-            $indexName = $this->getBaseIndexName();
-        }
+            $aliases = $this->getConnection()->getAliases();
+            $readIndices = array_keys($aliases[$this->readAlias] ?? []);
+            $writeIndices = array_keys($aliases[$this->writeAlias] ?? []);
 
-        if (!$this->getConnection()->existsIndexOrAlias(['index' => $indexName])) {
-            throw new Exception(sprintf('Live index "%s" not found', $indexName));
+            if (!$readIndices) {
+                throw new IndexOrAliasNotFoundException($this->readAlias, true);
+            }
+            if (!$writeIndices) {
+                throw new IndexOrAliasNotFoundException($this->writeAlias, true);
+            }
+
+            // Get the indices pointed to by both the read and write alias
+            $liveIndices = array_intersect($readIndices, $writeIndices);
+
+            // Make sure there is just one such index
+            if (count($liveIndices) === 0) {
+                throw new InvalidLiveIndexException(sprintf('There is no index pointed by the "%s" and "%s" aliases', $this->readAlias, $this->writeAlias));
+            }
+            if (count($liveIndices) > 1) {
+                throw new InvalidLiveIndexException(sprintf('There is more than one index pointed by the "%s" and "%s" aliases', $this->readAlias, $this->writeAlias));
+            }
+            $indexName = current($liveIndices);
+        } else {
+            $indexName = $this->getIndicesForAlias(null)[0];
         }
 
         return $indexName;
@@ -421,11 +486,10 @@ class IndexManager
                 throw new Exception('Index rebuilding is not supported, unless you use aliases');
             }
 
-            $this->prepareIndexForRebuilding($cancelExistingRebuild);
+            $oldIndex = $this->getLiveIndexPreparedForRebuilding($cancelExistingRebuild);
 
             // Create a new index
             $settings = $this->getIndexMapping();
-            $oldIndex = $this->getLiveIndex();
             $newIndex = $this->getUniqueIndexName();
             $settings['index'] = $newIndex;
             $this->getConnection()->getClient()->indices()->create($settings);
@@ -445,10 +509,6 @@ class IndexManager
             ];
             $this->getConnection()->getClient()->indices()->updateAliases($setAliasParams);
 
-            // Temporarily override the write alias with the new physical index name, so rebuilding only happens in the new index
-            $originalWriteAlias = $this->writeAlias;
-            $this->setWriteAlias($settings['index']);
-
             // Get and cycle all types for the index
             $indexDocumentsMetadata = $this->metadataCollector->getDocumentsMetadataForIndex($this->managerName);
             $documentClasses = array_keys($indexDocumentsMetadata);
@@ -461,11 +521,19 @@ class IndexManager
                 $typeDataProvider = $this->getDataProvider($documentClass);
                 $i = 1;
                 foreach ($typeDataProvider->getDocuments() as $document) {
+                    // Temporarily override the write alias with the new physical index name, so rebuilding only happens in the new index
+                    $originalWriteAlias = $this->writeAlias;
+                    $this->setWriteAlias($settings['index']);
+
                     if (is_array($document)) {
                         $this->persistRaw($documentClass, $document);
                     } else {
                         $this->persist($document);
                     }
+
+                    // Restore write alias name
+                    $this->setWriteAlias($originalWriteAlias);
+
                     // Send the bulk request every X documents, so it doesn't get too big
                     if (0 === $i % $batchSize) {
                         $this->getConnection()->commit();
@@ -478,9 +546,6 @@ class IndexManager
 
             // Recover the autocommit mode as it was
             $this->getConnection()->setAutocommit($autocommit);
-
-            // Restore write alias name
-            $this->setWriteAlias($originalWriteAlias);
 
             // Point both aliases to the new index and remove them from the old
             $setAliasParams = [
@@ -528,58 +593,6 @@ class IndexManager
 
             // Rethrow exception to be further handled
             throw $e;
-        }
-    }
-
-    /**
-     * Makes sure the index exists in Elasticsearch and its aliases (if using such) are properly set up
-     *
-     * @param bool|true $exceptionIfRebuilding
-     *
-     * @throws NoReadAliasException     When read alias does not exist
-     * @throws IndexRebuildingException When the index is rebuilding, according to the current aliases
-     * @throws Exception                When any other problem with the index or aliases mappings exists
-     */
-    public function verifyIndexAndAliasesState($exceptionIfRebuilding = true)
-    {
-        if (false === $this->getUseAliases()) {
-            // Check that the index exists
-            if (!$this->getConnection()->existsIndexOrAlias(['index' => $this->getBaseIndexName()])) {
-                throw new Exception(sprintf('Index "%s" does not exist', $this->getBaseIndexName()));
-            }
-        } else {
-            $aliases = $this->getConnection()->getAliases();
-
-            // Check that read alias exists
-            if (!isset($aliases[$this->readAlias])) {
-                throw new NoReadAliasException(sprintf('Read alias "%s" does not exist', $this->readAlias));
-            }
-            $liveIndex = key($aliases[$this->readAlias]);
-
-            // Check that read alias points to exactly 1 index
-            if (count($aliases[$this->readAlias]) > 1) {
-                throw new Exception(sprintf('Read alias "%s" points to more than one index (%s)', $this->readAlias, implode(', ', $aliases[$this->readAlias])));
-            }
-
-            // Check that write alias exists
-            if (!isset($aliases[$this->writeAlias])) {
-                throw new Exception(sprintf('Write alias "%s" does not exist', $this->writeAlias));
-            }
-
-            // Check that write alias points to the same index as the read alias
-            if (!isset($aliases[$this->writeAlias][$liveIndex])) {
-                throw new Exception(sprintf('Write alias "%s" does not point to the live index "%s"', $this->writeAlias, $liveIndex));
-            }
-
-            // Check if write alias points to more than one index
-            if ($exceptionIfRebuilding && count($aliases[$this->writeAlias]) > 1) {
-                $writeAliasIndices = $aliases[$this->writeAlias];
-                unset($writeAliasIndices[$liveIndex]);
-                throw new IndexRebuildingException(
-                    array_keys($writeAliasIndices),
-                    sprintf('Index is currently being rebuilt as "%s"', implode(', ', array_keys($writeAliasIndices)))
-                );
-            }
         }
     }
 
@@ -738,14 +751,22 @@ class IndexManager
      *
      * @param bool   $cancelExistingRebuild
      * @param string $retryForException     (internal) Set on recursive calls to the exception class thrown
+     *
+     * @return string The live (aka "hot") index name
      */
-    private function prepareIndexForRebuilding($cancelExistingRebuild, $retryForException = null)
+    private function getLiveIndexPreparedForRebuilding($cancelExistingRebuild, $retryForException = null)
     {
         try {
             // Make sure the index and both aliases are properly set
-            $this->verifyIndexAndAliasesState();
+            $liveIndex = $this->getLiveIndex();
+            $writeIndices = $this->getWriteIndices();
 
-        } catch (NoReadAliasException $e) {
+            // Check if write alias points to more than one index
+            if (count($writeIndices) > 1) {
+                throw new IndexRebuildingException(array_diff($writeIndices, [$liveIndex]));
+            }
+
+        } catch (IndexOrAliasNotFoundException $e) {
             // If this is a second attempt with the same exception, then we can't do anything more
             if (get_class($e) === $retryForException) {
                 throw $e;
@@ -755,8 +776,7 @@ class IndexManager
             $this->createIndex();
 
             // Now try again
-            $this->prepareIndexForRebuilding($cancelExistingRebuild, get_class($e));
-
+            $liveIndex = $this->getLiveIndexPreparedForRebuilding($cancelExistingRebuild, get_class($e));
         } catch (IndexRebuildingException $e) {
             // If we don't want to cancel the current rebuild or this is a second attempt with the same exception,
             // then we can't do anything more
@@ -770,7 +790,9 @@ class IndexManager
             }
 
             // Now try again
-            $this->prepareIndexForRebuilding($cancelExistingRebuild, get_class($e));
+            $liveIndex = $this->getLiveIndexPreparedForRebuilding($cancelExistingRebuild, get_class($e));
         }
+
+        return $liveIndex;
     }
 }

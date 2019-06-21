@@ -14,13 +14,13 @@ class IndexRebuildingException extends Exception
 
     /**
      * @param array          $indicesInProgress The physical indices, which are in the process of being built
-     * @param string         $message
      * @param int            $code
      * @param Exception|null $previous
      */
-    public function __construct(array $indicesInProgress, $message = "", $code = 0, Exception $previous = null)
+    public function __construct(array $indicesInProgress, $code = 0, Exception $previous = null)
     {
-        parent::__construct($message, $code, $previous);
+        parent::__construct(sprintf('Index is currently being rebuilt as "%s"', implode(', ', $indicesInProgress)), $code, $previous);
+
         $this->indicesInProgress = $indicesInProgress;
     }
 

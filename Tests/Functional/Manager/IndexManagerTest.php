@@ -355,31 +355,6 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('Jane Doe', $rawDoc['_source']['name']);
     }
 
-    public function testVerifyIndexAndAliasesState()
-    {
-        $imWithoutAliases = $this->getIndexManager('bar');
-        $imWithoutAliases->verifyIndexAndAliasesState();
-
-        $imWithAliases = $this->getIndexManager('customer');
-        $imWithAliases->verifyIndexAndAliasesState();
-
-        // Simulate state during rebuilding when write alias points to more than 1 index
-        $settings = array (
-            'index' => 'sineflow-esb-test-temp',
-            'body' => ['mappings' => ['customer' => ['properties' => ['name' => ['type' => 'keyword']]]]],
-        );
-        $imWithAliases->getConnection()->getClient()->indices()->create($settings);
-        $setAliasParams = [
-            'body' => ['actions' => [['add' => ['index' => 'sineflow-esb-test-temp', 'alias' => $imWithAliases->getWriteAlias()]]]],
-        ];
-        $imWithAliases->getConnection()->getClient()->indices()->updateAliases($setAliasParams);
-
-        $imWithAliases->verifyIndexAndAliasesState(false);
-
-        $this->expectException(IndexRebuildingException::class);
-        $imWithAliases->verifyIndexAndAliasesState();
-    }
-
     public function testGetDataProvider()
     {
         $imWithAliases = $this->getIndexManager('order', false);

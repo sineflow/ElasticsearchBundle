@@ -93,13 +93,13 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
 
         $this->assertArraySubset(
             [
-                "curlRequest" => "curl -XGET 'http://".implode(':', $esHostAndPort)."/sineflow-esb-test-bar/product/3?pretty=true'",
-                "senseRequest" => "GET /sineflow-esb-test-bar/product/3",
+                "curlRequest" => "curl -XGET 'http://".implode(':', $esHostAndPort)."/sineflow-esb-test-bar/product/_search?pretty=true' -d '{\"query\":{\"ids\":{\"values\":[3]}},\"version\":true}'",
+                "senseRequest" => "GET /sineflow-esb-test-bar/product/_search\n{\"query\":{\"ids\":{\"values\":[3]}},\"version\":true}",
                 "backtrace" => null,
                 "scheme" => "http",
                 "host" => $esHostAndPort[0],
                 "port" => (int) $esHostAndPort[1],
-                "path" => "/sineflow-esb-test-bar/product/3",
+                "path" => "/sineflow-esb-test-bar/product/_search",
             ],
             $lastQuery,
             'Logged data did not match expected data.'

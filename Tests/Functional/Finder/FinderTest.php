@@ -77,7 +77,6 @@ class FinderTest extends AbstractElasticsearchTestCase
             '_type' => 'product',
             '_id' => 'doc1',
             '_version' => 1,
-            'found' => true,
             '_source' => ['title' => 'aaa'],
         ], $docAsRaw);
 
