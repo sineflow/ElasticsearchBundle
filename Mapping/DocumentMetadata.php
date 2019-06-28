@@ -37,7 +37,7 @@ class DocumentMetadata
      */
     protected function configureOptions(OptionsResolver $optionsResolver)
     {
-        $optionsResolver->setRequired(['type', 'properties', 'fields', 'propertiesMetadata', 'objects', 'repositoryClass', 'className', 'shortClassName']);
+        $optionsResolver->setRequired(['type', 'properties', 'fields', 'propertiesMetadata', 'repositoryClass', 'className', 'shortClassName']);
     }
 
     /**
@@ -75,14 +75,6 @@ class DocumentMetadata
     public function getPropertiesMetadata()
     {
         return $this->metadata['propertiesMetadata'];
-    }
-
-    /**
-     * @return array
-     */
-    public function getObjects()
-    {
-        return $this->metadata['objects'];
     }
 
     /**

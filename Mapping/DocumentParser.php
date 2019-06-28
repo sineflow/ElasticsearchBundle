@@ -79,6 +79,8 @@ class DocumentParser
      * @param array            $indexAnalyzers
      *
      * @return array
+     *
+     * @throws \ReflectionException
      */
     public function parse(\ReflectionClass $documentReflection, array $indexAnalyzers)
     {
@@ -97,7 +99,6 @@ class DocumentParser
                 'properties' => $properties,
                 'fields' => array_filter($classAnnotation->dump()),
                 'propertiesMetadata' => $this->getPropertiesMetadata($documentReflection),
-                'objects' => $this->getObjects(),
                 'repositoryClass' => $classAnnotation->repositoryClass,
                 'className' => $documentReflection->getName(),
                 'shortClassName' => $this->documentLocator->getShortClassName($documentReflection->getName()),
@@ -113,6 +114,8 @@ class DocumentParser
      * @param \ReflectionClass $documentReflection
      *
      * @return array
+     *
+     * @throws \ReflectionException
      */
     public function getPropertiesMetadata(\ReflectionClass $documentReflection)
     {
@@ -242,16 +245,6 @@ class DocumentParser
     }
 
     /**
-     * Returns objects used in document.
-     *
-     * @return array
-     */
-    private function getObjects()
-    {
-        return array_keys($this->objects);
-    }
-
-    /**
      * Registers annotations to registry so that it could be used by reader.
      */
     private function registerAnnotations()
@@ -310,6 +303,8 @@ class DocumentParser
      * @param array            $indexAnalyzers
      *
      * @return array
+     *
+     * @throws \ReflectionException
      */
     private function getProperties(\ReflectionClass $documentReflection, array $indexAnalyzers = [])
     {
@@ -347,6 +342,15 @@ class DocumentParser
         return $mapping;
     }
 
+    /**
+     * @param Property    $propertyAnnotation
+     * @param string|null $language
+     * @param array       $indexAnalyzers
+     *
+     * @return array
+     *
+     * @throws \ReflectionException
+     */
     private function getPropertyMapping(Property $propertyAnnotation, $language = null, array $indexAnalyzers = [])
     {
         $propertyMapping = $propertyAnnotation->dump([
@@ -371,6 +375,8 @@ class DocumentParser
      * @param array  $indexAnalyzers
      *
      * @return array
+     *
+     * @throws \ReflectionException
      */
     private function getObjectMapping($objectName, array $indexAnalyzers = [])
     {
@@ -392,6 +398,8 @@ class DocumentParser
      * @param array            $indexAnalyzers
      *
      * @return array|null
+     *
+     * @throws \ReflectionException
      */
     private function getRelationMapping(\ReflectionClass $documentReflection, $indexAnalyzers = [])
     {
