@@ -36,6 +36,7 @@
         "doctrine/orm": "Allows for using Doctrine as source for rebuilding indices"
     },
     "autoload": {
-        "psr-4": { "Sineflow\\ElasticsearchBundle\\": "" }
+        "psr-4": { "Sineflow\\ElasticsearchBundle\\": "" },
+        "exclude-from-classmap": ["/Tests/"]
     }
 }
