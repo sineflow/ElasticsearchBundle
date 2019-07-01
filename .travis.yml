@@ -5,17 +5,17 @@ php:
 
 env:
   global:
-    - SYMFONY_VERSION="3.4.*" ES_VERSION="6.2.4" ES_FILENAME_SUFFIX=${ES_VERSION}
+    - SYMFONY_VERSION="3.4.*" ES_VERSION="6.2.4" ES_FILENAME_SUFFIX=""
   matrix:
     - ES_VERSION="6.8.1"
-    - ES_VERSION="7.2.0" ES_FILENAME_SUFFIX=${ES_VERSION}-linux-x86_64
     - SYMFONY_VERSION="3.0.*"
     - SYMFONY_VERSION="2.7.*"
+#    - ES_VERSION="7.2.0" ES_FILENAME_SUFFIX="-linux-x86_64"
 
 install:
   - composer require --no-update symfony/symfony:${SYMFONY_VERSION}
-  - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_FILENAME_SUFFIX}.tar.gz
-  - tar -xzf elasticsearch-${ES_FILENAME_SUFFIX}.tar.gz
+  - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}${ES_FILENAME_SUFFIX}.tar.gz
+  - tar -xzf elasticsearch-${ES_VERSION}${ES_FILENAME_SUFFIX}.tar.gz
   - ./elasticsearch-${ES_VERSION}/bin/elasticsearch > /dev/null 2>&1 &
   - composer install --dev --no-interaction
 
