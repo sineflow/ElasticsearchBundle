@@ -3,7 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Result;
 
 use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
-use Sineflow\ElasticsearchBundle\DTO\TypesToDocumentClasses;
+use Sineflow\ElasticsearchBundle\DTO\IndicesToDocumentClasses;
 
 /**
  * This class is able to iterate over Elasticsearch result documents while casting data into objects
@@ -15,15 +15,15 @@ class DocumentIterator implements \Countable, \Iterator
      */
     private $rawData;
 
-    /**AbstractResultsIterator
+    /**
      * @var DocumentConverter
      */
     private $documentConverter;
 
     /**
-     * @var TypesToDocumentClasses
+     * @var IndicesToDocumentClasses
      */
-    private $typesToDocumentClasses;
+    private $indicesToDocumentClasses;
 
     /**
      * @var array
@@ -43,15 +43,15 @@ class DocumentIterator implements \Countable, \Iterator
     /**
      * Constructor.
      *
-     * @param array                  $rawData
-     * @param DocumentConverter      $documentConverter
-     * @param TypesToDocumentClasses $typesToDocumentClasses
+     * @param array                    $rawData
+     * @param DocumentConverter        $documentConverter
+     * @param IndicesToDocumentClasses $indicesToDocumentClasses
      */
-    public function __construct($rawData, DocumentConverter $documentConverter, TypesToDocumentClasses $typesToDocumentClasses)
+    public function __construct($rawData, DocumentConverter $documentConverter, IndicesToDocumentClasses $indicesToDocumentClasses)
     {
         $this->rawData = $rawData;
         $this->documentConverter = $documentConverter;
-        $this->typesToDocumentClasses = $typesToDocumentClasses;
+        $this->indicesToDocumentClasses = $indicesToDocumentClasses;
 
         if (isset($rawData['suggest'])) {
             $this->suggestions = &$rawData['suggest'];
@@ -149,7 +149,7 @@ class DocumentIterator implements \Countable, \Iterator
      */
     private function convertToDocument($rawData)
     {
-        $documentClass = $this->typesToDocumentClasses->get($rawData['_index'], $rawData['_type']);
+        $documentClass = $this->indicesToDocumentClasses->get($rawData['_index']);
 
         return $this->documentConverter->convertToDocument($rawData, $documentClass);
     }

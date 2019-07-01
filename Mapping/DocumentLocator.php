@@ -58,6 +58,8 @@ class DocumentLocator
      * Returns list of existing directories within all application bundles that are possible locations for ES documents
      *
      * @return array
+     *
+     * @throws \ReflectionException
      */
     public function getAllDocumentDirs()
     {
@@ -79,7 +81,10 @@ class DocumentLocator
      * or the class name as it is, if it is already fully qualified
      *
      * @param string $className Short syntax for class name (e.g AppBundle:Product)
+     *
      * @return string Fully qualified class name
+     *
+     * @throws \UnexpectedValueException
      */
     public function resolveClassName($className)
     {
@@ -93,7 +98,7 @@ class DocumentLocator
             }
 
             $className = substr($bundleClass, 0, strrpos($bundleClass, '\\') + 1)
-                . str_replace('/', '\\', $this->getDocumentDir()) . '\\' . $document;
+                .str_replace('/', '\\', $this->getDocumentDir()).'\\'.$document;
         }
 
         return $className;
@@ -104,17 +109,18 @@ class DocumentLocator
      * or the name as it is, if it is already a short name
      *
      * @param string $className Fully qualified class name
+     *
      * @return string Class name in short notation (e.g. AppBundle:Product)
      */
     public function getShortClassName($className)
     {
         if (strpos($className, ':') === false) {
-            if (!preg_match('/^([a-z0-9\\\\]+)\\\\' . preg_quote(str_replace('/', '\\', $this->getDocumentDir()), '/') . '\\\\([a-z0-9]+)$/i', $className, $matches)
+            if (!preg_match('/^([a-z0-9\\\\]+)\\\\'.preg_quote(str_replace('/', '\\', $this->getDocumentDir()), '/').'\\\\([a-z0-9]+)$/i', $className, $matches)
                 || !isset($this->bundleNamesByNamespace[$matches[1]])) {
                 throw new \UnexpectedValueException(sprintf('Class "%s" is not a valid document entity', $className));
             }
 
-            $className = $this->bundleNamesByNamespace[$matches[1]] . ':' . $matches[2];
+            $className = $this->bundleNamesByNamespace[$matches[1]].':'.$matches[2];
         }
 
         return $className;

@@ -46,8 +46,7 @@ sineflow_elasticsearch:
         customer:
             name: dev_customer
             connection: default
-            types:
-                - AppBundle:Customer
+            class: AppBundle:Customer
 ```
 
 > This is the very basic example only, for a more detailed description of configuration options, please take a look at the [configuration](configuration.md) chapter.

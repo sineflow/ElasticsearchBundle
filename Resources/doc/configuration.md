@@ -53,8 +53,7 @@ sineflow_elasticsearch:
         products:
             extends: _base
             name: dev_products
-            types:
-                - AppBundle:Product
+            class: AppBundle:Product
 
 ```
 

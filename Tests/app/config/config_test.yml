@@ -34,14 +34,12 @@ sineflow_elasticsearch:
         customer: # foo:
             extends: _base
             name: sineflow-esb-test-customer
-            types:
-                - AcmeFooBundle:Customer
+            class: AcmeFooBundle:Customer
 
         order: # foo:
             extends: _base
             name: sineflow-esb-test-order
-            types:
-                - AcmeFooBundle:Order
+            class: AcmeFooBundle:Order
 
         bar:
             connection: default
@@ -55,14 +53,12 @@ sineflow_elasticsearch:
                             type: standard
                         en_analyzer:
                             type: standard
-            types:
-                - AcmeBarBundle:Product
+            class: AcmeBarBundle:Product
 
         backup:
             connection: backup_conn
             name: sineflow-esb-backup
-            types:
-                - AcmeFooBundle:Log
+            class: AcmeFooBundle:Log
 
 services:
     app.es.language_provider:

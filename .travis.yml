@@ -1,7 +1,7 @@
 language: php
 php:
   - '7.1'
-  - '7.0'
+  - '7.3'
 
 env:
   - SYMFONY_VERSION="3.4.*" ES_VERSION="6.2.4"
@@ -11,9 +11,11 @@ matrix:
     - php: hhvm
   include:
     - php: 7.1
-      env: SYMFONY_VERSION="3.3.*" ES_VERSION="6.2.4"
+      env: SYMFONY_VERSION="3.4.*" ES_VERSION="6.8.1"
     - php: 7.1
-      env: SYMFONY_VERSION="3.2.*" ES_VERSION="6.2.4"
+      env: SYMFONY_VERSION="3.4.*" ES_VERSION="7.2.0"
+    - php: 7.1
+      env: SYMFONY_VERSION="3.0.*" ES_VERSION="6.2.4"
     - php: 7.1
       env: SYMFONY_VERSION="2.7.*" ES_VERSION="6.2.4"
 

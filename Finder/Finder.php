@@ -2,7 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Finder;
 
-use Sineflow\ElasticsearchBundle\DTO\TypesToDocumentClasses;
+use Sineflow\ElasticsearchBundle\DTO\IndicesToDocumentClasses;
 use Sineflow\ElasticsearchBundle\Finder\Adapter\ScrollAdapter;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
@@ -69,13 +69,10 @@ class Finder
      */
     public function get($documentClass, $id, $resultType = self::RESULTS_OBJECT)
     {
-        $allDocumentClassToIndexMappings = $this->documentMetadataCollector->getDocumentClassesIndices();
-        $indexManagerName = $allDocumentClassToIndexMappings[$documentClass];
-        $documentMetadata = $this->documentMetadataCollector->getDocumentMetadata($documentClass);
+        $indexManagerName = current($this->documentMetadataCollector->getIndexManagersForDocumentClasses([$documentClass]));
 
         $search = [
             'index' => $this->indexManagerRegistry->get($indexManagerName)->getReadAlias(),
-            'type' => $documentMetadata->getType(),
             'body' => ['query' => ['ids' => ['values' => [$id]]], 'version' => true],
         ];
         $results = $this->getConnection([$documentClass])->getClient()->search($search);
@@ -119,10 +116,10 @@ class Finder
 
         $client = $this->getConnection($documentClasses)->getClient();
 
-        $params = $this->getTargetIndicesAndTypes($documentClasses);
+        $params = ['index' => $this->getTargetIndices($documentClasses)];
 
         // Add any additional params specified, overwriting the current ones
-        // This allows for overriding the target index or type if necessary
+        // This allows for overriding the target index if necessary
         if (!empty($additionalRequestParams)) {
             $params = array_replace_recursive($params, $additionalRequestParams);
         }
@@ -193,7 +190,7 @@ class Finder
     {
         $client = $this->getConnection($documentClasses)->getClient();
 
-        $params = $this->getTargetIndicesAndTypes($documentClasses);
+        $params = ['index' => $this->getTargetIndices($documentClasses)];
 
         if (!empty($searchBody)) {
             // Make sure sorting is not set in the query as it is not allowed for a count request
@@ -213,21 +210,42 @@ class Finder
     }
 
     /**
+     * Returns an array with the Elasticsearch indices to be queried,
+     * based on the given document classes in short notation (AppBundle:Product) or FQN
+     *
+     * @param array $documentClasses
+     *
+     * @return array
+     */
+    public function getTargetIndices(array $documentClasses) : array
+    {
+        $indexManagersForDocumentClasses = $this->documentMetadataCollector->getIndexManagersForDocumentClasses($documentClasses);
+
+        $indices = [];
+        foreach ($indexManagersForDocumentClasses as $documentClass => $indexManagerName) {
+            $indices[] = $this->indexManagerRegistry->get($indexManagerName)->getReadAlias();
+        }
+
+        return $indices;
+    }
+
+    /**
      * Returns an array with the Elasticsearch indices and types to be queried,
      * based on the given document classes in short notation (AppBundle:Product)
      *
      * @param string[] $documentClasses
      *
      * @return array
+     *
+     * @deprecated Use getTargetIndices
      */
     public function getTargetIndicesAndTypes(array $documentClasses)
     {
-        $allDocumentClassToIndexMappings = $this->documentMetadataCollector->getDocumentClassesIndices();
-        $documentClassToIndexMap = array_intersect_key($allDocumentClassToIndexMappings, array_flip($documentClasses));
+        $indexManagersForDocumentClasses = $this->documentMetadataCollector->getIndexManagersForDocumentClasses($documentClasses);
 
         $indices = [];
         $types = [];
-        foreach ($documentClassToIndexMap as $documentClass => $indexManagerName) {
+        foreach ($indexManagersForDocumentClasses as $documentClass => $indexManagerName) {
             $documentMetadata = $this->documentMetadataCollector->getDocumentMetadata($documentClass);
 
             $indices[] = $this->indexManagerRegistry->get($indexManagerName)->getReadAlias();
@@ -262,7 +280,7 @@ class Finder
                 return new DocumentIterator(
                     $raw,
                     $this->documentConverter,
-                    $this->getTypesToDocumentClasses($documentClasses)
+                    $this->getIndicesToDocumentClasses($documentClasses)
                 );
 
             case self::RESULTS_ARRAY:
@@ -277,39 +295,32 @@ class Finder
     }
 
     /**
-     * Returns a mapping of live indices and types to the document classes in short notation that represent them
+     * Returns a mapping of live indices to the document classes that represent them
      *
      * @param string[] $documentClasses
      *
-     * @return TypesToDocumentClasses
+     * @return IndicesToDocumentClasses
      */
-    private function getTypesToDocumentClasses(array $documentClasses)
+    private function getIndicesToDocumentClasses(array $documentClasses)
     {
-        $typesToDocumentClasses = new TypesToDocumentClasses();
+        $indicesToDocumentClasses = new IndicesToDocumentClasses();
+        $documentClassToIndexManagerMap = $this->documentMetadataCollector->getIndexManagersForDocumentClasses($documentClasses);
 
-        $documentClassToIndexManagerMap = $this->documentMetadataCollector->getDocumentClassesIndices($documentClasses);
-        $documentClassToTypeMap = $this->documentMetadataCollector->getDocumentClassesTypes($documentClasses);
-
-        $getLiveIndices = false;
-        // If there are duplicate type names across the indices we're querying
-        if (count($documentClassToTypeMap) > count(array_unique($documentClassToTypeMap))) {
-            // We'll need to get the live index name for each type, so we can correctly map the results to the appropriate objects
-            $getLiveIndices = true;
-        }
+        $getLiveIndices = (count($documentClasses) > 1);
 
         foreach ($documentClassToIndexManagerMap as $documentClass => $indexManagerName) {
-            // Build mappings of indices and types to document class names, for the Converter
+            // Build mappings of indices to document class names, for the Converter
             if (!$getLiveIndices) {
-                $typesToDocumentClasses->set(null, $documentClassToTypeMap[$documentClass], $documentClass);
+                $indicesToDocumentClasses->set(null, $documentClass);
             } else {
                 $readIndices = $this->indexManagerRegistry->get($indexManagerName)->getReadIndices();
                 foreach ($readIndices as $readIndex) {
-                    $typesToDocumentClasses->set($readIndex, $documentClassToTypeMap[$documentClass], $documentClass);
+                    $indicesToDocumentClasses->set($readIndex, $documentClass);
                 }
             }
         }
 
-        return $typesToDocumentClasses;
+        return $indicesToDocumentClasses;
     }
 
     /**

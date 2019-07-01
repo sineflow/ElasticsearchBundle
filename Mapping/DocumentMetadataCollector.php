@@ -6,31 +6,40 @@ use Doctrine\Common\Cache\Cache;
 use Sineflow\ElasticsearchBundle\Exception\Exception;
 
 /**
- * Class for getting type/document metadata.
+ * Class for getting document metadata.
  */
 class DocumentMetadataCollector
 {
+    /**
+     * For caching the full metadata of all available document entities
+     */
     const DOCUMENTS_CACHE_KEY = 'sfes.documents_metadata';
-    const OBJECTS_CACHE_KEY = 'sfes.objects_metadata.';
 
     /**
-     * <index_manager_name> => [
-     *      <document_class_short_name> => DocumentMetadata
-     *      ...
-     * ]
-     * ...
+     * For caching just the properties metadata of a document or object entity
+     */
+    const OBJECTS_CACHE_KEY = 'sfes.object_properties_metadata.';
+
+    /**
+     * <document_class_FQN> => DocumentMetadata
      *
      * @var array
      */
     private $metadata = [];
 
     /**
-     * <object_class_short_name> => [<properties_metadata>]
-     * ...
+     * <object_class_FQN> => [<properties_metadata>]
      *
      * @var array
      */
     private $objectsMetadata = [];
+
+    /**
+     * @var array
+     *
+     * <document_class_FQN> => <index_manager_name>
+     */
+    private $documentClassToIndexManagerNames = [];
 
     /**
      * @var array
@@ -58,97 +67,41 @@ class DocumentMetadataCollector
     private $debug;
 
     /**
-     * @var int
+     * @var bool
      */
-    private $documentsLastModifiedTime = 0;
+    private $isCacheEnabled;
 
     /**
      * @param array           $indexManagers   The list of index managers defined
      * @param DocumentLocator $documentLocator For finding documents.
      * @param DocumentParser  $parser          For reading document annotations.
-     * @param Cache           $cache           For caching documents metadata
+     * @param Cache|null      $cache           For caching documents metadata
      * @param bool            $debug
      *
      * @throws \ReflectionException
      */
-    public function __construct(array $indexManagers, DocumentLocator $documentLocator, DocumentParser $parser, Cache $cache, $debug = false)
+    public function __construct(array $indexManagers, DocumentLocator $documentLocator, DocumentParser $parser, ?Cache $cache, bool $debug = false)
     {
         $this->indexManagers = $indexManagers;
         $this->documentLocator = $documentLocator;
         $this->parser = $parser;
         $this->cache = $cache;
-        $this->debug = (bool) $debug;
+        $this->debug = $debug;
+        $this->isCacheEnabled = ($cache instanceof Cache && !$debug); // Only in production mode and if cache provider is given
 
-        // Gets the time when the documents' folders were last modified
-        $documentDirs = $this->documentLocator->getAllDocumentDirs();
-        foreach ($documentDirs as $dir) {
-            $this->documentsLastModifiedTime = max($this->documentsLastModifiedTime, filemtime($dir));
-        }
-
-        $this->metadata = $this->cache->fetch(self::DOCUMENTS_CACHE_KEY);
-        // If there was metadata in the cache
-        if (false !== $this->metadata) {
-            // If in debug mode and the cache has expired, don't use it
-            if ($this->debug && !$this->isDocumentsCacheFresh()) {
-                $this->metadata = false;
-            }
-        }
-
-        // If there was no cached metadata, retrieve it now
-        if (false === $this->metadata) {
-            $this->fetchDocumentsMetadata();
-        }
-    }
-
-    /**
-     * Returns true if documents' metadata cache is up to date
-     *
-     * @return bool
-     */
-    private function isDocumentsCacheFresh()
-    {
-        return $this->cache->fetch('[C]'.self::DOCUMENTS_CACHE_KEY) > $this->documentsLastModifiedTime;
-    }
-
-    /**
-     * Retrieves the metadata for all documents in all indices
-     *
-     * @return array
-     *
-     * @throws \ReflectionException
-     */
-    private function fetchDocumentsMetadata()
-    {
-        $this->metadata = [];
-        $documentClasses = [];
-
+        // Build an internal array with map of document class to index manager name
         foreach ($this->indexManagers as $indexManagerName => $indexSettings) {
-            $indexAnalyzers = isset($indexSettings['settings']['analysis']['analyzer']) ? $indexSettings['settings']['analysis']['analyzer'] : [];
-
-            // Fetches DocumentMetadata objects for the types within the index
-            foreach ($indexSettings['types'] as $documentClass) {
-                if (isset($documentClasses[$documentClass])) {
-                    throw new \InvalidArgumentException(
-                        sprintf(
-                            'You cannot have type %s under "%s" index manager, as it is already managed by "%s" index manager',
-                            $documentClass,
-                            $indexManagerName,
-                            $documentClasses[$documentClass]
-                        )
-                    );
-                }
-                $documentClasses[$documentClass] = $indexManagerName;
-                $metadata = $this->fetchMetadataFromClass($documentClass, $indexAnalyzers);
-                $this->metadata[$indexManagerName][$documentClass] = new DocumentMetadata($metadata);
-            }
+            $this->documentClassToIndexManagerNames[$this->documentLocator->resolveClassName($indexSettings['class'])] = $indexManagerName;
         }
 
-        $this->cache->save(self::DOCUMENTS_CACHE_KEY, $this->metadata);
-        if ($this->debug) {
-            $this->cache->save('[C]'.self::DOCUMENTS_CACHE_KEY, time());
+        if ($this->isCacheEnabled) {
+            $this->metadata = $this->cache->fetch(self::DOCUMENTS_CACHE_KEY);
         }
 
-        return $this->metadata;
+        // If we have no metadata, build it now
+        if (!$this->metadata) {
+            $this->metadata = $this->fetchDocumentsMetadata();
+        }
     }
 
     /**
@@ -159,17 +112,15 @@ class DocumentMetadataCollector
      *
      * @return DocumentMetadata
      */
-    public function getDocumentMetadata($documentClass)
+    public function getDocumentMetadata(string $documentClass)
     {
-        $documentClass = $this->documentLocator->getShortClassName($documentClass);
-        foreach ($this->metadata as $index => $types) {
-            foreach ($types as $typeDocumentClass => $documentMetadata) {
-                if ($documentClass === $typeDocumentClass) {
-                    return $documentMetadata;
-                }
-            }
+        $documentClass = $this->documentLocator->resolveClassName($documentClass);
+
+        if (!isset($this->metadata[$documentClass])) {
+            throw new \InvalidArgumentException(sprintf('Metadata for [%s] is not available', $documentClass));
         }
-        throw new \InvalidArgumentException(sprintf('Metadata for type "%s" is not available', $documentClass));
+
+        return $this->metadata[$documentClass];
     }
 
     /**
@@ -182,34 +133,31 @@ class DocumentMetadataCollector
      *
      * @throws Exception
      * @throws \ReflectionException
+     * @throws \UnexpectedValueException
      */
-    public function getObjectPropertiesMetadata($objectClass)
+    public function getObjectPropertiesMetadata(string $objectClass)
     {
         $objectMetadata = null;
 
-        $objectClass = $this->documentLocator->getShortClassName($objectClass);
+        $objectClass = $this->documentLocator->resolveClassName($objectClass);
         if (isset($this->objectsMetadata[$objectClass])) {
             return $this->objectsMetadata[$objectClass];
         }
 
-        // If we have it cached and up-to-date, get the data from cache
-        if ($this->cache->fetch('[C]'.self::OBJECTS_CACHE_KEY.$objectClass) > $this->documentsLastModifiedTime) {
+        if ($this->isCacheEnabled) {
             $objectMetadata = $this->cache->fetch(self::OBJECTS_CACHE_KEY.$objectClass);
         }
 
-        // Get the metadata the slow way and put it in the cache
+        // Get the metadata the slow way
         if (!$objectMetadata) {
-            $objectMetadata = $this->parser->getPropertiesMetadata(new \ReflectionClass($this->documentLocator->resolveClassName($objectClass)));
-            $this->cache->save(self::OBJECTS_CACHE_KEY.$objectClass, $objectMetadata);
-            $this->cache->save('[C]'.self::OBJECTS_CACHE_KEY.$objectClass, time());
+            $objectMetadata = $this->parser->getPropertiesMetadata(new \ReflectionClass($objectClass));
         }
 
-        if (!is_array($objectMetadata)) {
-            throw new Exception(sprintf('Metadata for object "%s" could not be retrieved', $objectClass));
-        }
-
-        // Cache the value in the class as well
+        // Save the value for subsequent calls
         $this->objectsMetadata[$objectClass] = $objectMetadata;
+        if ($this->isCacheEnabled) {
+            $this->cache->save(self::OBJECTS_CACHE_KEY.$objectClass, $objectMetadata);
+        }
 
         return $objectMetadata;
     }
@@ -219,63 +167,43 @@ class DocumentMetadataCollector
      *
      * @param string $indexManagerName
      *
-     * @return DocumentMetadata[]
+     * @return DocumentMetadata
      *
      * @throws \InvalidArgumentException
      */
-    public function getDocumentsMetadataForIndex($indexManagerName)
+    public function getDocumentMetadataForIndex(string $indexManagerName)
     {
-        if (!isset($this->metadata[$indexManagerName])) {
-            throw new \InvalidArgumentException(sprintf('No metadata found for index "%s"', $indexManagerName));
-        }
+        $documentClass = array_search($indexManagerName, $this->documentClassToIndexManagerNames);
+        $indexMetadata = $this->metadata[$documentClass] ?? null;
 
-        $indexMetadata = $this->metadata[$indexManagerName];
+        if (!$indexMetadata) {
+            throw new \InvalidArgumentException(sprintf('No metadata found for index [%s]', $indexManagerName));
+        }
 
         return $indexMetadata;
     }
 
     /**
-     * Return mapping of document classes in short notation (i.e. AppBundle:Product) to ES types
+     * Returns all document classes FQNs as keys and the corresponding index manager that manages them as values
      *
-     * @param array $documentClasses Only return those classes if specified
-     *
-     * @return array
-     */
-    public function getDocumentClassesTypes(array $documentClasses = [])
-    {
-        $result = [];
-        foreach ($this->metadata as $index => $documentsMetadata) {
-            foreach ($documentsMetadata as $documentClass => $documentMetadata) {
-                /** @var DocumentMetadata $documentMetadata */
-                $result[$documentClass] = $documentMetadata->getType();
-            }
-        }
-
-        if ($documentClasses) {
-            $result = array_intersect_key($result, array_flip($documentClasses));
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns all document classes as keys and the corresponding index manager that manages them as values
-     *
-     * @param array $documentClasses Only return those classes if specified
+     * @param array $documentClasses If specified, will only return indices for those class names
      *
      * @return array
      */
-    public function getDocumentClassesIndices(array $documentClasses = [])
+    public function getIndexManagersForDocumentClasses(array $documentClasses = [])
     {
-        $result = [];
-        foreach ($this->metadata as $index => $documentsMetadata) {
-            foreach ($documentsMetadata as $documentClass => $documentMetadata) {
-                $result[$documentClass] = $index;
-            }
-        }
-
         if ($documentClasses) {
-            $result = array_intersect_key($result, array_flip($documentClasses));
+            $result = [];
+            foreach ($documentClasses as $documentClass) {
+                $documentClass = $this->documentLocator->resolveClassName($documentClass);
+                if (isset($this->documentClassToIndexManagerNames[$documentClass])) {
+                    $result[$documentClass] = $this->documentClassToIndexManagerNames[$documentClass];
+                } else {
+                    throw new \InvalidArgumentException(sprintf('Class [%s] is not managed by any index manager', $documentClass));
+                }
+            }
+        } else {
+            $result = $this->documentClassToIndexManagerNames;
         }
 
         return $result;
@@ -288,49 +216,53 @@ class DocumentMetadataCollector
      *
      * @return string
      */
-    public function getDocumentClassIndex($documentClass)
+    public function getDocumentClassIndex(string $documentClass)
     {
-        $documentClass = $this->documentLocator->getShortClassName($documentClass);
+        $documentClass = $this->documentLocator->resolveClassName($documentClass);
 
-        $indices = $this->getDocumentClassesIndices();
-        if (!isset($indices[$documentClass])) {
-            throw new \InvalidArgumentException(sprintf('Entity "%s" is not managed by any index manager', $documentClass));
+        if (!isset($this->documentClassToIndexManagerNames[$documentClass])) {
+            throw new \InvalidArgumentException(sprintf('Entity [%s] is not managed by any index manager', $documentClass));
         }
 
-        return $indices[$documentClass];
+        return $this->documentClassToIndexManagerNames[$documentClass];
     }
 
     /**
-     * Returns document mapping with metadata
-     *
-     * @param string $documentClassName
-     * @param array  $indexAnalyzers
+     * Retrieves the metadata for all documents in all indices
      *
      * @return array
      *
      * @throws \ReflectionException
      */
-    public function fetchMetadataFromClass($documentClassName, array $indexAnalyzers)
+    private function fetchDocumentsMetadata()
     {
-        $metadata = $this->getDocumentReflectionMetadata(
-            new \ReflectionClass($this->documentLocator->resolveClassName($documentClassName)),
-            $indexAnalyzers
-        );
+        $metadata = [];
+        $indexManagerNames = [];
 
-        return $metadata;
-    }
+        foreach ($this->indexManagers as $indexManagerName => $indexSettings) {
+            $indexAnalyzers = isset($indexSettings['settings']['analysis']['analyzer']) ? $indexSettings['settings']['analysis']['analyzer'] : [];
 
-    /**
-     * Gathers annotation data from class.
-     *
-     * @param \ReflectionClass $documentReflection Document reflection class to read mapping from.
-     * @param array            $indexAnalyzers
-     *
-     * @return array
-     */
-    private function getDocumentReflectionMetadata(\ReflectionClass $documentReflection, array $indexAnalyzers)
-    {
-        $metadata = $this->parser->parse($documentReflection, $indexAnalyzers);
+            // Fetch DocumentMetadata object for the entity in that index
+            $documentClass = $this->documentLocator->resolveClassName($indexSettings['class']);
+            if (isset($indexManagerNames[$documentClass])) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Index manager [%s] can not have class [%s], as that class is already specified for [%s]',
+                        $indexManagerName,
+                        $documentClass,
+                        $indexManagerNames[$documentClass]
+                    )
+                );
+            }
+            $indexManagerNames[$documentClass] = $indexManagerName;
+            $documentMetadataArray = $this->parser->parse(new \ReflectionClass($documentClass), $indexAnalyzers);
+
+            $metadata[$documentClass] = new DocumentMetadata($documentMetadataArray);
+        }
+
+        if ($this->isCacheEnabled) {
+            $this->cache->save(self::DOCUMENTS_CACHE_KEY, $metadata);
+        }
 
         return $metadata;
     }

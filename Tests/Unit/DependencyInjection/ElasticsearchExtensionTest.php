@@ -55,10 +55,7 @@ class ElasticsearchExtensionTest extends TestCase
                                 ]
                             ]
                         ],
-                        'types' => [
-                            'testBundle:Foo',
-                            'testBundle:Bar',
-                        ],
+                        'class' => 'testBundle:Foo',
                     ],
                 ],
             ],
@@ -99,10 +96,7 @@ class ElasticsearchExtensionTest extends TestCase
                         ]
                     ]
                 ],
-                'types' => [
-                    'testBundle:Foo',
-                    'testBundle:Bar',
-                ],
+                'class' => 'testBundle:Foo',
             ],
         ];
 

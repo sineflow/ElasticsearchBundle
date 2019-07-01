@@ -16,11 +16,12 @@ class SineflowElasticsearchExtension extends Extension
     /**
      * @param array            $config
      * @param ContainerBuilder $container
+     *
      * @return Configuration
      */
     public function getConfiguration(array $config, ContainerBuilder $container)
     {
-        return new Configuration($container->getParameter('kernel.logs_dir'));
+        return new Configuration();
     }
 
     /**
@@ -31,7 +32,7 @@ class SineflowElasticsearchExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
 
         $container->setParameter('sfes.document_dir', $config['document_dir']);

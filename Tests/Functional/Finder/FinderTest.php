@@ -161,6 +161,18 @@ class FinderTest extends AbstractElasticsearchTestCase
         $this->assertEquals(2, $finder->count(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer'], $searchBody));
     }
 
+    public function testGetTargetIndices()
+    {
+        $finder = $this->getContainer()->get('sfes.finder');
+
+        $res = $finder->getTargetIndices(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer']);
+
+        $this->assertEquals([
+            'sineflow-esb-test-bar',
+            'sineflow-esb-test-customer',
+        ], $res);
+    }
+
     public function testGetTargetIndicesAndTypes()
     {
         $finder = $this->getContainer()->get('sfes.finder');
@@ -170,13 +182,13 @@ class FinderTest extends AbstractElasticsearchTestCase
         $this->assertEquals([
             'index' =>
                 [
-                    0 => 'sineflow-esb-test-customer',
-                    1 => 'sineflow-esb-test-bar',
+                    'sineflow-esb-test-bar',
+                    'sineflow-esb-test-customer',
                 ],
-                'type' =>
+            'type' =>
                 [
-                    0 => 'customer',
-                    1 => 'product',
+                    'product',
+                    'customer',
                 ],
         ], $res);
     }

@@ -35,10 +35,7 @@ class AddIndexManagersPassTest extends TestCase
                     'refresh_interval' => 2,
                     'number_of_replicas' => 3,
                 ],
-                'types' => [
-                    'testBundle:Foo',
-                    'testBundle:Bar',
-                ],
+                'class' => 'testBundle:Foo',
             ],
         ];
 

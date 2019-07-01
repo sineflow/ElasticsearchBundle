@@ -167,16 +167,8 @@ class IndexManager
             $index['body']['settings'] = $this->indexSettings['settings'];
         }
 
-        $mappings = [];
-
-        $metadata = $this->metadataCollector->getDocumentsMetadataForIndex($indexManagerName);
-        foreach ($metadata as $className => $documentMetadata) {
-            $mappings[$documentMetadata->getType()] = $documentMetadata->getClientMapping();
-        }
-
-        if (!empty($mappings)) {
-            $index['body']['mappings'] = $mappings;
-        }
+        $metadata = $this->metadataCollector->getDocumentMetadataForIndex($indexManagerName);
+        $index['body']['mappings'][$metadata->getType()] = $metadata->getClientMapping();
 
         return $index;
     }
@@ -238,23 +230,23 @@ class IndexManager
     /**
      * Returns repository for a document class
      *
-     * @param string $documentClass
-     *
      * @return Repository
      */
-    public function getRepository($documentClass)
+    public function getRepository()
     {
-        if (isset($this->repositories[$documentClass])) {
-            return $this->repositories[$documentClass];
+        $documentMetadata = $this->metadataCollector->getDocumentMetadataForIndex($this->managerName);
+
+        if (isset($this->repositories[$documentMetadata->getClassName()])) {
+            return $this->repositories[$documentMetadata->getClassName()];
         }
 
-        $repositoryClass = $this->metadataCollector->getDocumentMetadata($documentClass)->getRepositoryClass() ?: Repository::class;
-        $repo = new $repositoryClass($this, $documentClass, $this->finder, $this->metadataCollector);
+        $repositoryClass = $documentMetadata->getRepositoryClass() ?: Repository::class;
+        $repo = new $repositoryClass($this, $documentMetadata->getClassName(), $this->finder, $this->metadataCollector);
 
         if (!($repo instanceof Repository)) {
-            throw new \InvalidArgumentException(sprintf('Repository "%s" must extend "%s"', $repositoryClass, Repository::class));
+            throw new \InvalidArgumentException(sprintf('Repository [%s] must extend [%s]', $repositoryClass, Repository::class));
         }
-        $this->repositories[$documentClass] = $repo;
+        $this->repositories[$documentMetadata->getClassName()] = $repo;
 
         return $repo;
     }
@@ -510,37 +502,35 @@ class IndexManager
             $this->getConnection()->getClient()->indices()->updateAliases($setAliasParams);
 
             // Get and cycle all types for the index
-            $indexDocumentsMetadata = $this->metadataCollector->getDocumentsMetadataForIndex($this->managerName);
-            $documentClasses = array_keys($indexDocumentsMetadata);
+            $documentClass = $this->metadataCollector->getDocumentMetadataForIndex($this->managerName)->getClassName();
 
             // Make sure we don't autocommit on every item in the bulk request
             $autocommit = $this->getConnection()->isAutocommit();
             $this->getConnection()->setAutocommit(false);
 
-            foreach ($documentClasses as $documentClass) {
-                $typeDataProvider = $this->getDataProvider($documentClass);
-                $i = 1;
-                foreach ($typeDataProvider->getDocuments() as $document) {
-                    // Temporarily override the write alias with the new physical index name, so rebuilding only happens in the new index
-                    $originalWriteAlias = $this->writeAlias;
-                    $this->setWriteAlias($settings['index']);
+            $typeDataProvider = $this->getDataProvider($documentClass);
+            $i = 1;
+            foreach ($typeDataProvider->getDocuments() as $document) {
+                // Temporarily override the write alias with the new physical index name, so rebuilding only happens in the new index
+                $originalWriteAlias = $this->writeAlias;
+                $this->setWriteAlias($settings['index']);
 
-                    if (is_array($document)) {
-                        $this->persistRaw($documentClass, $document);
-                    } else {
-                        $this->persist($document);
-                    }
-
-                    // Restore write alias name
-                    $this->setWriteAlias($originalWriteAlias);
-
-                    // Send the bulk request every X documents, so it doesn't get too big
-                    if (0 === $i % $batchSize) {
-                        $this->getConnection()->commit();
-                    }
-                    $i++;
+                if (is_array($document)) {
+                    $this->persistRaw($documentClass, $document);
+                } else {
+                    $this->persist($document);
                 }
+
+                // Restore write alias name
+                $this->setWriteAlias($originalWriteAlias);
+
+                // Send the bulk request every X documents, so it doesn't get too big
+                if (0 === $i % $batchSize) {
+                    $this->getConnection()->commit();
+                }
+                $i++;
             }
+
             // Save any remaining documents to ES
             $this->getConnection()->commit();
 

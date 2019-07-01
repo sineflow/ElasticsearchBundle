@@ -13,8 +13,12 @@ services:
 
     sfes.provider_registry:
         class: Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry
+        arguments:
+            - '@sfes.document_metadata_collector'
+            - '@sfes.index_manager_registry'
+            - '%sfes.provider_self.class%'
         calls:
-            - [setContainer, ['@service_container']]
+            - [ setContainer, [ '@service_container' ]]
 
     sfes.index_manager_factory:
         class: Sineflow\ElasticsearchBundle\Manager\IndexManagerFactory

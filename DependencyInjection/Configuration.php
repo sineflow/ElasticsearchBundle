@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -36,7 +37,7 @@ class Configuration implements ConfigurationInterface
     /**
      * Connections configuration node.
      *
-     * @return \Symfony\Component\Config\Definition\Builder\NodeDefinition
+     * @return NodeDefinition
      *
      * @throws InvalidConfigurationException
      */
@@ -82,7 +83,7 @@ class Configuration implements ConfigurationInterface
     /**
      * Managers configuration node.
      *
-     * @return \Symfony\Component\Config\Definition\Builder\NodeDefinition
+     * @return NodeDefinition
      */
     private function getIndicesNode()
     {
@@ -101,7 +102,7 @@ class Configuration implements ConfigurationInterface
                         return [];
                     }
                     foreach ($v as $indexManager => $values) {
-                        if ($indexManager[0] == '_') {
+                        if ($indexManager[0] === '_') {
                             $templates[$indexManager] = $values;
                             unset($v[$indexManager]);
                         }
@@ -142,9 +143,10 @@ class Configuration implements ConfigurationInterface
                         ->info('Sets index settings')
                         ->prototype('variable')->end()
                     ->end()
-                    ->arrayNode('types')
-                        ->info('Defines which types will reside in this index, by specifying their entity classes, e.g AppBundle:Product')
-                        ->prototype('scalar')->end()
+                    ->scalarNode('class')
+                        ->info('The entity class representing the documents in the index. Can be specified either in a short notation (e.g AppBundle:Product) or a class FQN')
+                        ->isRequired()
+                        ->cannotBeEmpty()
                     ->end()
                 ->end()
             ->end();

@@ -2,6 +2,8 @@
 
 namespace Sineflow\ElasticsearchBundle\Document\Provider;
 
+use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
+
 /**
  * Base document provider
  */
@@ -24,7 +26,7 @@ abstract class AbstractProvider implements ProviderInterface
     /**
      * @return string
      */
-    protected function getDocumentClass()
+    public function getDocumentClass() : string
     {
         return $this->documentClass;
     }
@@ -42,6 +44,7 @@ abstract class AbstractProvider implements ProviderInterface
      * The returned data can be either a document entity or an array ready for direct sending to ES
      *
      * @param int|string $id
+     *
      * @return DocumentInterface|array
      */
     abstract public function getDocument($id);

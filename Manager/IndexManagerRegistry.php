@@ -47,20 +47,22 @@ class IndexManagerRegistry implements ContainerAwareInterface
      * Returns the index manager service for a given index manager name
      *
      * @param string $name
+     *
      * @return IndexManager
+     *
      * @throws InvalidIndexManagerException If service does not exist or is the wrong class
      */
-    public function get($name)
+    public function get(string $name)
     {
         $serviceName = sprintf('sfes.index.%s', $name);
         if (!$this->container->has($serviceName)) {
-            throw new InvalidIndexManagerException(sprintf('No manager is defined for "%s" index', $name));
+            throw new InvalidIndexManagerException(sprintf('No manager is defined for [%s] index', $name));
         }
 
         $indexManager = $this->container->get($serviceName);
 
         if (!$indexManager instanceof IndexManager) {
-            throw new InvalidIndexManagerException(sprintf('Manager must be instance of "%s", "%s" given', IndexManager::class, get_class($indexManager)));
+            throw new InvalidIndexManagerException(sprintf('Manager must be instance of [%s], [%s] given', IndexManager::class, get_class($indexManager)));
         }
 
         return $indexManager;
@@ -70,6 +72,7 @@ class IndexManagerRegistry implements ContainerAwareInterface
      * Returns the index manager managing a given Elasticsearch entity
      *
      * @param DocumentInterface $entity
+     *
      * @return IndexManager
      */
     public function getByEntity(DocumentInterface $entity)

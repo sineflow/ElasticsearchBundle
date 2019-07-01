@@ -366,11 +366,6 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                         'propertyAccess' => 1,
                     ],
                 ],
-                'objects' =>
-                [
-                    0 => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjTag',
-                    1 => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjCategory',
-                ],
                 'repositoryClass' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\Repository\\ProductRepository',
                 'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\Product',
                 'shortClassName' => 'AcmeBarBundle:Product',

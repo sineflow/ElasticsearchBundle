@@ -32,8 +32,7 @@ sineflow_elasticsearch:
         products:
             extends: _base
             name: acme_products
-            types:
-                - AppBundle:Product
+            class: AppBundle:Product
 ```
 
 ## Index manager

@@ -2,30 +2,55 @@
 
 namespace Sineflow\ElasticsearchBundle\Document\Provider;
 
+use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
+use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * References persistence providers for each index and type.
  */
 class ProviderRegistry implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     /**
-     * @var ContainerInterface
+     * @var DocumentMetadataCollector
      */
-    private $container;
-
-    private $providers = array();
+    private $documentMetadataCollector;
 
     /**
-     * Sets the Container.
+     * @var IndexManagerRegistry
+     */
+    private $indexManagerRegistry;
+
+    /**
+     * @var string
+     */
+    private $selfProviderClass;
+
+    /**
+     * @var array
+     */
+    private $providers = [];
+
+    /**
+     * ProviderRegistry constructor.
      *
-     * @param ContainerInterface|null $container A ContainerInterface instance or null
+     * @param DocumentMetadataCollector $documentMetadataCollector
+     * @param IndexManagerRegistry      $indexManagerRegistry
+     * @param string                    $selfProviderClass
      */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
+    public function __construct(
+        DocumentMetadataCollector $documentMetadataCollector,
+        IndexManagerRegistry $indexManagerRegistry,
+        string $selfProviderClass
+    ) {
+        $this->documentMetadataCollector = $documentMetadataCollector;
+        $this->indexManagerRegistry = $indexManagerRegistry;
+        $this->selfProviderClass = $selfProviderClass;
     }
+
 
     /**
      * Registers a provider service for the specified type entity.
@@ -33,65 +58,47 @@ class ProviderRegistry implements ContainerAwareInterface
      * @param string $documentClass The short path to the type entity (e.g AppBundle:MyType)
      * @param string $providerId    The provider service id
      */
-    public function addProvider($documentClass, $providerId)
+    public function addProvider(string $documentClass, string $providerId) : void
     {
-        $this->providers[$documentClass] = $providerId;
-    }
-
-    /**
-     * Unsets registered provider for the specified type entity.
-     *
-     * @param string $documentClass The short path to the type entity (e.g AppBundle:MyType)
-     */
-    public function removeProvider($documentClass)
-    {
-        unset($this->providers[$documentClass]);
-    }
-
-    /**
-     * Gets registered provider service id for the specified type entity.
-     *
-     * @param string $documentClass The short path to the type entity (e.g AppBundle:MyType)
-     * @return string|null
-     */
-    public function getProviderId($documentClass)
-    {
-        return isset($this->providers[$documentClass]) ? $this->providers[$documentClass] : null;
+        $this->providers[$this->documentMetadataCollector->getDocumentMetadata($documentClass)->getClassName()] = $providerId;
     }
 
     /**
      * Gets the provider for a type.
      *
-     * @param string $documentClass The short path to the type entity (e.g AppBundle:MyType)
+     * @param string $documentClass FQN or alias (e.g AppBundle:Entity)
+     *
      * @return ProviderInterface
+     *
      * @throws \InvalidArgumentException if no provider was registered for the type
      */
-    public function getProviderInstance($documentClass)
+    public function getProviderInstance(string $documentClass) : ProviderInterface
     {
+        $documentClass = $this->documentMetadataCollector->getDocumentMetadata($documentClass)->getClassName();
+
         if (isset($this->providers[$documentClass])) {
             $provider = $this->container->get($this->providers[$documentClass]);
             if (!$provider instanceof ProviderInterface) {
-                throw new \InvalidArgumentException(sprintf('Registered provider "%s" must implement ProviderInterface.', $this->providers[$documentClass]));
+                throw new \InvalidArgumentException(sprintf('Registered provider [%s] must implement [%s].', $this->providers[$documentClass], ProviderInterface::class));
             }
 
             return $provider;
         }
 
         // Return default self-provider, if no specific one was registered
-        $providerClass = $this->container->getParameter('sfes.provider_self.class');
-        if (class_exists($providerClass)) {
-            $indexManager = $this->container->get('sfes.index_manager_registry')->get(
-                $this->container->get('sfes.document_metadata_collector')->getDocumentClassIndex($documentClass)
+        if (class_exists($this->selfProviderClass)) {
+            $indexManager = $this->indexManagerRegistry->get(
+                $this->documentMetadataCollector->getDocumentClassIndex($documentClass)
             );
 
-            return new $providerClass(
+            return new $this->selfProviderClass(
                 $documentClass,
-                $this->container->get('sfes.document_metadata_collector'),
+                $this->documentMetadataCollector,
                 $indexManager,
                 $documentClass
             );
         }
 
-        throw new \InvalidArgumentException(sprintf('No provider is registered for type "%s".', $documentClass));
+        throw new \InvalidArgumentException(sprintf('No data provider is registered for [%s].', $documentClass));
     }
 }
