@@ -755,7 +755,6 @@ class IndexManager
             if (count($writeIndices) > 1) {
                 throw new IndexRebuildingException(array_diff($writeIndices, [$liveIndex]));
             }
-
         } catch (IndexOrAliasNotFoundException $e) {
             // If this is a second attempt with the same exception, then we can't do anything more
             if (get_class($e) === $retryForException) {

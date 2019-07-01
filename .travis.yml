@@ -4,16 +4,14 @@ php:
   - '7.3'
 
 env:
-  - SYMFONY_VERSION="3.4.*" ES_VERSION="6.2.4"
+  - SYMFONY_VERSION="3.4.*" ES_VERSION="6.2.4" ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
 
 matrix:
-  allow_failures:
-    - php: hhvm
   include:
     - php: 7.1
       env: SYMFONY_VERSION="3.4.*" ES_VERSION="6.8.1"
     - php: 7.1
-      env: SYMFONY_VERSION="3.4.*" ES_VERSION="7.2.0"
+      env: SYMFONY_VERSION="3.4.*" ES_VERSION="7.2.0" ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
     - php: 7.1
       env: SYMFONY_VERSION="3.0.*" ES_VERSION="6.2.4"
     - php: 7.1
@@ -21,7 +19,7 @@ matrix:
 
 install:
   - composer require --no-update symfony/symfony:${SYMFONY_VERSION}
-  - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
+  - wget ${ES_DOWNLOAD_URL}
   - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
   - ./elasticsearch-${ES_VERSION}/bin/elasticsearch > /dev/null 2>&1 &
   - composer install --dev --no-interaction
