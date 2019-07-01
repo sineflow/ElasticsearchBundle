@@ -62,14 +62,19 @@ class DocumentMetadataCollector
     private $cache;
 
     /**
-     * @var bool
+     * @var int
      */
-    private $debug;
+    private $documentsLastModifiedTime;
 
     /**
      * @var bool
      */
     private $isCacheEnabled;
+
+    /**
+     * @var bool
+     */
+    private $verifyCacheFreshness;
 
     /**
      * @param array           $indexManagers   The list of index managers defined
@@ -86,21 +91,29 @@ class DocumentMetadataCollector
         $this->documentLocator = $documentLocator;
         $this->parser = $parser;
         $this->cache = $cache;
-        $this->debug = $debug;
-        $this->isCacheEnabled = ($cache instanceof Cache && !$debug); // Only in production mode and if cache provider is given
+        $this->isCacheEnabled = $cache instanceof Cache;
+        $this->verifyCacheFreshness = $this->isCacheEnabled && $debug;
 
-        // Build an internal array with map of document class to index manager name
-        foreach ($this->indexManagers as $indexManagerName => $indexSettings) {
-            $this->documentClassToIndexManagerNames[$this->documentLocator->resolveClassName($indexSettings['class'])] = $indexManagerName;
+        if ($this->verifyCacheFreshness) {
+            // Gets the time when the documents' folders were last modified
+            $documentDirs = $this->documentLocator->getAllDocumentDirs();
+            foreach ($documentDirs as $dir) {
+                $this->documentsLastModifiedTime = max($this->documentsLastModifiedTime, filemtime($dir));
+            }
         }
 
-        if ($this->isCacheEnabled) {
+        if ($this->isCacheEnabled && $this->isCacheFresh(self::DOCUMENTS_CACHE_KEY)) {
             $this->metadata = $this->cache->fetch(self::DOCUMENTS_CACHE_KEY);
         }
 
         // If we have no metadata, build it now
         if (!$this->metadata) {
             $this->metadata = $this->fetchDocumentsMetadata();
+        }
+
+        // Build an internal array with map of document class to index manager name
+        foreach ($this->indexManagers as $indexManagerName => $indexSettings) {
+            $this->documentClassToIndexManagerNames[$this->documentLocator->resolveClassName($indexSettings['class'])] = $indexManagerName;
         }
     }
 
@@ -144,7 +157,7 @@ class DocumentMetadataCollector
             return $this->objectsMetadata[$objectClass];
         }
 
-        if ($this->isCacheEnabled) {
+        if ($this->isCacheEnabled && $this->isCacheFresh(self::OBJECTS_CACHE_KEY.$objectClass)) {
             $objectMetadata = $this->cache->fetch(self::OBJECTS_CACHE_KEY.$objectClass);
         }
 
@@ -157,6 +170,7 @@ class DocumentMetadataCollector
         $this->objectsMetadata[$objectClass] = $objectMetadata;
         if ($this->isCacheEnabled) {
             $this->cache->save(self::OBJECTS_CACHE_KEY.$objectClass, $objectMetadata);
+            $this->cache->save('[C]'.self::OBJECTS_CACHE_KEY.$objectClass, time());
         }
 
         return $objectMetadata;
@@ -262,8 +276,25 @@ class DocumentMetadataCollector
 
         if ($this->isCacheEnabled) {
             $this->cache->save(self::DOCUMENTS_CACHE_KEY, $metadata);
+            $this->cache->save('[C]'.self::DOCUMENTS_CACHE_KEY, time());
         }
 
         return $metadata;
+    }
+
+    /**
+     * Return whether cache for the given cache key is up-to-date
+     *
+     * @param string $cacheKey
+     *
+     * @return bool
+     */
+    private function isCacheFresh(string $cacheKey) : bool
+    {
+        if ($this->verifyCacheFreshness) {
+            return $this->cache->fetch('[C]'.$cacheKey) > $this->documentsLastModifiedTime;
+        }
+
+        return true;
     }
 }
