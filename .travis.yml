@@ -4,18 +4,13 @@ php:
   - '7.3'
 
 env:
-  - SYMFONY_VERSION="3.4.*" ES_VERSION="6.2.4" ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
-
-matrix:
-  include:
-    - php: 7.1
-      env: SYMFONY_VERSION="3.4.*" ES_VERSION="6.8.1"
-    - php: 7.1
-      env: SYMFONY_VERSION="3.4.*" ES_VERSION="7.2.0" ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
-    - php: 7.1
-      env: SYMFONY_VERSION="3.0.*" ES_VERSION="6.2.4"
-    - php: 7.1
-      env: SYMFONY_VERSION="2.7.*" ES_VERSION="6.2.4"
+  global:
+    - SYMFONY_VERSION="3.4.*" ES_VERSION="6.2.4" ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
+  matrix:
+    - ES_VERSION="6.8.1"
+    - ES_VERSION="7.2.0" ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
+    - SYMFONY_VERSION="3.0.*"
+    - SYMFONY_VERSION="2.7.*"
 
 install:
   - composer require --no-update symfony/symfony:${SYMFONY_VERSION}
