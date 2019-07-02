@@ -225,8 +225,8 @@ class DocumentParser
         /** @var Document $classAnnotation */
         $classAnnotation = $this->reader->getClassAnnotation($documentReflection, Document::class);
 
-        // If an Elasticsearch type is not defined in the entity annotation, use the lowercased class name as such
-        return empty($classAnnotation->type) ? strtolower($documentReflection->getShortName()) : $classAnnotation->type;
+        // If an Elasticsearch type is not defined in the entity annotation, use '_doc' as such
+        return empty($classAnnotation->type) ? '_doc' : $classAnnotation->type;
     }
 
     /**

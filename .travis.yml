@@ -24,4 +24,4 @@ script:
   - vendor/bin/phpcs -np --standard=PSR2 --ignore=vendor/,Tests/app/ ./
 
 after_script:
-  - travis_retry php vendor/bin/coveralls
+  - travis_retry php vendor/bin/php-coveralls -v

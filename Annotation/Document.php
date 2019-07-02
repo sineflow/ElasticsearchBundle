@@ -8,12 +8,15 @@ use Sineflow\ElasticsearchBundle\Mapping\DumperInterface;
  * Annotation to mark a class as an Elasticsearch document.
  *
  * @Annotation
+ *
  * @Target("CLASS")
  */
 final class Document implements DumperInterface
 {
     /**
      * @var string
+     *
+     * @deprecated Will be removed in v7
      */
     public $type;
 
