@@ -6,17 +6,14 @@ use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\Exception\InvalidIndexManagerException;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * Class to get defined index manager services
  */
 class IndexManagerRegistry implements ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    use ContainerAwareTrait;
 
     /**
      * @var DocumentMetadataCollector
@@ -31,16 +28,6 @@ class IndexManagerRegistry implements ContainerAwareInterface
     public function __construct(DocumentMetadataCollector $metadataCollector)
     {
         $this->metadataCollector = $metadataCollector;
-    }
-
-    /**
-     * Sets the Container.
-     *
-     * @param ContainerInterface|null $container A ContainerInterface instance or null
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
     }
 
     /**

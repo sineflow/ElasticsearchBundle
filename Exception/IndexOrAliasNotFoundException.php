@@ -15,11 +15,6 @@ class IndexOrAliasNotFoundException extends Exception
     private $indexOrAlias;
 
     /**
-     * @var bool
-     */
-    private $isAlias;
-
-    /**
      * Constructor
      *
      * @param string         $indexOrAlias
@@ -30,7 +25,6 @@ class IndexOrAliasNotFoundException extends Exception
     public function __construct(string $indexOrAlias, bool $isAlias = false, $code = 0, Throwable $previous = null)
     {
         $this->indexOrAlias = $indexOrAlias;
-        $this->isAlias = $isAlias;
 
         parent::__construct(sprintf('%s "%s" does not exist', $isAlias ? 'Alias' : 'Index', $indexOrAlias), $code, $previous);
     }
