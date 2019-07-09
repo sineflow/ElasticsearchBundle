@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Manager;
 
+use Elasticsearch\Common\Exceptions\ElasticsearchException;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\Document\Provider\ProviderInterface;
@@ -344,7 +345,7 @@ class IndexManager
      *
      * @throws IndexOrAliasNotFoundException
      */
-    protected function getWriteIndices()
+    public function getWriteIndices()
     {
         return $this->getIndicesForAlias($this->writeAlias);
     }
@@ -477,7 +478,7 @@ class IndexManager
             ];
             $this->getConnection()->getClient()->indices()->updateAliases($setAliasParams);
 
-            $this->copyDataFromOldToNewIndex($newIndex);
+            $this->copyDataFromOldToNewIndex($newIndex, $oldIndex);
 
             // Point both aliases to the new index and remove them from the old
             $setAliasParams = [
@@ -496,9 +497,10 @@ class IndexManager
                 $this->getConnection()->getClient()->indices()->delete(['index' => $oldIndex]);
                 $this->getConnection()->getLogger()->notice(sprintf('Deleted old index %s', $oldIndex));
             }
-        } catch (Exception $e) {
-            // Bulk exceptions are logged in the connection manager, so only log other exceptions here
-            if (!($e instanceof BulkRequestException)) {
+        } catch (\Exception $e) {
+            // Do not log BulkRequestException here as they are logged in the connection manager
+            // Do not log ElasticsearchException either, as they are logged inside the elasticsearch bundle
+            if (!($e instanceof BulkRequestException) && !($e instanceof ElasticsearchException)) {
                 $this->getConnection()->getLogger()->error($e->getMessage());
             }
 
@@ -682,8 +684,9 @@ class IndexManager
      * Retrieves all documents from the index's data provider and populates them in a new index
      *
      * @param string $newIndex
+     * @param string $oldIndex
      */
-    protected function copyDataFromOldToNewIndex(string $newIndex)
+    protected function copyDataFromOldToNewIndex(string $newIndex, string $oldIndex)
     {
         $batchSize = $this->connection->getConnectionSettings()['bulk_batch_size'];
 
