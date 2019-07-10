@@ -68,4 +68,17 @@ class IndexManagerRegistry implements ContainerAwareInterface
 
         return $this->get($indexManagerName);
     }
+
+    /**
+     * Get all index manager instances defined
+     *
+     * @return \Generator|IndexManager[]
+     */
+    public function getAll() : \Generator
+    {
+        $indexManagerNames = $this->metadataCollector->getIndexManagersForDocumentClasses();
+        foreach ($indexManagerNames as $indexManagerName) {
+            yield $this->get($indexManagerName);
+        }
+    }
 }
