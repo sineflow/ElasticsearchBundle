@@ -55,12 +55,36 @@ class ProviderRegistry implements ContainerAwareInterface
     /**
      * Registers a provider service for the specified type entity.
      *
-     * @param string $documentClass The short path to the type entity (e.g AppBundle:MyType)
+     * @param string $documentClass The FQN or alias to the type entity
      * @param string $providerId    The provider service id
      */
     public function addProvider(string $documentClass, string $providerId) : void
     {
         $this->providers[$this->documentMetadataCollector->getDocumentMetadata($documentClass)->getClassName()] = $providerId;
+    }
+
+    /**
+     * Unsets registered provider for the specified type entity.
+     *
+     * @param string $documentClass The FQN or alias to the type entity
+     */
+    public function removeProvider(string $documentClass) : void
+    {
+        unset($this->providers[$this->documentMetadataCollector->getDocumentMetadata($documentClass)->getClassName()]);
+    }
+
+    /**
+     * Gets registered provider service id for the specified type entity.
+     *
+     * @param string $documentClass The FQN or alias to the type entity
+     *
+     * @return string|null
+     */
+    public function getProviderId(string $documentClass) : ?string
+    {
+        $fullClassName = $this->documentMetadataCollector->getDocumentMetadata($documentClass)->getClassName();
+
+        return isset($this->providers[$fullClassName]) ? $this->providers[$fullClassName] : null;
     }
 
     /**
