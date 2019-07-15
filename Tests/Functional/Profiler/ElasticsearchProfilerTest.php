@@ -68,7 +68,7 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
     {
         $imWithoutAliases = $this->getIndexManager('bar');
         $imWithoutAliases->getConnection()->setAutocommit(true);
-        $imWithoutAliases->getRepository('AcmeBarBundle:Product')->getById(3);
+        $imWithoutAliases->getRepository()->getById(3);
 
         $this->assertGreaterThan(0.0, $this->getCollector()->getTime(), 'Time should be greater than 0ms');
         $this->assertLessThan(1000.0, $this->getCollector()->getTime(), 'Time should be less than 1s');
@@ -81,7 +81,7 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
     {
         $imWithoutAliases = $this->getIndexManager('bar');
         $imWithoutAliases->getConnection()->setAutocommit(true);
-        $imWithoutAliases->getRepository('AcmeBarBundle:Product')->getById(3);
+        $imWithoutAliases->getRepository()->getById(3);
 
 
         $queries = $this->getCollector()->getQueries();

@@ -255,13 +255,13 @@ class IndexManager
     /**
      * Returns the data provider object for a type (provided in short class notation, e.g AppBundle:Product)
      *
-     * @param string $documentClass The document class for the type
-     *
      * @return ProviderInterface
      */
-    public function getDataProvider($documentClass)
+    public function getDataProvider()
     {
-        $provider = $this->providerRegistry->getProviderInstance($documentClass);
+        $provider = $this->providerRegistry->getProviderInstance(
+            $this->getDocumentClass()
+        );
 
         return $provider;
     }
@@ -519,20 +519,19 @@ class IndexManager
      * Rebuilds the data of a document and adds it to a bulk request for the next commit.
      * Depending on the connection autocommit mode, the change may be committed right away.
      *
-     * @param string     $documentClass The document class in short notation (i.e. AppBundle:Product)
      * @param string|int $id
      */
-    public function reindex(string $documentClass, $id)
+    public function reindex($id)
     {
-        $documentMetadata = $this->metadataCollector->getDocumentMetadata($documentClass);
+        $documentClass = $this->getDocumentClass();
 
-        $dataProvider = $this->getDataProvider($documentClass);
+        $dataProvider = $this->getDataProvider();
         $document = $dataProvider->getDocument($id);
 
         switch (true) {
             case $document instanceof DocumentInterface:
-                if (get_class($document) !== $documentMetadata->getClassName()) {
-                    throw new Exception(sprintf('Document must be "%s", but "%s" was returned from data provider', $documentMetadata->getClassName(), get_class($document)));
+                if (get_class($document) !== $documentClass) {
+                    throw new Exception(sprintf('Document must be [%s], but [%s] was returned from data provider', $documentClass, get_class($document)));
                 }
                 $this->persist($document);
                 break;
@@ -542,9 +541,9 @@ class IndexManager
                     throw new Exception(sprintf('The returned document array must include an "_id" field: (%s)', serialize($document)));
                 }
                 if ($document['_id'] != $id) {
-                    throw new Exception(sprintf('The document id must be "%s", but "%s" was returned from data provider', $id, $document['_id']));
+                    throw new Exception(sprintf('The document id must be [%s], but "%s" was returned from data provider', $id, $document['_id']));
                 }
-                $this->persistRaw($documentClass, $document);
+                $this->persistRaw($document);
                 break;
 
             default:
@@ -560,12 +559,11 @@ class IndexManager
      * Adds document removal to a bulk request for the next commit.
      * Depending on the connection autocommit mode, the removal may be committed right away.
      *
-     * @param string $documentClass The document class in short notation (i.e. AppBundle:Product)
-     * @param string $id            Document ID to remove.
+     * @param string $id Document ID to remove.
      */
-    public function delete($documentClass, $id)
+    public function delete($id)
     {
-        $documentMetadata = $this->metadataCollector->getDocumentMetadata($documentClass);
+        $documentMetadata = $this->metadataCollector->getDocumentMetadata($this->indexSettings['class']);
 
         $this->getConnection()->addBulkOperation(
             'delete',
@@ -583,16 +581,15 @@ class IndexManager
     /**
      * Adds a document update to a bulk request for the next commit.
      *
-     * @param string $documentClass The document class in short notation (i.e. AppBundle:Product)
-     * @param string $id            Document id to update.
-     * @param array  $fields        Fields array to update (ignored if script is specified).
-     * @param string $script        Script to update fields.
-     * @param array  $queryParams   Additional params to pass with the payload (upsert, doc_as_upsert, _source, etc.)
-     * @param array  $metaParams    Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
+     * @param string $id          Document id to update.
+     * @param array  $fields      Fields array to update (ignored if script is specified).
+     * @param string $script      Script to update fields.
+     * @param array  $queryParams Additional params to pass with the payload (upsert, doc_as_upsert, _source, etc.)
+     * @param array  $metaParams  Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
      */
-    public function update($documentClass, $id, array $fields = [], $script = null, array $queryParams = [], array $metaParams = [])
+    public function update($id, array $fields = [], $script = null, array $queryParams = [], array $metaParams = [])
     {
-        $documentMetadata = $this->metadataCollector->getDocumentMetadata($documentClass);
+        $documentMetadata = $this->metadataCollector->getDocumentMetadata($this->indexSettings['class']);
 
         // Add the id of the updated document to the meta params for the bulk request
         $metaParams = array_merge(
@@ -637,20 +634,19 @@ class IndexManager
         }
 
         $documentArray = $this->documentConverter->convertToArray($document);
-        $this->persistRaw(get_class($document), $documentArray, $metaParams);
+        $this->persistRaw($documentArray, $metaParams);
     }
 
     /**
      * Adds a prepared document array to a bulk request for the next commit.
      * Depending on the connection autocommit mode, the update may be committed right away.
      *
-     * @param string $documentClass The document class in short notation (i.e. AppBundle:Product)
-     * @param array  $documentArray The document to index in ES
-     * @param array  $metaParams    Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
+     * @param array $documentArray The document to index in ES
+     * @param array $metaParams    Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
      */
-    public function persistRaw($documentClass, array $documentArray, array $metaParams = [])
+    public function persistRaw(array $documentArray, array $metaParams = [])
     {
-        $documentMetadata = $this->metadataCollector->getDocumentMetadata($documentClass);
+        $documentMetadata = $this->metadataCollector->getDocumentMetadata($this->indexSettings['class']);
 
         $this->getConnection()->addBulkOperation(
             'index',
@@ -705,7 +701,7 @@ class IndexManager
             $this->setWriteAlias($newIndex);
 
             if (is_array($document)) {
-                $this->persistRaw($documentClass, $document);
+                $this->persistRaw($document);
             } else {
                 $this->persist($document);
             }
@@ -774,5 +770,15 @@ class IndexManager
         }
 
         return $liveIndex;
+    }
+
+    /**
+     * Get FQN of document class managed by this index manager
+     *
+     * @return string
+     */
+    protected function getDocumentClass()
+    {
+        return $this->metadataCollector->getDocumentMetadata($this->indexSettings['class'])->getClassName();
     }
 }

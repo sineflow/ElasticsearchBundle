@@ -13,7 +13,7 @@ In addition to that, the **DocumentIterator** itself has some extra methods:
 * `getAggregations()` Return the aggregations, if you have requested any.
  
 ```php
-$repo = $this->get('sfes.index.product')->getRepository('AppBundle:Product');
+$repo = $this->get('sfes.index.product')->getRepository();
 $searchBody = [
     'query' => [
         'match_all' => (object) []

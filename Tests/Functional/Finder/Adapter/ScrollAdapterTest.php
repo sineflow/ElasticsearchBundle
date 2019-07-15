@@ -57,7 +57,7 @@ class ScrollAdapterTest extends AbstractElasticsearchTestCase
     public function testScanScroll()
     {
         /** @var Repository $repo */
-        $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
+        $repo = $this->getIndexManager('bar')->getRepository();
 
         $query = ['query' => ['term' => ['title' => ['value' => 'product']]]];
 

@@ -75,7 +75,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
     public function testPagination()
     {
         /** @var Repository $repo */
-        $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
+        $repo = $this->getIndexManager('bar')->getRepository();
         $paginator = $this->getContainer()->get('knp_paginator');
 
         $query = ['query' => ['match_all' => (object) []], 'sort' => ['_uid' => ['order' =>'asc']]];
@@ -128,7 +128,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
     public function testInvalidResultsType()
     {
         /** @var Repository $repo */
-        $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
+        $repo = $this->getIndexManager('bar')->getRepository();
         $paginator = $this->getContainer()->get('knp_paginator');
 
         $query = ['query' => ['match_all' => (object) []]];

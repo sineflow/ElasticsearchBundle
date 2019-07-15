@@ -124,7 +124,7 @@ class Repository
      */
     public function reindex($id)
     {
-        $this->indexManager->reindex($this->documentClass, $id);
+        $this->indexManager->reindex($id);
     }
 
     /**
@@ -135,7 +135,7 @@ class Repository
      */
     public function delete($id)
     {
-        $this->indexManager->delete($this->documentClass, $id);
+        $this->indexManager->delete($id);
     }
 
     /**
@@ -148,7 +148,7 @@ class Repository
      */
     public function update($id, array $fields = [], $script = null, array $params = [])
     {
-        $this->indexManager->update($this->documentClass, $id, $fields, $script, $params);
+        $this->indexManager->update($id, $fields, $script, $params);
     }
 
     /**
@@ -170,6 +170,6 @@ class Repository
      */
     public function persistRaw(array $documentArray)
     {
-        $this->indexManager->persistRaw($this->documentClass, $documentArray);
+        $this->indexManager->persistRaw($documentArray);
     }
 }

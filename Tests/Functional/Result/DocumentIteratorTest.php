@@ -79,7 +79,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
     public function testIteration()
     {
         /** @var Repository $repo */
-        $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
+        $repo = $this->getIndexManager('bar')->getRepository();
 
         /** @var DocumentIterator $iterator */
         $iterator = $repo->find(['query' => ['match_all' => (object) []], 'size' => 3, 'sort' => ['_uid' => ['order' =>'asc']]], Finder::RESULTS_OBJECT);
@@ -118,7 +118,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
     public function testManualIteration()
     {
         /** @var Repository $repo */
-        $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
+        $repo = $this->getIndexManager('bar')->getRepository();
 
         /** @var DocumentIterator $iterator */
         $iterator = $repo->find(['query' => ['match_all' => (object) []], 'size' => 3, 'sort' => ['_uid' => ['order' =>'asc']]], Finder::RESULTS_OBJECT);
@@ -145,7 +145,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
     public function testCurrentWithEmptyIterator()
     {
         /** @var Repository $repo */
-        $repo = $this->getIndexManager('customer')->getRepository('AcmeFooBundle:Customer');
+        $repo = $this->getIndexManager('customer')->getRepository();
         /** @var DocumentIterator $iterator */
         $iterator = $repo->find(['query' => ['match_all' => (object) []]], Finder::RESULTS_OBJECT);
 
@@ -158,7 +158,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
     public function testAggregations()
     {
         /** @var Repository $repo */
-        $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
+        $repo = $this->getIndexManager('bar')->getRepository();
 
         /** @var DocumentIterator $iterator */
         $iterator = $repo->find([
@@ -183,7 +183,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
     public function testSuggestions()
     {
         /** @var Repository $repo */
-        $repo = $this->getIndexManager('bar')->getRepository('AcmeBarBundle:Product');
+        $repo = $this->getIndexManager('bar')->getRepository();
 
         /** @var DocumentIterator $iterator */
         $iterator = $repo->find([

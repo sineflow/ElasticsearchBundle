@@ -189,11 +189,11 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $product->title = 'Acme title';
         $imWithoutAliases->persist($product);
 
-        $doc = $imWithoutAliases->getRepository('AcmeBarBundle:Product')->getById(555);
+        $doc = $imWithoutAliases->getRepository()->getById(555);
         $this->assertNull($doc);
 
         $imWithoutAliases->getConnection()->commit();
-        $doc = $imWithoutAliases->getRepository('AcmeBarBundle:Product')->getById(555);
+        $doc = $imWithoutAliases->getRepository()->getById(555);
         $this->assertInstanceOf(Product::class, $doc);
         $this->assertEquals('Acme title', $doc->title);
 
@@ -201,7 +201,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $product->title = null;
         $imWithoutAliases->persist($product);
         $imWithoutAliases->getConnection()->commit();
-        $doc = $imWithoutAliases->getRepository('AcmeBarBundle:Product')->getById(555);
+        $doc = $imWithoutAliases->getRepository()->getById(555);
         $this->assertEquals(null, $doc->title, 'Null property value was not persisted');
     }
 
@@ -226,12 +226,12 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $customer->name = 'John Doe';
         $imWithAliases->persist($customer);
 
-        $doc = $imWithAliases->getRepository('AcmeFooBundle:Customer')->getById(555);
+        $doc = $imWithAliases->getRepository()->getById(555);
         $this->assertNull($doc);
 
         $imWithAliases->getConnection()->commit();
 
-        $doc = $imWithAliases->getRepository('AcmeFooBundle:Customer')->getById(555);
+        $doc = $imWithAliases->getRepository()->getById(555);
         $this->assertInstanceOf(Customer::class, $doc);
         $this->assertEquals('John Doe', $doc->name);
 
@@ -251,26 +251,13 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases = $this->getIndexManager('customer');
         $imWithAliases->getConnection()->setAutocommit(true);
 
-        $imWithAliases->persistRaw('AcmeFooBundle:Customer', [
+        $imWithAliases->persistRaw([
             '_id' => 444,
             'name' => 'Jane'
         ]);
 
-        $doc = $imWithAliases->getRepository('AcmeFooBundle:Customer')->getById(444);
+        $doc = $imWithAliases->getRepository()->getById(444);
         $this->assertEquals('Jane', $doc->name);
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testPersistRawWithInvalidDocumentClass()
-    {
-        $imWithAliases = $this->getIndexManager('customer');
-        $imWithAliases->getConnection()->setAutocommit(true);
-
-        $imWithAliases->persistRaw('AcmeFooBundle:NonExisting', [
-            'bla' => 'blu'
-        ]);
     }
 
     public function testUpdateWithCorrectParams()
@@ -278,11 +265,11 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases = $this->getIndexManager('customer');
         $imWithAliases->getConnection()->setAutocommit(true);
 
-        $imWithAliases->update('AcmeFooBundle:Customer', 111, [
+        $imWithAliases->update(111, [
             'name' => 'Alicia'
         ]);
 
-        $doc = $imWithAliases->getRepository('AcmeFooBundle:Customer')->getById(111);
+        $doc = $imWithAliases->getRepository()->getById(111);
         $this->assertEquals('Alicia', $doc->name);
     }
 
@@ -294,7 +281,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases = $this->getIndexManager('customer');
         $imWithAliases->getConnection()->setAutocommit(true);
 
-        $imWithAliases->update('AcmeFooBundle:Customer', 'non-existing-id', [
+        $imWithAliases->update('non-existing-id', [
             'name' => 'Alicia'
         ]);
     }
@@ -321,9 +308,9 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases->persist($customer);
 
         // Delete record in both physical indices pointed by alias
-        $imWithAliases->delete('AcmeFooBundle:Customer', '111');
+        $imWithAliases->delete('111');
 
-        $doc = $imWithAliases->getRepository('AcmeFooBundle:Customer')->getById(111);
+        $doc = $imWithAliases->getRepository()->getById(111);
         $this->assertNull($doc);
 
         $this->expectException(Missing404Exception::class);
@@ -340,17 +327,17 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases = $this->getIndexManager('customer');
         $imWithAliases->getConnection()->setAutocommit(false);
 
-        $rawDoc = $imWithAliases->getRepository('AcmeFooBundle:Customer')->getById(111, Finder::RESULTS_RAW);
+        $rawDoc = $imWithAliases->getRepository()->getById(111, Finder::RESULTS_RAW);
         $this->assertEquals(1, $rawDoc['_version']);
 
-        $imWithAliases->reindex('AcmeFooBundle:Customer', 111);
+        $imWithAliases->reindex(111);
 
-        $rawDoc = $imWithAliases->getRepository('AcmeFooBundle:Customer')->getById(111, Finder::RESULTS_RAW);
+        $rawDoc = $imWithAliases->getRepository()->getById(111, Finder::RESULTS_RAW);
         $this->assertEquals(1, $rawDoc['_version']);
 
         $imWithAliases->getConnection()->commit();
 
-        $rawDoc = $imWithAliases->getRepository('AcmeFooBundle:Customer')->getById(111, Finder::RESULTS_RAW);
+        $rawDoc = $imWithAliases->getRepository()->getById(111, Finder::RESULTS_RAW);
         $this->assertEquals(2, $rawDoc['_version']);
         $this->assertEquals('Jane Doe', $rawDoc['_source']['name']);
     }
@@ -358,17 +345,17 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
     public function testGetDataProvider()
     {
         $imWithAliases = $this->getIndexManager('order', false);
-        $dataProvider = $imWithAliases->getDataProvider('AcmeFooBundle:Order');
+        $dataProvider = $imWithAliases->getDataProvider();
         $this->assertInstanceOf(OrderProvider::class, $dataProvider);
     }
 
     public function testGetRepository()
     {
         $imWithoutAliases = $this->getIndexManager('bar', false);
-        $this->assertInstanceOf(ProductRepository::class, $imWithoutAliases->getRepository('AcmeBarBundle:Product'));
+        $this->assertInstanceOf(ProductRepository::class, $imWithoutAliases->getRepository());
 
         $imWithAliases = $this->getIndexManager('customer', false);
-        $this->assertInstanceOf(Repository::class, $imWithAliases->getRepository('AcmeFooBundle:Customer'));
+        $this->assertInstanceOf(Repository::class, $imWithAliases->getRepository());
     }
 
     public function testGetters()

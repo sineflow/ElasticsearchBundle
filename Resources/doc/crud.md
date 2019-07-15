@@ -46,12 +46,12 @@ $im = $this->get('sfes.index.product');
 
 ## Repositories
 
-When you need to work with a specific type, you can do so through the Repository class of an entity. 
+When you need to work with documents in the index, you can do so through the Repository class of an entity. 
 The default Repository is mostly a convenience class, as its methods are also available either through the IndexManager or the Finder services. However it may be useful to have type-specific methods in your own custom repositories.
-You can get a type's repository through the index manager that manages it:
+You can get a document's repository through the index manager that manages it:
 
 ```php
-$repo = $im->getRepository('AppBundle:Product');
+$repo = $im->getRepository();
 ```
 
 ## Create a document

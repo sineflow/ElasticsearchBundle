@@ -59,7 +59,7 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
         if (!empty($data)) {
             foreach ($data as $type => $documents) {
                 foreach ($documents as $document) {
-                    $indexManager->persistRaw($type, $document);
+                    $indexManager->persistRaw($document);
                 }
             }
             try {

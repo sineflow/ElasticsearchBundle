@@ -41,7 +41,7 @@ class EntityTrackerSubscriberTest extends AbstractElasticsearchTestCase
         $rawCustomer = new Customer();
         $rawCustomer->name = 'firstRaw';
         $documentArray = $converter->convertToArray($rawCustomer);
-        $imWithAliases->persistRaw('AcmeFooBundle:Customer', $documentArray);
+        $imWithAliases->persistRaw($documentArray);
 
         // Persist entity - handled by the subscriber
         $customer = new Customer();
@@ -52,7 +52,7 @@ class EntityTrackerSubscriberTest extends AbstractElasticsearchTestCase
         $secondRawCustomer = new Customer();
         $secondRawCustomer->name = 'secondRaw';
         $documentArray = $converter->convertToArray($secondRawCustomer);
-        $imWithAliases->persistRaw('AcmeFooBundle:Customer', $documentArray);
+        $imWithAliases->persistRaw($documentArray);
 
         // Persist an entity to another connection to make sure the subscriber handles the 2 commits independently
         $log = new Log();

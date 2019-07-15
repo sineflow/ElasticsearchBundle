@@ -3,7 +3,7 @@
 ## Get a document by id
 
 ```php
-$repo = $this->get('sfes.index.product')->getRepository('AppBundle:Product');
+$repo = $this->get('sfes.index.product')->getRepository();
 $product = $repo->getById(5); // 5 is the _id of the document in Elasticsearch
 ```
 > The result is returned as an instance of the Product class. An optional second parameter of getByID() allows you to specify different format of the result. See [results types](#resulttypes) below for more information.
@@ -11,7 +11,7 @@ $product = $repo->getById(5); // 5 is the _id of the document in Elasticsearch
 ## Find documents using a search query
 
 ```php
-$repo = $this->get('sfes.index.product')->getRepository('AppBundle:Product');
+$repo = $this->get('sfes.index.product')->getRepository();
 $searchBody = [
     'query' => [
         'match_all' => (object) []
