@@ -686,14 +686,11 @@ class IndexManager
     {
         $batchSize = $this->connection->getConnectionSettings()['bulk_batch_size'];
 
-        // Get the document class for the index
-        $documentClass = $this->metadataCollector->getDocumentMetadataForIndex($this->managerName)->getClassName();
-
         // Make sure we don't autocommit on every item in the bulk request
         $autocommit = $this->getConnection()->isAutocommit();
         $this->getConnection()->setAutocommit(false);
 
-        $typeDataProvider = $this->getDataProvider($documentClass);
+        $typeDataProvider = $this->getDataProvider();
         $i = 1;
         foreach ($typeDataProvider->getDocuments() as $document) {
             // Temporarily override the write alias with the new physical index name, so rebuilding only happens in the new index
