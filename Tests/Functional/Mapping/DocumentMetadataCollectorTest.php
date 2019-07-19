@@ -96,7 +96,7 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
                     ],
             ],
         'repositoryClass'    => null,
-        'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\FooBundle\\Document\\Customer',
+        'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\FooBundle\\Document\\Customer',
         'shortClassName'     => 'AcmeFooBundle:Customer',
     ];
 
@@ -302,11 +302,11 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
                                                         'propertyAccess' => 1,
                                                     ],
                                             ],
-                                        'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjTag',
+                                        'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\ObjTag',
                                         'propertyAccess'     => 1,
                                     ],
                             ],
-                        'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjCategory',
+                        'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\ObjCategory',
                         'propertyAccess'     => 1,
                     ],
                 'related_categories' =>
@@ -347,11 +347,11 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
                                                         'propertyAccess' => 1,
                                                     ],
                                             ],
-                                        'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjTag',
+                                        'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\ObjTag',
                                         'propertyAccess'     => 1,
                                     ],
                             ],
-                        'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjCategory',
+                        'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\ObjCategory',
                         'propertyAccess'     => 1,
                     ],
                 'price'              =>
@@ -416,12 +416,12 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
                         'propertyAccess' => 1,
                     ],
             ],
-        'repositoryClass'    => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\Repository\\ProductRepository',
-        'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\Product',
+        'repositoryClass'    => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\Repository\\ProductRepository',
+        'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\Product',
         'shortClassName'     => 'AcmeBarBundle:Product',
     ];
 
-    public function setUp()
+    protected function setUp()
     {
         $this->indexManagers = $this->getContainer()->getParameter('sfes.indices');
         $this->docLocator    = $this->getContainer()->get('sfes.document_locator');
@@ -434,7 +434,7 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
     public function testGetDocumentMetadata()
     {
         $indexMetadataForAlias = $this->metadataCollector->getDocumentMetadata('AcmeFooBundle:Customer');
-        $indexMetadata = $this->metadataCollector->getDocumentMetadata('Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Customer');
+        $indexMetadata = $this->metadataCollector->getDocumentMetadata('Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Customer');
 
         // Make sure alias and FQN name work the same
         $this->assertEquals($indexMetadata, $indexMetadataForAlias);
@@ -464,7 +464,7 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
         $this->assertEquals($this->expectedCustomerMetadata['propertiesMetadata'], $metadata);
 
         // Test nested object's metadata
-        $metadata = $this->metadataCollector->getObjectPropertiesMetadata('Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\ObjTag');
+        $metadata = $this->metadataCollector->getObjectPropertiesMetadata('Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\ObjTag');
         $this->assertEquals($this->expectedProductMetadata['propertiesMetadata']['category']['propertiesMetadata']['tags']['propertiesMetadata'], $metadata);
 
         // Test nested object in short notation metadata
@@ -478,7 +478,7 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
 
         // Test non-existing class
         $this->assertThrows(\ReflectionException::class, function () {
-            $this->metadataCollector->getObjectPropertiesMetadata('Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\NonExisting');
+            $this->metadataCollector->getObjectPropertiesMetadata('Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\NonExisting');
         });
     }
 
@@ -496,24 +496,24 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
     {
         $docClassIndices = $this->metadataCollector->getIndexManagersForDocumentClasses();
         $this->assertEquals([
-            'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Customer' => 'customer',
-            'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Order' => 'order',
-            'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product' => 'bar',
-            'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Log' => 'backup',
+            'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Customer' => 'customer',
+            'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Order' => 'order',
+            'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product' => 'bar',
+            'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Log' => 'backup',
         ], $docClassIndices);
 
         $docClassIndices = $this->metadataCollector->getIndexManagersForDocumentClasses([
-            'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Customer',
+            'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Customer',
             'AcmeBarBundle:Product',
         ]);
         $this->assertEquals([
-            'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Customer' => 'customer',
-            'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product' => 'bar',
+            'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Customer' => 'customer',
+            'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product' => 'bar',
         ], $docClassIndices);
 
         $this->assertThrows(\InvalidArgumentException::class, function () {
             $this->metadataCollector->getIndexManagersForDocumentClasses([
-                'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\NonExistingClass',
+                'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\NonExistingClass',
             ]);
         });
     }
@@ -523,11 +523,11 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
         $docClassIndex = $this->metadataCollector->getDocumentClassIndex('AcmeBarBundle:Product');
         $this->assertEquals('bar', $docClassIndex);
 
-        $docClassIndex = $this->metadataCollector->getDocumentClassIndex('Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product');
+        $docClassIndex = $this->metadataCollector->getDocumentClassIndex('Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product');
         $this->assertEquals('bar', $docClassIndex);
 
         $this->assertThrows(\InvalidArgumentException::class, function () {
-            $this->metadataCollector->getDocumentClassIndex('Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\NonExistingClass');
+            $this->metadataCollector->getDocumentClassIndex('Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\NonExistingClass');
         });
     }
 }

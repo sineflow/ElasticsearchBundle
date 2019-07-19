@@ -3,24 +3,16 @@
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Command;
 
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
+use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
 use Symfony\Component\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * Helper test case for testing commands.
  */
-abstract class AbstractCommandTestCase extends WebTestCase
+abstract class AbstractCommandTestCase extends AbstractContainerAwareTestCase
 {
-    /**
-     * @return \Symfony\Component\DependencyInjection\ContainerInterface
-     */
-    protected function getContainer()
-    {
-        return self::createClient()->getContainer();
-    }
-
     /**
      * @param string $name
      *
@@ -41,7 +33,8 @@ abstract class AbstractCommandTestCase extends WebTestCase
     /**
      * Returns command tester.
      *
-     * @param string commandName
+     * @param string $commandName
+     *
      * @return CommandTester
      */
     protected function getCommandTester($commandName)

@@ -23,17 +23,13 @@ class RegisterDataProvidersPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('sfes.provider_registry')) {
-            return;
-        }
-
-        $registry = $container->getDefinition('sfes.provider_registry');
+        $registry = $container->findDefinition('sfes.provider_registry');
         $providers = $container->findTaggedServiceIds('sfes.provider');
 
         foreach ($providers as $providerId => $tags) {
             $documentClass = null;
 
-            $class = $container->getDefinition($providerId)->getClass();
+            $class = $container->findDefinition($providerId)->getClass();
             if (!$class || !$this->isProviderImplementation($class)) {
                 throw new \InvalidArgumentException(sprintf('Data provider [%s] with class [%s] must implement ProviderInterface.', $providerId, $class));
             }

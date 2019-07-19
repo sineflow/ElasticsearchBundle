@@ -6,7 +6,7 @@ use Sineflow\ElasticsearchBundle\Exception\InvalidIndexManagerException;
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
-use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product;
+use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product;
 
 /**
  * Class IndexManagerTest

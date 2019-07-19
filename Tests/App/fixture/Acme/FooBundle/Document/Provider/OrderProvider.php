@@ -1,9 +1,9 @@
 <?php
 
-namespace Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Provider;
+namespace Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Provider;
 
 use Sineflow\ElasticsearchBundle\Document\Provider\AbstractProvider;
-use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Order;
+use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Order;
 
 class OrderProvider extends AbstractProvider
 {

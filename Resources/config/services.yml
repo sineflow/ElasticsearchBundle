@@ -1,3 +1,6 @@
+imports:
+    - { resource: legacy_aliases.yml }
+
 parameters:
     sfes.logging.path: "%kernel.logs_dir%/%kernel.environment%.sf_elasticsearch.log"
     sfes.profiler_backtrace_enabled: false
@@ -7,12 +10,19 @@ parameters:
     sfes.index_manager.class: Sineflow\ElasticsearchBundle\Manager\IndexManager
 
 services:
-    sfes.document_converter:
-        class: Sineflow\ElasticsearchBundle\Result\DocumentConverter
+    _defaults:
+        # automatically injects dependencies in your services
+        autowire: false
+        # automatically registers your services as commands, event subscribers, etc.
+        autoconfigure: false
+        # this means you cannot fetch services directly from the container via $container->get()
+        # if you need to do this, you can override this setting on individual services
+        public: false
+
+    Sineflow\ElasticsearchBundle\Result\DocumentConverter:
         arguments: ['@sfes.document_metadata_collector', '%sfes.mlproperty.language_separator%']
 
-    sfes.provider_registry:
-        class: Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry
+    Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry:
         arguments:
             - '@sfes.document_metadata_collector'
             - '@sfes.index_manager_registry'
@@ -20,8 +30,7 @@ services:
         calls:
             - [ setContainer, [ '@service_container' ]]
 
-    sfes.index_manager_factory:
-        class: Sineflow\ElasticsearchBundle\Manager\IndexManagerFactory
+    Sineflow\ElasticsearchBundle\Manager\IndexManagerFactory:
         arguments:
             - '@sfes.document_metadata_collector'
             - '@sfes.provider_registry'
@@ -32,26 +41,55 @@ services:
             - [setEventDispatcher, ['@event_dispatcher']]
         public: false
 
-    sfes.index_manager_registry:
-        class: Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry
+    Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry:
         arguments: ['@sfes.document_metadata_collector']
         calls:
             - [setContainer, ['@service_container']]
 
-    sfes.finder:
-        class: Sineflow\ElasticsearchBundle\Finder\Finder
+    Sineflow\ElasticsearchBundle\Finder\Finder:
         arguments: ['@sfes.document_metadata_collector', '@sfes.index_manager_registry', '@sfes.document_converter']
 
-    sfes.document_locator:
-        class: Sineflow\ElasticsearchBundle\Mapping\DocumentLocator
+    Sineflow\ElasticsearchBundle\Mapping\DocumentLocator:
         arguments: ['%kernel.bundles%']
         calls:
             - [setDocumentDir, ['%sfes.document_dir%']]
 
+    Sineflow\ElasticsearchBundle\Mapping\DocumentParser:
+        arguments: ['@sfes.annotations.cached_reader', '@sfes.document_locator', '%sfes.mlproperty.language_separator%']
+
+    Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector:
+        arguments: ['%sfes.indices%', '@sfes.document_locator', '@sfes.document_parser', '@sfes.cache_engine', '%kernel.debug%']
+
+    Sineflow\ElasticsearchBundle\Profiler\Handler\CollectionHandler:
+        arguments: ['@request_stack', '%sfes.profiler_backtrace_enabled%']
+        public: false
+
+    Sineflow\ElasticsearchBundle\Manager\ConnectionManagerFactory:
+        arguments: ['%kernel.debug%', '@sfes.logger.trace', '@sfes.logger.log']
+        calls:
+            - [setEventDispatcher, ['@event_dispatcher']]
+
+    Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler:
+        calls:
+            - [setIndexManagers, ['%sfes.indices%']]
+            - [addLogger, ['@sfes.logger.trace']]
+        tags:
+            - {name: data_collector, template: "@SineflowElasticsearch/Profiler/profiler.html.twig", id: sfes.profiler}
+
+    Sineflow\ElasticsearchBundle\Subscriber\KnpPaginateQuerySubscriber:
+        arguments: ['@request_stack']
+        tags:
+            - { name: knp_paginator.subscriber }
+
+    Sineflow\ElasticsearchBundle\Subscriber\EntityTrackerSubscriber:
+        arguments: ['@sfes.document_metadata_collector']
+        tags:
+            - { name: kernel.event_subscriber }
+
     sfes.cache_engine:
         class: Doctrine\Common\Cache\FilesystemCache
         arguments: ['%kernel.cache_dir%/sineflow', '.sineflow.data']
-        public: false
+        public: true
 
     sfes.annotations.reader:
         class: Doctrine\Common\Annotations\AnnotationReader
@@ -60,19 +98,6 @@ services:
     sfes.annotations.cached_reader:
         class: Doctrine\Common\Annotations\CachedReader
         arguments: ['@sfes.annotations.reader', '@sfes.cache_engine', '%kernel.debug%']
-        public: false
-
-    sfes.document_parser:
-        class: Sineflow\ElasticsearchBundle\Mapping\DocumentParser
-        arguments: ['@sfes.annotations.cached_reader', '@sfes.document_locator', '%sfes.mlproperty.language_separator%']
-
-    sfes.document_metadata_collector:
-        class: Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector
-        arguments: ['%sfes.indices%', '@sfes.document_locator', '@sfes.document_parser', '@sfes.cache_engine', '%kernel.debug%']
-
-    sfes.logger.collection_handler:
-        class: Sineflow\ElasticsearchBundle\Profiler\Handler\CollectionHandler
-        arguments: ['@request_stack', '%sfes.profiler_backtrace_enabled%']
         public: false
 
     sfes.logger.trace:
@@ -90,29 +115,3 @@ services:
         arguments: ['sfes_log']
         calls:
             - [pushHandler, ['@sfes.logger.log_handler']]
-
-    sfes.connection_factory:
-        class: Sineflow\ElasticsearchBundle\Manager\ConnectionManagerFactory
-        arguments: ['%kernel.debug%', '@sfes.logger.trace', '@sfes.logger.log']
-        calls:
-            - [setEventDispatcher, ['@event_dispatcher']]
-
-    sfes.profiler:
-        class: Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler
-        calls:
-            - [setIndexManagers, ['%sfes.indices%']]
-            - [addLogger, ['@sfes.logger.trace']]
-        tags:
-            - {name: data_collector, template: "@SineflowElasticsearch/Profiler/profiler.html.twig", id: sfes.profiler}
-
-    sfes.subscriber.knp_paginate_query_subscriber:
-        class: Sineflow\ElasticsearchBundle\Subscriber\KnpPaginateQuerySubscriber
-        arguments: ['@request_stack']
-        tags:
-            - { name: knp_paginator.subscriber }
-
-    sfes.subscriber.entity_tracker_subscriber:
-        class: Sineflow\ElasticsearchBundle\Subscriber\EntityTrackerSubscriber
-        arguments: ['@sfes.document_metadata_collector']
-        tags:
-            - { name: kernel.event_subscriber }

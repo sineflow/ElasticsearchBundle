@@ -28,7 +28,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
     public function testParseNonDocument()
     {
 
-        $reflection = new \ReflectionClass('Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\ObjCategory');
+        $reflection = new \ReflectionClass('Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\ObjCategory');
         $res = $this->documentParser->parse($reflection, []);
 
         $this->assertEquals([], $res);
@@ -36,7 +36,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
 
     public function testParseDocumentWithoutType()
     {
-        $reflection = new \ReflectionClass('Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Log');
+        $reflection = new \ReflectionClass('Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Log');
         $res = $this->documentParser->parse($reflection, []);
 
         $this->assertSame('_doc', $res['type']);
@@ -44,7 +44,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
     
     public function testParse()
     {
-        $reflection = new \ReflectionClass('Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product');
+        $reflection = new \ReflectionClass('Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product');
         $indexAnalyzers = [
             'default_analyzer' =>
                 [
@@ -260,11 +260,11 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                                         'propertyAccess' => 1,
                                                     ],
                                             ],
-                                            'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjTag',
+                                            'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\ObjTag',
                                             'propertyAccess' => 1,
                                     ],
                             ],
-                            'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjCategory',
+                            'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\ObjCategory',
                             'propertyAccess' => 1,
                     ],
                     'related_categories' =>
@@ -305,11 +305,11 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                                                         'propertyAccess' => 1,
                                                     ],
                                             ],
-                                            'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjTag',
+                                            'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\ObjTag',
                                             'propertyAccess' => 1,
                                     ],
                             ],
-                            'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\ObjCategory',
+                            'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\ObjCategory',
                             'propertyAccess' => 1,
                     ],
                     'price' =>
@@ -374,8 +374,8 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                         'propertyAccess' => 1,
                     ],
                 ],
-                'repositoryClass' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\Repository\\ProductRepository',
-                'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\app\\fixture\\Acme\\BarBundle\\Document\\Product',
+                'repositoryClass' => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\Repository\\ProductRepository',
+                'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\Product',
                 'shortClassName' => 'AcmeBarBundle:Product',
         ];
 

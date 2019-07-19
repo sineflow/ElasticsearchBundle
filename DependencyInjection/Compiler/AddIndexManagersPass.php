@@ -36,7 +36,7 @@ class AddIndexManagersPass implements CompilerPassInterface
                 [
                     $indexManagerClass,
                     $indexManagerName,
-                    $container->getDefinition($connectionService),
+                    $container->findDefinition($connectionService),
                     $indexSettings,
                 ]
             );

@@ -10,10 +10,10 @@ use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
-use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product;
-use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Repository\ProductRepository;
-use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Customer;
-use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Provider\OrderProvider;
+use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product;
+use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Repository\ProductRepository;
+use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Customer;
+use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Provider\OrderProvider;
 
 /**
  * Class IndexManagerTest

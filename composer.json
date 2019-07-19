@@ -13,21 +13,30 @@
     "require": {
         "php": "^7.1",
         "psr/log": "^1.0",
-        "symfony/symfony": "^3.4",
+
+        "symfony/framework-bundle": "^3.4",
+        "symfony/options-resolver": "^3.4",
+        "symfony/config": "^3.4",
+        "symfony/event-dispatcher": "^3.4",
+        "symfony/translation": "^3.4",
+        "symfony/console": "^3.4",
+        "symfony/http-kernel": "^3.4",
+
         "doctrine/annotations": "^1.2",
         "doctrine/inflector": "^1.0",
         "doctrine/cache": "^1.4",
         "elasticsearch/elasticsearch": "^6.0"
     },
     "require-dev": {
+        "symfony/debug": "^3.4",
+        "symfony/stopwatch": "^3.4",
         "monolog/monolog": "^1.0",
         "knplabs/knp-paginator-bundle": "^2.7",
-        "doctrine/orm": "^2.5",
-        "mikey179/vfsstream": "^1.6",
-        "phpunit/phpunit": "^7.0",
         "squizlabs/php_codesniffer": "^3.0",
         "php-coveralls/php-coveralls": "^2.1",
         "escapestudios/symfony2-coding-standard": "^3.0",
+        "symfony/phpunit-bridge": "^3.4",
+        "symfony/browser-kit": "^3.4",
         "jchook/phpunit-assert-throws": "^1.0"
     },
     "suggest": {
@@ -38,5 +47,8 @@
     "autoload": {
         "psr-4": { "Sineflow\\ElasticsearchBundle\\": "" },
         "exclude-from-classmap": ["/Tests/"]
+    },
+    "autoload-dev": {
+        "psr-4": { "Sineflow\\ElasticsearchBundle\\Tests\\": "Tests/" }
     }
 }

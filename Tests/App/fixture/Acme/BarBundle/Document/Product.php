@@ -1,6 +1,6 @@
 <?php
 
-namespace Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document;
+namespace Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document;
 
 use Sineflow\ElasticsearchBundle\Annotation as ES;
 use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
@@ -11,7 +11,7 @@ use Sineflow\ElasticsearchBundle\Document\MLProperty;
  *
  * @ES\Document(
  *  type="product",
- *  repositoryClass="Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Repository\ProductRepository",
+ *  repositoryClass="Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Repository\ProductRepository",
  *  options={
  *      "dynamic":"strict",
  *  }

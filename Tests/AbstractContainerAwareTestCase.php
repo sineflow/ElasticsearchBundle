@@ -2,13 +2,13 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base test which gives access to container
  */
-abstract class AbstractContainerAwareTestCase extends WebTestCase
+abstract class AbstractContainerAwareTestCase extends KernelTestCase
 {
     /**
      * @var ContainerInterface
@@ -16,16 +16,23 @@ abstract class AbstractContainerAwareTestCase extends WebTestCase
     private $container;
 
     /**
+     * {@inheritDoc}
+     */
+    protected function setUp()
+    {
+        $this->container = null;
+    }
+
+    /**
      * Returns service container.
      *
-     * @param bool  $reinitialize  Force kernel reinitialization.
      * @param array $kernelOptions Options used passed to kernel if it needs to be initialized.
      *
      * @return ContainerInterface
      */
-    protected function getContainer($reinitialize = false, $kernelOptions = [])
+    protected function getContainer($kernelOptions = [])
     {
-        if (!$this->container || $reinitialize) {
+        if (!$this->container) {
             static::bootKernel($kernelOptions);
             $this->container = static::$kernel->getContainer();
         }

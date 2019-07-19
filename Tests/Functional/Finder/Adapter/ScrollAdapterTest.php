@@ -6,7 +6,7 @@ use Sineflow\ElasticsearchBundle\Document\Repository\Repository;
 use Sineflow\ElasticsearchBundle\Finder\Adapter\ScrollAdapter;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
-use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product;
+use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product;
 
 class ScrollAdapterTest extends AbstractElasticsearchTestCase
 {

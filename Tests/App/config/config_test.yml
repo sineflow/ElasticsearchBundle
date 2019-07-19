@@ -62,16 +62,19 @@ sineflow_elasticsearch:
 
 services:
     app.es.language_provider:
-        class: Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\LanguageProvider
+        class: Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\LanguageProvider
         tags:
             - { name: sfes.language_provider }
+        public: true
 
     app.es.data_provider.order:
-        class: Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Provider\OrderProvider
+        class: Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Provider\OrderProvider
         arguments:
             - AcmeFooBundle:Order
         tags:
             - { name: sfes.provider, type: "AcmeFooBundle:Order" }
+        public: true
 
     sfes.index.blah: # some index manager service that is not actually an index manager
-        class: Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\LanguageProvider
+        class: Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\LanguageProvider
+        public: true

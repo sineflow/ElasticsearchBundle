@@ -4,8 +4,8 @@ namespace Sineflow\ElasticsearchBundle\Tests\Functional\Subscriber;
 
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
-use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Customer;
-use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Log;
+use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Customer;
+use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Log;
 
 /**
  * Class EntityTrackerSubscriberTest

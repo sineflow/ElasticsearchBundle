@@ -153,7 +153,7 @@ class RegisterDataProvidersPassTest extends TestCase
                             case 'sfes.provider_registry':
                                 return $providerDefinitionMock;
                             case 'app.es.data_provider.dummy':
-                                return new Definition('\Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Provider\OrderProvider');
+                                return new Definition('\Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Provider\OrderProvider');
                             default:
                                 return null;
                         }

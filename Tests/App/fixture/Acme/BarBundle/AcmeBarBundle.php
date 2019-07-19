@@ -1,6 +1,6 @@
 <?php
 
-namespace Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle;
+namespace Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

@@ -6,8 +6,8 @@ use Sineflow\ElasticsearchBundle\Document\MLProperty;
 use Sineflow\ElasticsearchBundle\Exception\DocumentConversionException;
 use Sineflow\ElasticsearchBundle\Result\ObjectIterator;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
-use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\ObjCategory;
-use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product;
+use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\ObjCategory;
+use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product;
 
 class DocumentConverterTest extends AbstractContainerAwareTestCase
 {

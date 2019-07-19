@@ -25,7 +25,7 @@ class RegisterLanguageProviderPass implements CompilerPassInterface
         }
 
         $providerServiceName = key($providers);
-        $providerDefinition = $container->getDefinition($providerServiceName);
+        $providerDefinition = $container->findDefinition($providerServiceName);
 
         // Make sure the class implements LanguageProviderInterface
         $providerClass = $providerDefinition->getClass();
@@ -34,7 +34,7 @@ class RegisterLanguageProviderPass implements CompilerPassInterface
             throw new \InvalidArgumentException(sprintf('Language provider "%s" must implement LanguageProviderInterface.', $providerClass));
         }
 
-        $documentParser = $container->getDefinition('sfes.document_parser');
+        $documentParser = $container->findDefinition('sfes.document_parser');
         $documentParser->addMethodCall('setLanguageProvider', [$providerDefinition]);
     }
 }

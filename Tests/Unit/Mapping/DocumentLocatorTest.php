@@ -29,15 +29,15 @@ class DocumentLocatorTest extends TestCase
         $out = [
             [
                 'AcmeBarBundle:Product',
-                'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product',
+                'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product',
             ],
             [
                 'AcmeFooBundle:Product',
-                'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Product',
+                'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Product',
             ],
             [
-                'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product',
-                'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product',
+                'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product',
+                'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product',
             ],
         ];
 
@@ -52,11 +52,11 @@ class DocumentLocatorTest extends TestCase
     {
         $out = [
             [
-                'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product',
+                'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product',
                 'AcmeBarBundle:Product',
             ],
             [
-                'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\Document\Product',
+                'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Product',
                 'AcmeFooBundle:Product',
             ],
             [
@@ -76,10 +76,10 @@ class DocumentLocatorTest extends TestCase
     {
         $out = [
             [
-                'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\InvalidDocumentDir\Product',
+                'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\InvalidDocumentDir\Product',
             ],
             [
-                'Sineflow\NonExistingBundle\Tests\app\fixture\Acme\FooBundle\Document\Product',
+                'Sineflow\NonExistingBundle\Tests\App\fixture\Acme\FooBundle\Document\Product',
             ],
             [
                 'Blah',
@@ -147,8 +147,8 @@ class DocumentLocatorTest extends TestCase
     private function getBundles()
     {
         return [
-            'AcmeFooBundle' => 'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\FooBundle\AcmeFooBundle',
-            'AcmeBarBundle' => 'Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\AcmeBarBundle',
+            'AcmeFooBundle' => 'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\AcmeFooBundle',
+            'AcmeBarBundle' => 'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\AcmeBarBundle',
         ];
     }
 }

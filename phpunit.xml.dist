@@ -23,7 +23,7 @@
     </testsuites>
 
     <php>
-        <server name="KERNEL_DIR" value="Tests/app/" />
+        <server name="KERNEL_CLASS" value="Sineflow\ElasticsearchBundle\Tests\App\AppKernel" />
     </php>
 
     <filter>
@@ -38,7 +38,7 @@
 
     <logging>
         <log type="coverage-text" target="php://stdout" showOnlySummary="true"/>
-        <!--<log type="coverage-html" target="Tests/app/build/coverage" title="Coverage" charset="UTF-8" yui="true" highlight="true"/>-->
+        <!--<log type="coverage-html" target="Tests/App/build/coverage" title="Coverage" charset="UTF-8" yui="true" highlight="true"/>-->
     </logging>
 
 </phpunit>

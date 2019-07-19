@@ -1,6 +1,6 @@
 <?php
 
-namespace Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document;
+namespace Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document;
 
 use Sineflow\ElasticsearchBundle\Annotation as ES;
 use Sineflow\ElasticsearchBundle\Document\ObjectInterface;

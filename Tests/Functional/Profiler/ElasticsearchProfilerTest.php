@@ -4,7 +4,7 @@ namespace ONGR\ElasticsearchBundle\Tests\Functional\Profiler;
 
 use Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
-use Sineflow\ElasticsearchBundle\Tests\app\fixture\Acme\BarBundle\Document\Product;
+use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -93,8 +93,8 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
 
         $this->assertArraySubset(
             [
-                "curlRequest" => "curl -XGET 'http://".implode(':', $esHostAndPort)."/sineflow-esb-test-bar/_search?pretty=true' -d '{\"query\":{\"ids\":{\"values\":[3]}},\"version\":true}'",
-                "senseRequest" => "GET /sineflow-esb-test-bar/_search\n{\"query\":{\"ids\":{\"values\":[3]}},\"version\":true}",
+                "curlRequest" => "curl -XPOST 'http://".implode(':', $esHostAndPort)."/sineflow-esb-test-bar/_search?pretty=true' -d '{\"query\":{\"ids\":{\"values\":[3]}},\"version\":true}'",
+                "senseRequest" => "POST /sineflow-esb-test-bar/_search\n{\"query\":{\"ids\":{\"values\":[3]}},\"version\":true}",
                 "backtrace" => null,
                 "scheme" => "http",
                 "host" => $esHostAndPort[0],

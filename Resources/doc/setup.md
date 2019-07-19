@@ -13,11 +13,11 @@ $ composer require sineflow/elasticsearch-bundle "~0.4"
 
 ### Step 2: Enable the Bundle
 
-To enable the bundle, add the following to `app/AppKernel.php` in your project.
+To enable the bundle, add the following to `App/AppKernel.php` in your project.
 
 ```php
 <?php
-// app/AppKernel.php
+// App/AppKernel.php
 // ...
 class AppKernel extends Kernel
 {
@@ -37,7 +37,7 @@ class AppKernel extends Kernel
 ### Step 3: Add configuration
 
 ```yaml
-# app/config/config.yml
+# App/config/config.yml
 sineflow_elasticsearch:
     connections:
         default:

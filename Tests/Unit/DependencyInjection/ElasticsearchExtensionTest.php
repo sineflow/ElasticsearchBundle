@@ -4,6 +4,19 @@ namespace Sineflow\ElasticsearchBundle\Tests\Unit\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\DependencyInjection\SineflowElasticsearchExtension;
+use Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry;
+use Sineflow\ElasticsearchBundle\Finder\Finder;
+use Sineflow\ElasticsearchBundle\Manager\ConnectionManagerFactory;
+use Sineflow\ElasticsearchBundle\Manager\IndexManagerFactory;
+use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
+use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
+use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
+use Sineflow\ElasticsearchBundle\Mapping\DocumentParser;
+use Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler;
+use Sineflow\ElasticsearchBundle\Profiler\Handler\CollectionHandler;
+use Sineflow\ElasticsearchBundle\Result\DocumentConverter;
+use Sineflow\ElasticsearchBundle\Subscriber\EntityTrackerSubscriber;
+use Sineflow\ElasticsearchBundle\Subscriber\KnpPaginateQuerySubscriber;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -142,61 +155,27 @@ class ElasticsearchExtensionTest extends TestCase
             $container->getParameter('sfes.indices'),
             'Incorrect index managers parameter'
         );
-        $this->assertTrue(
-            $container->hasDefinition('sfes.document_converter'),
-            'Container should have sfes.document_converter definition set.'
-        );
-        $this->assertTrue(
-            $container->hasDefinition('sfes.provider_registry'),
-            'Container should have sfes.provider_registry definition set.'
-        );
-        $this->assertTrue(
-            $container->hasDefinition('sfes.index_manager_factory'),
-            'Container should have sfes.index_manager_factory definition set.'
-        );
-        $this->assertTrue(
-            $container->hasDefinition('sfes.index_manager_registry'),
-            'Container should have sfes.index_manager_registry definition set.'
-        );
-        $this->assertTrue(
-            $container->hasDefinition('sfes.finder'),
-            'Container should have sfes.finder definition set.'
-        );
-        $this->assertTrue(
-            $container->hasDefinition('sfes.document_locator'),
-            'Container should have sfes.document_locator definition set.'
-        );
-        $this->assertTrue(
-            $container->hasDefinition('sfes.cache_engine'),
-            'Container should have sfes.cache_engine definition set.'
-        );
-        $this->assertTrue(
-            $container->hasDefinition('sfes.annotations.reader'),
-            'Container should have sfes.annotations.reader definition set.'
-        );
-        $this->assertTrue(
-            $container->hasDefinition('sfes.provider_registry'),
-            'Container should have sfes.provider_registry definition set.'
-        );
-        $this->assertTrue(
-            $container->hasDefinition('sfes.document_parser'),
-            'Container should have sfes.document_parser definition set.'
-        );
-        $this->assertTrue(
-            $container->hasDefinition('sfes.document_metadata_collector'),
-            'Container should have sfes.document_metadata_collector definition set.'
-        );
-        $this->assertTrue(
-            $container->hasDefinition('sfes.logger.collection_handler'),
-            'Container should have sfes.logger.collection_handler definition set.'
-        );
-        $this->assertTrue(
-            $container->hasDefinition('sfes.connection_factory'),
-            'Container should have sfes.connection_factory definition set.'
-        );
-        $this->assertTrue(
-            $container->hasDefinition('sfes.profiler'),
-            'Container should have sfes.profiler definition set.'
-        );
+
+        $expectedServiceDefinitions = [
+            DocumentConverter::class,
+            ProviderRegistry::class,
+            IndexManagerFactory::class,
+            IndexManagerRegistry::class,
+            Finder::class,
+            DocumentLocator::class,
+            DocumentParser::class,
+            DocumentMetadataCollector::class,
+            CollectionHandler::class,
+            ConnectionManagerFactory::class,
+            ElasticsearchProfiler::class,
+            KnpPaginateQuerySubscriber::class,
+            EntityTrackerSubscriber::class,
+        ];
+        foreach ($expectedServiceDefinitions as $expectedServiceDefinition) {
+            $this->assertTrue(
+                $container->hasDefinition($expectedServiceDefinition),
+                sprintf('Container should have [%s] definition set.', $expectedServiceDefinition)
+            );
+        }
     }
 }
