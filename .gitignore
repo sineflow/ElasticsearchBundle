@@ -4,3 +4,4 @@
 /Tests/App/build/
 /phpunit.xml
 /composer.lock
+/var/

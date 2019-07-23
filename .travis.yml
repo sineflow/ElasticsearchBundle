@@ -6,11 +6,12 @@ php:
 
 env:
   global:
-    - SYMFONY_VERSION="3.4.*" ES_FILENAME_SUFFIX=""
+    - SYMFONY_VERSION="~3.4" ES_FILENAME_SUFFIX=""
   matrix:
     - ES_VERSION="6.2.0"
     - ES_VERSION="6.8.1"
-#    - ES_VERSION="7.2.0" ES_FILENAME_SUFFIX="-linux-x86_64"
+    - ES_VERSION="6.8.1" SYMFONY_VERSION="~4.0"
+#    - ES_VERSION="7.2.0" SYMFONY_VERSION="~4.0" ES_FILENAME_SUFFIX="-linux-x86_64"
 
 install:
   - composer require --no-update symfony/symfony:${SYMFONY_VERSION}

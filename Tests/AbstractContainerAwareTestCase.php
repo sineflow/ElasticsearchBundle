@@ -13,14 +13,14 @@ abstract class AbstractContainerAwareTestCase extends KernelTestCase
     /**
      * @var ContainerInterface
      */
-    private $container;
+    private $cachedContainer;
 
     /**
      * {@inheritDoc}
      */
     protected function setUp()
     {
-        $this->container = null;
+        $this->cachedContainer = null;
     }
 
     /**
@@ -32,11 +32,11 @@ abstract class AbstractContainerAwareTestCase extends KernelTestCase
      */
     protected function getContainer($kernelOptions = [])
     {
-        if (!$this->container) {
+        if (!$this->cachedContainer) {
             static::bootKernel($kernelOptions);
-            $this->container = static::$kernel->getContainer();
+            $this->cachedContainer = static::$kernel->getContainer();
         }
 
-        return $this->container;
+        return $this->cachedContainer;
     }
 }

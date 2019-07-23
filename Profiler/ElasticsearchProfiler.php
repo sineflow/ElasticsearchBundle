@@ -51,7 +51,7 @@ class ElasticsearchProfiler implements DataCollectorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -64,6 +64,16 @@ class ElasticsearchProfiler implements DataCollectorInterface
                 }
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function reset()
+    {
+        $this->queries = [];
+        $this->count = 0;
+        $this->time = 0;
     }
 
     /**
@@ -131,7 +141,7 @@ class ElasticsearchProfiler implements DataCollectorInterface
     /**
      * Handles passed records.
      *
-     * @param array  $records
+     * @param array $records
      */
     private function handleRecords($records)
     {
@@ -152,7 +162,13 @@ class ElasticsearchProfiler implements DataCollectorInterface
         }
     }
 
-    private function addQuery($route, $record, $queryBody, $rawRequest)
+    /**
+     * @param string $route
+     * @param array  $record
+     * @param string $queryBody
+     * @param string $rawRequest
+     */
+    private function addQuery(string $route, array $record, string $queryBody, string $rawRequest)
     {
         $parsedUrl = array_merge(
             [
