@@ -21,7 +21,7 @@ install:
   - composer install --dev --no-interaction
 
 script:
-  - vendor/bin/phpunit --coverage-clover=Tests/App/build/clover.xml
+  - vendor/bin/simple-phpunit --coverage-clover=Tests/App/build/clover.xml
   - vendor/bin/phpcs -np --standard=PSR2 --ignore=vendor/,Tests/App/ ./
 
 after_script:
