@@ -22,7 +22,7 @@ install:
 
 script:
   - vendor/bin/simple-phpunit --coverage-clover=Tests/App/build/clover.xml
-  - vendor/bin/phpcs -np --standard=PSR2 --ignore=vendor/,Tests/App/ ./
+  - vendor/bin/phpcs -np --standard=PSR2 --ignore=vendor/,Tests/App/,var/ ./
 
 after_script:
   - travis_retry php vendor/bin/php-coveralls -v
