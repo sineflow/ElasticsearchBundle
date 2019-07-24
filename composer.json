@@ -51,5 +51,8 @@
     },
     "autoload-dev": {
         "psr-4": { "Sineflow\\ElasticsearchBundle\\Tests\\": "Tests/" }
+    },
+    "config": {
+        "prepend-autoloader": false
     }
 }
