@@ -1,6 +1,6 @@
 <?php
 
-namespace ONGR\ElasticsearchBundle\Tests\Functional\Profiler;
+namespace Sineflow\ElasticsearchBundle\Tests\Functional\Profiler;
 
 use Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
