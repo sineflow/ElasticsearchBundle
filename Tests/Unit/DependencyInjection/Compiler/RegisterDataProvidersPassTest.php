@@ -13,17 +13,6 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class RegisterDataProvidersPassTest extends TestCase
 {
-    public function setUp()
-    {
-        if (Kernel::VERSION >= '3.4') {
-            $this->markTestSkipped(
-                'Container mocking doesn\'t seem to work with Symfony 3.4'
-            );
-        }
-
-        parent::setUp();
-    }
-
     /**
      * Before a test method is run, a template method called setUp() is invoked.
      */
@@ -54,7 +43,7 @@ class RegisterDataProvidersPassTest extends TestCase
             ]
         );
 
-        $containerMock->expects($this->exactly(3))->method('getDefinition')->with($this->anything())
+        $containerMock->expects($this->exactly(3))->method('findDefinition')->with($this->anything())
             ->will(
                 $this->returnCallback(
                     function ($parameter) {
@@ -97,7 +86,7 @@ class RegisterDataProvidersPassTest extends TestCase
             ]
         );
 
-        $containerMock->expects($this->exactly(2))->method('getDefinition')->with($this->anything())
+        $containerMock->expects($this->exactly(2))->method('findDefinition')->with($this->anything())
             ->will(
                 $this->returnCallback(
                     function ($parameter) {
@@ -145,7 +134,7 @@ class RegisterDataProvidersPassTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $containerMock->expects($this->exactly(2))->method('getDefinition')->with($this->anything())
+        $containerMock->expects($this->exactly(2))->method('findDefinition')->with($this->anything())
             ->will(
                 $this->returnCallback(
                     function ($parameter) use ($providerDefinitionMock) {
