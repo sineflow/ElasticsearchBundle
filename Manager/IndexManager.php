@@ -478,7 +478,7 @@ class IndexManager
             ];
             $this->getConnection()->getClient()->indices()->updateAliases($setAliasParams);
 
-            $this->copyDataFromOldToNewIndex($newIndex, $oldIndex);
+            $this->copyDataToNewIndex($newIndex, $oldIndex);
 
             // Point both aliases to the new index and remove them from the old
             $setAliasParams = [
@@ -680,9 +680,9 @@ class IndexManager
      * Retrieves all documents from the index's data provider and populates them in a new index
      *
      * @param string $newIndex
-     * @param string $oldIndex
+     * @param string $oldIndex This is not used here but passed in case an overriding class may need it
      */
-    protected function copyDataFromOldToNewIndex(string $newIndex, string $oldIndex)
+    protected function copyDataToNewIndex(string $newIndex, string $oldIndex)
     {
         $batchSize = $this->connection->getConnectionSettings()['bulk_batch_size'];
 
