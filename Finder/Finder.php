@@ -77,7 +77,7 @@ class Finder
         ];
         $results = $this->getConnection([$documentClass])->getClient()->search($search);
 
-        // The document id should not be duplicated across the indices pointed by the read alias,
+        // The document id must not be duplicated across the indices pointed by the read alias,
         // but in case it is, just return the first one we get
         $rawDoc = $results['hits']['hits'][0] ?? null;
 

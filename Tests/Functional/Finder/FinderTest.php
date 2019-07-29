@@ -7,6 +7,7 @@ use Sineflow\ElasticsearchBundle\Finder\Adapter\KnpPaginatorAdapter;
 use Sineflow\ElasticsearchBundle\Result\DocumentIterator;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product;
+use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Customer;
 
 /**
  * Class FinderTest
@@ -48,6 +49,24 @@ class FinderTest extends AbstractElasticsearchTestCase
         ];
     }
 
+    private $readOnlyIndexName = 'sineflow-customer-read-only-index-123';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        try {
+            // Delete the read-only index we manually created
+            $im = $this->getIndexManager('customer', false);
+            $im->getConnection()->getClient()->indices()->delete(['index' => $this->readOnlyIndexName]);
+        } catch (\Exception $e) {
+            // Do nothing.
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -56,11 +75,44 @@ class FinderTest extends AbstractElasticsearchTestCase
         parent::setUp();
 
         // Create and populate indices just once for all tests in this class
-        $this->getIndexManager('customer', !$this->hasCreatedIndexManager('customer'));
         $this->getIndexManager('bar', !$this->hasCreatedIndexManager('bar'));
+        $im = $this->getIndexManager('customer', !$this->hasCreatedIndexManager('customer'));
+
+        // Create a second read-only index for 'customer' index manager, which uses aliases
+        $settings = $im->getIndexMapping();
+        $settings['index'] = $this->readOnlyIndexName;
+        $im->getConnection()->getClient()->indices()->create($settings);
+        $setAliasParams = [
+            'body' => [
+                'actions' => [
+                    ['add' => ['index' => $this->readOnlyIndexName, 'alias' => $im->getReadAlias()]],
+                ],
+            ],
+        ];
+        $im->getConnection()->getClient()->indices()->updateAliases($setAliasParams);
+
+        // Enter data in the read-only index
+        $im->getConnection()->getClient()->index([
+            'index' => $this->readOnlyIndexName,
+            'type' => 'customer',
+            'id' => 111,
+            'refresh' => true,
+            'body' => [
+                'name' => 'Another Jane',
+            ],
+        ]);
+        $im->getConnection()->getClient()->index([
+            'index' => $this->readOnlyIndexName,
+            'type' => 'customer',
+            'id' => 123,
+            'refresh' => true,
+            'body' => [
+                'name' => 'Jason Bourne',
+            ],
+        ]);
     }
 
-    public function testGet()
+    public function testGetById()
     {
         $finder = $this->getContainer()->get('sfes.finder');
 
@@ -82,6 +134,16 @@ class FinderTest extends AbstractElasticsearchTestCase
 
         $docAsObjectKNP = $finder->get('AcmeBarBundle:Product', 'doc1', Finder::RESULTS_OBJECT | Finder::ADAPTER_KNP);
         $this->assertInstanceOf(Product::class, $docAsObjectKNP);
+    }
+
+    public function testGetByIdWhenHavingAnotherReadOnlyIndex()
+    {
+        $finder = $this->getContainer()->get('sfes.finder');
+
+        $doc = $finder->get(Customer::class, 111);
+
+        // Make sure a document is returned for the duplicated id, whichever it is
+        $this->assertInstanceOf(Customer::class, $doc);
     }
 
     public function testFindInMultipleTypesAndIndices()

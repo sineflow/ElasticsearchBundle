@@ -120,7 +120,7 @@ services:
         class: Monolog\Logger
         arguments: ['sfes_trace']
         calls:
-            - [pushHandler, ['@sfes.logger.collection_handler']]
+            - [pushHandler, ['@Sineflow\ElasticsearchBundle\Profiler\Handler\CollectionHandler']]
 
     sfes.logger.log_handler:
         class: Monolog\Handler\RotatingFileHandler
