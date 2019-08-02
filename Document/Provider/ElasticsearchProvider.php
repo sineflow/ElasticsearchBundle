@@ -91,7 +91,6 @@ class ElasticsearchProvider extends AbstractProvider
     {
         $params = [
             'index' => $this->sourceIndexManager->getLiveIndex(),
-            'type' => $this->metadataCollector->getDocumentMetadata($this->sourceDocumentClass)->getType(),
             'id' => $id,
         ];
         $doc = $this->sourceIndexManager->getConnection()->getClient()->get($params);

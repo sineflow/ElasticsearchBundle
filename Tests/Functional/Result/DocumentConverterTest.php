@@ -193,7 +193,6 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
     {
         $rawFromEs = array (
             '_index' => 'sineflow-esb-test-bar',
-            '_type' => 'product',
             '_id' => 'doc1',
             '_version' => 1,
             'found' => true,
@@ -234,7 +233,6 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
     {
         $rawFromEs = [
             '_index' => 'sineflow-esb-test-bar',
-            '_type' => 'product',
             '_id' => 'doc1',
             '_score' => 1,
             'fields' =>

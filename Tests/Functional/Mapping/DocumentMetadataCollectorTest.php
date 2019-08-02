@@ -46,7 +46,6 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
      * @var array Expected metadata for customer index
      */
     private $expectedCustomerMetadata = [
-        'type'               => 'customer',
         'properties'         =>
             [
                 'name'   =>
@@ -101,7 +100,6 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
     ];
 
     private $expectedProductMetadata = [
-        'type'               => 'product',
         'properties'         =>
             [
                 'title'                =>

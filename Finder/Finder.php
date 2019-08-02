@@ -142,7 +142,7 @@ class Finder
 
         $raw = $client->search($params);
 
-        $totalHits = $raw['hits']['total'];
+        $totalHits = $raw['hits']['total']['value'];
 
         return $this->parseResult($raw, $resultsType, $documentClasses);
     }
@@ -172,7 +172,7 @@ class Finder
 
         $scrollId = $raw['_scroll_id'];
 
-        $totalHits = $raw['hits']['total'];
+        $totalHits = $raw['hits']['total']['value'];
 
         return (count($raw['hits']['hits']) > 0) ? $this->parseResult($raw, $resultsType, $documentClasses) : false;
     }
@@ -227,37 +227,6 @@ class Finder
         }
 
         return $indices;
-    }
-
-    /**
-     * Returns an array with the Elasticsearch indices and types to be queried,
-     * based on the given document classes in short notation (AppBundle:Product)
-     *
-     * @param string[] $documentClasses
-     *
-     * @return array
-     *
-     * @deprecated Use getTargetIndices
-     */
-    public function getTargetIndicesAndTypes(array $documentClasses)
-    {
-        $indexManagersForDocumentClasses = $this->documentMetadataCollector->getIndexManagersForDocumentClasses($documentClasses);
-
-        $indices = [];
-        $types = [];
-        foreach ($indexManagersForDocumentClasses as $documentClass => $indexManagerName) {
-            $documentMetadata = $this->documentMetadataCollector->getDocumentMetadata($documentClass);
-
-            $indices[] = $this->indexManagerRegistry->get($indexManagerName)->getReadAlias();
-            $types[] = $documentMetadata->getType();
-        }
-
-        $result = [
-            'index' => array_unique($indices),
-            'type' => $types,
-        ];
-
-        return $result;
     }
 
     /**

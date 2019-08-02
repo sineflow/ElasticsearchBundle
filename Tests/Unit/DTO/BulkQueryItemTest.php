@@ -17,64 +17,59 @@ class BulkQueryItemTest extends TestCase
     {
         return [
             [
-                ['index', 'myindex', 'mytype', ['_id' => '3', 'foo' => 'bar'], false],
+                ['index', 'myindex', ['_id' => '3', 'foo' => 'bar'], false],
                 [
                     [
                         'index' => [
                             '_index' => 'myindex',
-                            '_type' => 'mytype',
-                            '_id' => 3
-                        ]
+                            '_id'    => 3,
+                        ],
                     ],
                     [
-                        'foo' => 'bar'
-                    ]
-                ]
+                        'foo' => 'bar',
+                    ],
+                ],
             ],
 
             [
-                ['create', 'myindex', 'mytype', [], false],
+                ['create', 'myindex', [], false],
                 [
                     [
                         'create' => [
                             '_index' => 'myindex',
-                            '_type' => 'mytype',
-                        ]
+                        ],
                     ],
-                    []
-                ]
+                    [],
+                ],
             ],
 
             [
-                ['update', 'myindex', 'mytype', ['_id' => '3'], 'forcedindex'],
+                ['update', 'myindex', ['_id' => '3'], 'forcedindex'],
                 [
                     [
                         'update' => [
                             '_index' => 'forcedindex',
-                            '_type' => 'mytype',
-                            '_id' => 3,
-                        ]
+                            '_id'    => 3,
+                        ],
                     ],
-                    []
-                ]
+                    [],
+                ],
             ],
 
             [
-                ['delete', 'myindex', 'mytype', ['_id' => '3'], false],
+                ['delete', 'myindex', ['_id' => '3'], false],
                 [
                     [
                         'delete' => [
                             '_index' => 'myindex',
-                            '_type' => 'mytype',
-                            '_id' => 3,
-                        ]
+                            '_id'    => 3,
+                        ],
                     ],
-                ]
+                ],
             ],
 
         ];
     }
-
 
     /**
      * @param array $input
@@ -84,8 +79,8 @@ class BulkQueryItemTest extends TestCase
      */
     public function testGetLines($input, $expected)
     {
-        $bqi = new BulkQueryItem($input[0], $input[1], $input[2], $input[3]);
-        $lines = $bqi->getLines($input[4]);
+        $bqi = new BulkQueryItem($input[0], $input[1], $input[2]);
+        $lines = $bqi->getLines($input[3]);
         $this->assertEquals($expected, $lines);
     }
 }

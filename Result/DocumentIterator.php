@@ -87,7 +87,7 @@ class DocumentIterator implements \Countable, \Iterator
      */
     public function getTotalCount()
     {
-        return $this->rawData['hits']['total'];
+        return $this->rawData['hits']['total']['value'];
     }
 
     /**

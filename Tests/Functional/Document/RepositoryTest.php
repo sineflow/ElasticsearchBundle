@@ -42,19 +42,17 @@ class RepositoryTest extends AbstractElasticsearchTestCase
     {
         return [
             'bar' => [
-                'AcmeBarBundle:Product' => [
-                    [
-                        '_id' => 'doc1',
-                        'title' => 'aaa',
-                    ],
-                    [
-                        '_id' => 2,
-                        'title' => 'ccc',
-                    ],
-                    [
-                        '_id' => 3,
-                        'title' => 'ccc',
-                    ],
+                [
+                    '_id' => 'doc1',
+                    'title' => 'aaa',
+                ],
+                [
+                    '_id' => 2,
+                    'title' => 'ccc',
+                ],
+                [
+                    '_id' => 3,
+                    'title' => 'ccc',
                 ],
             ],
         ];

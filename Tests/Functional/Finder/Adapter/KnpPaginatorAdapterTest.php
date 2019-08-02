@@ -18,55 +18,53 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
     {
         return [
             'bar' => [
-                'AcmeBarBundle:Product' => [
-                    [
-                        '_id' => '1',
-                        'title' => 'Foo Product',
-                        'price' => 10,
-                        'category' => [
-                            'title' => 'Bar',
+                [
+                    '_id' => '1',
+                    'title' => 'Foo Product',
+                    'price' => 10,
+                    'category' => [
+                        'title' => 'Bar',
+                        'tags' => [
+                            ['tagname' => 'first tag'],
+                            ['tagname' => 'second tag']
+                        ]
+                    ],
+                    'related_categories' => [
+                        [
+                            'title' => 'Acme',
                             'tags' => [
-                                ['tagname' => 'first tag'],
-                                ['tagname' => 'second tag']
+                                ['tagname' => 'tutu']
                             ]
                         ],
-                        'related_categories' => [
-                            [
-                                'title' => 'Acme',
-                                'tags' => [
-                                    ['tagname' => 'tutu']
-                                ]
-                            ],
-                            [
-                                'title' => 'Doodle',
-                            ],
-                        ],
-                        'ml_info-en' => 'info in English',
-                        'ml_info-fr' => 'info in French',
-                    ],
-                    [
-                        '_id' => '2',
-                        'title' => 'Bar Product',
-                        'price' => 20,
-                        'category' => null,
-                        'related_categories' => [
-                            [
-                                'title' => 'Acme',
-                            ],
-                            [
-                                'title' => 'Bar',
-                            ],
+                        [
+                            'title' => 'Doodle',
                         ],
                     ],
-                    [
-                        '_id' => '3',
-                        'title' => '3rd Product',
-                        'related_categories' => [],
-                    ],
-                    [
-                        '_id' => '54321',
-                    ]
+                    'ml_info-en' => 'info in English',
+                    'ml_info-fr' => 'info in French',
                 ],
+                [
+                    '_id' => '2',
+                    'title' => 'Bar Product',
+                    'price' => 20,
+                    'category' => null,
+                    'related_categories' => [
+                        [
+                            'title' => 'Acme',
+                        ],
+                        [
+                            'title' => 'Bar',
+                        ],
+                    ],
+                ],
+                [
+                    '_id' => '3',
+                    'title' => '3rd Product',
+                    'related_categories' => [],
+                ],
+                [
+                    '_id' => '54321',
+                ]
             ],
         ];
     }
@@ -77,7 +75,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $repo = $this->getIndexManager('bar')->getRepository();
         $paginator = $this->getContainer()->get('knp_paginator');
 
-        $query = ['query' => ['match_all' => (object) []], 'sort' => ['_uid' => ['order' =>'asc']]];
+        $query = ['query' => ['match_all' => (object) []], 'sort' => ['_id' => ['order' =>'asc']]];
         $query['aggs'] = ['avg_price' => ['avg' => ['field' => 'price']]];
 
         // Test object results

@@ -14,19 +14,17 @@ class ElasticsearchProviderTest extends AbstractElasticsearchTestCase
     {
         return [
             'bar' => [
-                'AcmeBarBundle:Product' => [
-                    [
-                        '_id' => 1,
-                        'title' => 'Product 1',
-                    ],
-                    [
-                        '_id' => 2,
-                        'title' => 'Product 2',
-                    ],
-                    [
-                        '_id' => 3,
-                        'title' => 'Product 3',
-                    ],
+                [
+                    '_id' => 1,
+                    'title' => 'Product 1',
+                ],
+                [
+                    '_id' => 2,
+                    'title' => 'Product 2',
+                ],
+                [
+                    '_id' => 3,
+                    'title' => 'Product 3',
                 ],
             ],
         ];

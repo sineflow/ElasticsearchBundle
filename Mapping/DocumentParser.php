@@ -90,12 +90,9 @@ class DocumentParser
         $classAnnotation = $this->reader->getClassAnnotation($documentReflection, Document::class);
 
         if (null !== $classAnnotation) {
-            $type = $this->getDocumentType($documentReflection);
-
             $properties = $this->getProperties($documentReflection, $indexAnalyzers);
 
             $metadata = [
-                'type' => $type,
                 'properties' => $properties,
                 'fields' => array_filter($classAnnotation->dump()),
                 'propertiesMetadata' => $this->getPropertiesMetadata($documentReflection),
@@ -211,22 +208,6 @@ class DocumentParser
         $this->propertiesMetadata[$className] = $propertyMetadata;
 
         return $this->propertiesMetadata[$className];
-    }
-
-    /**
-     * Returns document's elasticsearch type.
-     *
-     * @param \ReflectionClass $documentReflection
-     *
-     * @return string
-     */
-    private function getDocumentType(\ReflectionClass $documentReflection)
-    {
-        /** @var Document $classAnnotation */
-        $classAnnotation = $this->reader->getClassAnnotation($documentReflection, Document::class);
-
-        // If an Elasticsearch type is not defined in the entity annotation, use '_doc' as such
-        return empty($classAnnotation->type) ? '_doc' : $classAnnotation->type;
     }
 
     /**

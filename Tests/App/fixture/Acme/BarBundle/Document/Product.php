@@ -10,7 +10,6 @@ use Sineflow\ElasticsearchBundle\Document\MLProperty;
  * Product document for testing.
  *
  * @ES\Document(
- *  type="product",
  *  repositoryClass="Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Repository\ProductRepository",
  *  options={
  *      "dynamic":"strict",

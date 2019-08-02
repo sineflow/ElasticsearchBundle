@@ -21,11 +21,6 @@ class BulkQueryItem
     private $index;
 
     /**
-     * @var string
-     */
-    private $type;
-
-    /**
      * @var array
      */
     private $query;
@@ -38,11 +33,10 @@ class BulkQueryItem
     /**
      * @param string $operation  One of: index, update, delete, create.
      * @param string $index      Elasticsearch index name.
-     * @param string $type       Elasticsearch type name.
      * @param array  $query      Bulk item query (aka optional_source in the ES docs)
      * @param array  $metaParams Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
      */
-    public function __construct($operation, $index, $type, array $query, array $metaParams = [])
+    public function __construct($operation, $index, array $query, array $metaParams = [])
     {
         if (!in_array($operation, ['index', 'create', 'update', 'delete'])) {
             throw new InvalidArgumentException(sprintf('Invalid bulk operation "%s" specified', $operation));
@@ -50,7 +44,6 @@ class BulkQueryItem
 
         $this->operation = $operation;
         $this->index = $index;
-        $this->type = $type;
 
         // in case some meta param is specified as part of the query and not in $metaParams, move it there
         // (this happens when converting a document entity to an array)
@@ -85,6 +78,7 @@ class BulkQueryItem
      * Return array of lines for bulk request
      *
      * @param string|null $forceIndex If set, that will be the index used for the output bulk request
+     *
      * @return array
      */
     public function getLines($forceIndex = null)
@@ -96,7 +90,6 @@ class BulkQueryItem
                 $this->metaParams,
                 [
                     '_index' => $forceIndex ?: $this->index,
-                    '_type' => $this->type,
                 ]
             ),
         ];

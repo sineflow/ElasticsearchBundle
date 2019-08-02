@@ -155,13 +155,12 @@ class ConnectionManager
      *
      * @param string $operation  One of: index, update, delete, create.
      * @param string $index      Elasticsearch index name.
-     * @param string $type       Elasticsearch type name.
      * @param array  $query      Bulk item query (aka optional_source in the ES docs)
      * @param array  $metaParams Additional meta data params for the bulk item
      */
-    public function addBulkOperation($operation, $index, $type, array $query, array $metaParams = [])
+    public function addBulkOperation($operation, $index, array $query, array $metaParams = [])
     {
-        $this->bulkQueries[] = new BulkQueryItem($operation, $index, $type, $query, $metaParams);
+        $this->bulkQueries[] = new BulkQueryItem($operation, $index, $query, $metaParams);
     }
 
     /**

@@ -15,13 +15,6 @@ final class Document implements DumperInterface
 {
     /**
      * @var string
-     *
-     * @deprecated Will be removed in v7
-     */
-    public $type;
-
-    /**
-     * @var string
      */
     public $repositoryClass;
 

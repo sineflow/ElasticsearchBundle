@@ -169,7 +169,7 @@ class IndexManager
         }
 
         $metadata = $this->metadataCollector->getDocumentMetadataForIndex($indexManagerName);
-        $index['body']['mappings'][$metadata->getType()] = $metadata->getClientMapping();
+        $index['body']['mappings'] = $metadata->getClientMapping();
 
         return $index;
     }
@@ -568,7 +568,6 @@ class IndexManager
         $this->getConnection()->addBulkOperation(
             'delete',
             $this->writeAlias,
-            $documentMetadata->getType(),
             [],
             ['_id' => $id]
         );
@@ -610,7 +609,6 @@ class IndexManager
         $this->getConnection()->addBulkOperation(
             'update',
             $this->writeAlias,
-            $documentMetadata->getType(),
             $query,
             $metaParams
         );
@@ -651,7 +649,6 @@ class IndexManager
         $this->getConnection()->addBulkOperation(
             'index',
             $this->writeAlias,
-            $documentMetadata->getType(),
             $documentArray,
             $metaParams
         );

@@ -6,7 +6,7 @@ use Sineflow\ElasticsearchBundle\Annotation as ES;
 use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
 
 /**
- * @ES\Document(type="order");
+ * @ES\Document
  */
 class Order extends AbstractDocument
 {

@@ -12,7 +12,7 @@ use Sineflow\ElasticsearchBundle\Annotation as ES;
 use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
 
 /**
- * @ES\Document(type="product")
+ * @ES\Document
  */
 class Product extends AbstractDocument
 {

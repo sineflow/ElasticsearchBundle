@@ -21,29 +21,25 @@ class FinderTest extends AbstractElasticsearchTestCase
     {
         return [
             'bar' => [
-                'AcmeBarBundle:Product' => [
-                    [
-                        '_id' => 'doc1',
-                        'title' => 'aaa',
-                    ],
-                    [
-                        '_id' => 'doc2',
-                        'title' => 'bbb',
-                    ],
-                    [
-                        '_id' => 3,
-                        'title' => 'ccc',
-                    ],
+                [
+                    '_id' => 'doc1',
+                    'title' => 'aaa',
+                ],
+                [
+                    '_id' => 'doc2',
+                    'title' => 'bbb',
+                ],
+                [
+                    '_id' => 3,
+                    'title' => 'ccc',
                 ],
             ],
             'customer' => [
-                'AcmeFooBundle:Customer' => [
-                    [
-                        '_id' => 111,
-                        'name' => 'Jane Doe',
-                        'title' => 'aaa bbb',
-                        'active' => true,
-                    ],
+                [
+                    '_id' => 111,
+                    'name' => 'Jane Doe',
+                    'title' => 'aaa bbb',
+                    'active' => true,
                 ],
             ],
         ];
@@ -94,7 +90,6 @@ class FinderTest extends AbstractElasticsearchTestCase
         // Enter data in the read-only index
         $im->getConnection()->getClient()->index([
             'index' => $this->readOnlyIndexName,
-            'type' => 'customer',
             'id' => 111,
             'refresh' => true,
             'body' => [
@@ -103,7 +98,6 @@ class FinderTest extends AbstractElasticsearchTestCase
         ]);
         $im->getConnection()->getClient()->index([
             'index' => $this->readOnlyIndexName,
-            'type' => 'customer',
             'id' => 123,
             'refresh' => true,
             'body' => [
@@ -126,7 +120,6 @@ class FinderTest extends AbstractElasticsearchTestCase
         $docAsRaw = $finder->get('AcmeBarBundle:Product', 'doc1', Finder::RESULTS_RAW);
         $this->assertArraySubset([
             '_index' => 'sineflow-esb-test-bar',
-            '_type' => 'product',
             '_id' => 'doc1',
             '_version' => 1,
             '_source' => ['title' => 'aaa'],
@@ -232,26 +225,6 @@ class FinderTest extends AbstractElasticsearchTestCase
         $this->assertEquals([
             'sineflow-esb-test-bar',
             'sineflow-esb-test-customer',
-        ], $res);
-    }
-
-    public function testGetTargetIndicesAndTypes()
-    {
-        $finder = $this->getContainer()->get('sfes.finder');
-
-        $res = $finder->getTargetIndicesAndTypes(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer']);
-
-        $this->assertEquals([
-            'index' =>
-                [
-                    'sineflow-esb-test-bar',
-                    'sineflow-esb-test-customer',
-                ],
-            'type' =>
-                [
-                    'product',
-                    'customer',
-                ],
         ], $res);
     }
 }

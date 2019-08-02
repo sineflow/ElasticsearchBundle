@@ -13,7 +13,7 @@ use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
 use Sineflow\ElasticsearchBundle\Annotation as ES;
 
 /**
- * @ES\Document(type="product")
+ * @ES\Document
  */
 class Product extends AbstractDocument
 {
@@ -32,8 +32,6 @@ class Product extends AbstractDocument
 #### Document annotation
 
 The class representing a document must be annotated as `@ES\Document`. The following properties are supported inside that annotation:
-
-- `type` Specifies the name of the Elasticsearch type this class represents. The parameter is optional and, if not supplied, the bundle will use the lowercased class name as such. 
 
 - `repositoryClass` Allows you to specify a specific repository class for this document. If not specified, the default repository class is used.
 ```
@@ -112,7 +110,7 @@ This way, you can specify the `_id` when you create or update a document and you
 use Sineflow\ElasticsearchBundle\Annotation as ES;
 
 /**
- * @ES\Document(type="product")
+ * @ES\Document
  */
 class Product
 {
@@ -134,7 +132,7 @@ You should have a property with this annotation, if you wish the matching `_scor
 use Sineflow\ElasticsearchBundle\Annotation as ES;
 
 /**
- * @ES\Document(type="product")
+ * @ES\Document
  */
 class Product
 {

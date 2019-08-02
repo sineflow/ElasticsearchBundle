@@ -57,10 +57,8 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
     protected function populateElasticsearchWithData($indexManager, array $data)
     {
         if (!empty($data)) {
-            foreach ($data as $type => $documents) {
-                foreach ($documents as $document) {
-                    $indexManager->persistRaw($document);
-                }
+            foreach ($data as $document) {
+                $indexManager->persistRaw($document);
             }
             try {
                 $indexManager->getConnection()->commit();

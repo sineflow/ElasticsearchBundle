@@ -17,38 +17,36 @@ class ScrollAdapterTest extends AbstractElasticsearchTestCase
     {
         return [
             'bar' => [
-                'AcmeBarBundle:Product' => [
-                    [
-                        '_id' => '1',
-                        'title' => 'Foo Product',
-                    ],
-                    [
-                        '_id' => '2',
-                        'title' => 'Bar Product',
-                    ],
-                    [
-                        '_id' => '3',
-                        'title' => '3rd product',
-                    ],
-                    [
-                        '_id' => 'aaa',
-                        'title' => 'bla bla product',
-                    ],
-                    [
-                        '_id' => 'bbb',
-                        'title' => 'blu blu',
-                    ],
-                    [
-                        '_id' => '54321',
-                    ],
-                    [
-                        '_id' => '8',
-                        'title' => 'product X',
-                    ],
-                    [
-                        '_id' => '9',
-                        'title' => 'product Y',
-                    ],
+                [
+                    '_id' => '1',
+                    'title' => 'Foo Product',
+                ],
+                [
+                    '_id' => '2',
+                    'title' => 'Bar Product',
+                ],
+                [
+                    '_id' => '3',
+                    'title' => '3rd product',
+                ],
+                [
+                    '_id' => 'aaa',
+                    'title' => 'bla bla product',
+                ],
+                [
+                    '_id' => 'bbb',
+                    'title' => 'blu blu',
+                ],
+                [
+                    '_id' => '54321',
+                ],
+                [
+                    '_id' => '8',
+                    'title' => 'product X',
+                ],
+                [
+                    '_id' => '9',
+                    'title' => 'product Y',
                 ],
             ],
         ];
@@ -76,6 +74,7 @@ class ScrollAdapterTest extends AbstractElasticsearchTestCase
             }
             $scrolls++;
         }
+
         $this->assertEquals(6, $i, 'Total matching documents iterated');
         $this->assertEquals(6, $scrollAdapter->getTotalHits(), 'Total hits returned by scroll');
         $this->assertEquals(3, $scrolls, 'Total number of scrolls');
@@ -106,7 +105,7 @@ class ScrollAdapterTest extends AbstractElasticsearchTestCase
 
         // Test raw results
 
-        $query = ['query' => ['term' => ['title' => ['value' => 'product']]], 'sort' => ['_uid']];
+        $query = ['query' => ['term' => ['title' => ['value' => 'product']]], 'sort' => ['_id']];
 
         /** @var ScrollAdapter $scrollAdapter */
         $scrollAdapter = $repo->find($query, Finder::RESULTS_RAW | Finder::ADAPTER_SCROLL, ['size' => 4]);
@@ -121,7 +120,7 @@ class ScrollAdapterTest extends AbstractElasticsearchTestCase
             foreach ($matches['hits']['hits'] as $doc) {
                 $this->assertInternalType('array', $doc);
                 $this->assertArrayHasKey('_id', $doc, 'Document array returned');
-                $this->assertEquals('product#'.$doc['_id'], $doc['sort'][0], 'The correct sort order is not applied');
+                $this->assertEquals($doc['_id'], $doc['sort'][0], 'The correct sort order is not applied');
                 $this->assertNotEquals($prevId, $doc['_id'], 'Document returned is the same as the previous one');
                 $i++;
                 $prevId = $doc['_id'];

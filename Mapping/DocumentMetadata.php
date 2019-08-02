@@ -37,7 +37,7 @@ class DocumentMetadata
      */
     protected function configureOptions(OptionsResolver $optionsResolver)
     {
-        $optionsResolver->setRequired(['type', 'properties', 'fields', 'propertiesMetadata', 'repositoryClass', 'className', 'shortClassName']);
+        $optionsResolver->setRequired(['properties', 'fields', 'propertiesMetadata', 'repositoryClass', 'className', 'shortClassName']);
     }
 
     /**

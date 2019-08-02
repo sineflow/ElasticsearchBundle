@@ -22,52 +22,50 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
     {
         return [
             'bar' => [
-                'AcmeBarBundle:Product' => [
-                    [
-                        '_id' => '1',
-                        'title' => 'Foo Product',
-                        'category' => [
+                [
+                    '_id'                => '1',
+                    'title'              => 'Foo Product',
+                    'category'           => [
+                        'title' => 'Bar',
+                        'tags'  => [
+                            ['tagname' => 'first tag'],
+                            ['tagname' => 'second tag'],
+                        ],
+                    ],
+                    'related_categories' => [
+                        [
+                            'title' => 'Acme',
+                            'tags'  => [
+                                ['tagname' => 'tutu'],
+                            ],
+                        ],
+                        [
+                            'title' => 'Doodle',
+                        ],
+                    ],
+                    'ml_info-en'         => 'info in English',
+                    'ml_info-fr'         => 'info in French',
+                ],
+                [
+                    '_id'                => '2',
+                    'title'              => 'Bar Product',
+                    'category'           => null,
+                    'related_categories' => [
+                        [
+                            'title' => 'Acme',
+                        ],
+                        [
                             'title' => 'Bar',
-                            'tags' => [
-                                ['tagname' => 'first tag'],
-                                ['tagname' => 'second tag']
-                            ]
-                        ],
-                        'related_categories' => [
-                            [
-                                'title' => 'Acme',
-                                'tags' => [
-                                    ['tagname' => 'tutu']
-                                ]
-                            ],
-                            [
-                                'title' => 'Doodle',
-                            ],
-                        ],
-                        'ml_info-en' => 'info in English',
-                        'ml_info-fr' => 'info in French',
-                    ],
-                    [
-                        '_id' => '2',
-                        'title' => 'Bar Product',
-                        'category' => null,
-                        'related_categories' => [
-                            [
-                                'title' => 'Acme',
-                            ],
-                            [
-                                'title' => 'Bar',
-                            ],
                         ],
                     ],
-                    [
-                        '_id' => '3',
-                        'title' => '3rd Product',
-                        'related_categories' => [],
-                    ],
-                    [
-                        '_id' => '54321',
-                    ]
+                ],
+                [
+                    '_id'                => '3',
+                    'title'              => '3rd Product',
+                    'related_categories' => [],
+                ],
+                [
+                    '_id' => '54321',
                 ],
             ],
         ];
@@ -82,7 +80,10 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
         $repo = $this->getIndexManager('bar')->getRepository();
 
         /** @var DocumentIterator $iterator */
-        $iterator = $repo->find(['query' => ['match_all' => (object) []], 'size' => 3, 'sort' => ['_uid' => ['order' =>'asc']]], Finder::RESULTS_OBJECT);
+        $iterator = $repo->find(
+            ['query' => ['match_all' => (object)[]], 'size' => 3, 'sort' => ['_id' => ['order' => 'asc']]],
+            Finder::RESULTS_OBJECT
+        );
 
         $this->assertInstanceOf(DocumentIterator::class, $iterator);
 
@@ -121,13 +122,16 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
         $repo = $this->getIndexManager('bar')->getRepository();
 
         /** @var DocumentIterator $iterator */
-        $iterator = $repo->find(['query' => ['match_all' => (object) []], 'size' => 3, 'sort' => ['_uid' => ['order' =>'asc']]], Finder::RESULTS_OBJECT);
+        $iterator = $repo->find(
+            ['query' => ['match_all' => (object) []], 'size' => 3, 'sort' => ['_id' => ['order' => 'asc']]],
+            Finder::RESULTS_OBJECT
+        );
 
         $i = 0;
         $expected = [
             'Foo Product',
             'Bar Product',
-            '3rd Product'
+            '3rd Product',
         ];
         while ($iterator->valid()) {
             $this->assertEquals($i, $iterator->key());
