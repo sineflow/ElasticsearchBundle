@@ -47,8 +47,8 @@ class IndexBuildCommandTest extends AbstractCommandTestCase
      */
     protected function getCommand()
     {
-        $command = new IndexBuildCommand();
-        $command->setContainer($this->getContainer());
+        $registry = $this->getContainer()->get('sfes.index_manager_registry');
+        $command = new IndexBuildCommand($registry);
 
         return $command;
     }

@@ -1,5 +1,6 @@
 imports:
     - { resource: legacy_aliases.yml }
+    - { resource: services_commands.yml }
 
 parameters:
     sfes.logging.path: "%kernel.logs_dir%/%kernel.environment%.sf_elasticsearch.log"

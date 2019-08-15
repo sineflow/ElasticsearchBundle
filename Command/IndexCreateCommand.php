@@ -2,14 +2,34 @@
 
 namespace Sineflow\ElasticsearchBundle\Command;
 
+use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command for creating elasticsearch index.
  */
-class IndexCreateCommand extends AbstractManagerAwareCommand
+class IndexCreateCommand extends Command
 {
+    protected static $defaultName = 'sineflow:es:index:create';
+
+    /**
+     * @var IndexManagerRegistry
+     */
+    private $indexManagerRegistry;
+
+    /**
+     * @param IndexManagerRegistry $indexManagerRegistry
+     */
+    public function __construct(IndexManagerRegistry $indexManagerRegistry)
+    {
+        $this->indexManagerRegistry = $indexManagerRegistry;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -18,8 +38,12 @@ class IndexCreateCommand extends AbstractManagerAwareCommand
         parent::configure();
 
         $this
-            ->setName('sineflow:es:index:create')
-            ->setDescription('Creates elasticsearch index.');
+            ->setDescription('Creates elasticsearch index.')
+            ->addArgument(
+                'index',
+                InputArgument::REQUIRED,
+                'The identifier of the index'
+            );
     }
 
     /**
@@ -28,7 +52,7 @@ class IndexCreateCommand extends AbstractManagerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $indexManagerName = $input->getArgument('index');
-        $indexManager = $this->getManager($indexManagerName);
+        $indexManager = $this->indexManagerRegistry->get($indexManagerName);
         try {
             $indexManager->createIndex();
             $output->writeln(

@@ -76,14 +76,14 @@ class IndexCreateCommandTest extends AbstractCommandTestCase
     }
 
     /**
-     * Returns create index command with assigned container.
+     * Returns create index command
      *
      * @return IndexCreateCommand
      */
     protected function getCommand()
     {
-        $command = new IndexCreateCommand();
-        $command->setContainer($this->getContainer());
+        $registry = $this->getContainer()->get('sfes.index_manager_registry');
+        $command = new IndexCreateCommand($registry);
 
         return $command;
     }

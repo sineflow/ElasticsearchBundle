@@ -1,0 +1,15 @@
+services:
+    _defaults:
+        public: false
+
+    Sineflow\ElasticsearchBundle\Command\IndexCreateCommand:
+        arguments:
+            - '@Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry'
+        tags:
+            - { name: 'console.command' }
+
+    Sineflow\ElasticsearchBundle\Command\IndexBuildCommand:
+        arguments:
+            - '@Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry'
+        tags:
+            - { name: 'console.command' }
