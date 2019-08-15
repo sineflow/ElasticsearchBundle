@@ -2,7 +2,9 @@
 
 namespace Sineflow\ElasticsearchBundle\Command;
 
-use Sineflow\ElasticsearchBundle\Manager\IndexManager;
+use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,8 +12,25 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Command for (re)building elasticsearch index.
  */
-class IndexBuildCommand extends AbstractManagerAwareCommand
+class IndexBuildCommand extends Command
 {
+    protected static $defaultName = 'sineflow:es:index:build';
+
+    /**
+     * @var IndexManagerRegistry
+     */
+    private $indexManagerRegistry;
+
+    /**
+     * @param IndexManagerRegistry $indexManagerRegistry
+     */
+    public function __construct(IndexManagerRegistry $indexManagerRegistry)
+    {
+        $this->indexManagerRegistry = $indexManagerRegistry;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -20,8 +39,12 @@ class IndexBuildCommand extends AbstractManagerAwareCommand
         parent::configure();
 
         $this
-            ->setName('sineflow:es:index:build')
             ->setDescription('(Re)builds elasticsearch index.')
+            ->addArgument(
+                'index',
+                InputArgument::REQUIRED,
+                'The identifier of the index'
+            )
             ->addOption(
                 'delete-old',
                 null,
@@ -42,8 +65,7 @@ class IndexBuildCommand extends AbstractManagerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $indexManagerName = $input->getArgument('index');
-        /** @var IndexManager $indexManager */
-        $indexManager = $this->getManager($indexManagerName);
+        $indexManager = $this->indexManagerRegistry->get($indexManagerName);
 
         $deleteOldIndex = (bool) $input->getOption('delete-old');
         $cancelCurrent = (bool) $input->getOption('cancel-current');

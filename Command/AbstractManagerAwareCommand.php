@@ -9,6 +9,8 @@ use Symfony\Component\Console\Input\InputArgument;
 
 /**
  * Class providing common methods for commands working with an index manager
+ *
+ * @deprecated Inject IndexManagerRegistry into your own command and get the index manager from it
  */
 abstract class AbstractManagerAwareCommand extends ContainerAwareCommand
 {
