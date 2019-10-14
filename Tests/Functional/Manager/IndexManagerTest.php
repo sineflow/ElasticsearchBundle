@@ -248,11 +248,26 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
 
         $imWithAliases->persistRaw([
             '_id' => 444,
-            'name' => 'Jane'
+            'name' => 'Jane',
+            '_score' => 1,
         ]);
 
         $doc = $imWithAliases->getRepository()->getById(444);
         $this->assertEquals('Jane', $doc->name);
+    }
+
+    public function testPersistStrictMappingDocRetrievedById()
+    {
+        $im = $this->getIndexManager('bar');
+        $im->getConnection()->setAutocommit(true);
+        $repo = $im->getRepository();
+        /** @var Product $doc */
+        $doc = $repo->getById('doc1');
+        $doc->title = 'NewName';
+        $repo->persist($doc);
+
+        $doc = $repo->getById('doc1');
+        $this->assertEquals('NewName', $doc->title);
     }
 
     public function testUpdateWithCorrectParams()
