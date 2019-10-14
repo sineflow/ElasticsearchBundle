@@ -648,6 +648,9 @@ class IndexManager
     {
         $documentMetadata = $this->metadataCollector->getDocumentMetadata($this->indexSettings['class']);
 
+        // Remove any read-only meta fields from array to be persisted
+        unset($documentArray['_score']);
+
         $this->getConnection()->addBulkOperation(
             'index',
             $this->writeAlias,
