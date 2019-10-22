@@ -47,7 +47,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
                     [
                         '_id' => '2',
                         'title' => 'Bar Product',
-                        'price' => 20,
+                        'price' => 15,
                         'category' => null,
                         'related_categories' => [
                             [
@@ -60,6 +60,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
                     ],
                     [
                         '_id' => '3',
+                        'price' => 5,
                         'title' => '3rd Product',
                         'related_categories' => [],
                     ],
@@ -77,7 +78,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $repo = $this->getIndexManager('bar')->getRepository();
         $paginator = $this->getContainer()->get('knp_paginator');
 
-        $query = ['query' => ['match_all' => (object) []], 'sort' => ['_uid' => ['order' =>'asc']]];
+        $query = ['query' => ['match_all' => (object) []], 'sort' => [['_id' => ['order' => 'asc']]]];
         $query['aggs'] = ['avg_price' => ['avg' => ['field' => 'price']]];
 
         // Test object results
@@ -91,7 +92,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $this->assertCount(2, $pagination);
         $this->assertInstanceOf(Product::class, $pagination->offsetGet(0));
         $this->assertEquals(3, $pagination->offsetGet(0)->id);
-        $this->assertEquals(15, $pagination->getCustomParameter('aggregations')['avg_price']['value']);
+        $this->assertEquals(10, $pagination->getCustomParameter('aggregations')['avg_price']['value']);
         $this->assertInternalType('array', $pagination->getCustomParameter('suggestions'));
 
         // Test array results
@@ -117,8 +118,32 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
 
         $this->assertEquals(3, $pagination->current()['_id']);
         $this->assertEquals('3rd Product', $pagination->current()['_source']['title']);
-        $this->assertEquals(15, $pagination->getCustomParameter('aggregations')['avg_price']['value']);
+        $this->assertEquals(10, $pagination->getCustomParameter('aggregations')['avg_price']['value']);
         $this->assertInternalType('array', $pagination->getCustomParameter('suggestions'));
+    }
+
+    public function testPaginationSorting()
+    {
+        /** @var Repository $repo */
+        $repo = $this->getIndexManager('bar')->getRepository();
+        $paginator = $this->getContainer()->get('knp_paginator');
+
+        $query = ['query' => ['match_all' => (object) []], 'sort' => [['price' => ['order' => 'asc']]]];
+
+        /** @var KnpPaginatorAdapter $adapter */
+        $adapter = $repo->find($query, Finder::RESULTS_OBJECT | Finder::ADAPTER_KNP);
+
+        // Do not apply default order to KNP, so just use the one in the query
+        /** @var SlidingPagination $pagination */
+        $pagination = $paginator->paginate($adapter, 1, 3);
+        $this->assertEquals(3, $pagination->current()->id);
+
+        // Test setting default order to KNP
+        $pagination = $paginator->paginate($adapter, 1, 3, [
+            'defaultSortFieldName' => '_id',
+            'defaultSortDirection' => 'desc',
+        ]);
+        $this->assertEquals(54321, $pagination->current()->id);
     }
 
     /**
