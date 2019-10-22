@@ -88,13 +88,19 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
         $sortField = null;
         $sortDirection = 'asc';
 
-        if (isset($_GET[$event->options['sortFieldParameterName']])) {
-            $sortField = $_GET[$event->options['sortFieldParameterName']];
-            $sortDirection = isset($_GET[$event->options['sortDirectionParameterName']]) && strtolower($_GET[$event->options['sortDirectionParameterName']]) === 'desc' ? 'desc' : 'asc';
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request instanceof Request) {
+            $sortField = $request->get($event->options['sortFieldParameterName']);
+            $sortDirection = $request->get($event->options['sortDirectionParameterName'], 'desc');
+            $sortDirection = strtolower($sortDirection) === 'desc' ? 'desc' : 'asc';
 
-            // check if the requested sort field is in the sort whitelist
-            if (isset($event->options['sortFieldWhitelist']) && !in_array($sortField, $event->options['sortFieldWhitelist'])) {
-                throw new \UnexpectedValueException(sprintf('Cannot sort by [%s] as it is not in the whitelist', $sortField));
+            if ($sortField) {
+                // check if the requested sort field is in the sort whitelist
+                if (isset($event->options['sortFieldWhitelist']) && !in_array($sortField, $event->options['sortFieldWhitelist'])) {
+                    throw new \UnexpectedValueException(
+                        sprintf('Cannot sort by [%s] as it is not in the whitelist', $sortField)
+                    );
+                }
             }
         }
 
