@@ -8,6 +8,7 @@ use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Finder\Adapter\KnpPaginatorAdapter;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product;
+use Symfony\Component\HttpFoundation\Request;
 
 class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
 {
@@ -122,6 +123,10 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
 
     public function testPaginationSorting()
     {
+        // Create an empty request to get around a bug in KNP paginator that assumes there is always a Request
+        // https://github.com/KnpLabs/knp-components/issues/239
+        $this->getContainer()->get('request_stack')->push(new Request());
+
         /** @var Repository $repo */
         $repo = $this->getIndexManager('bar')->getRepository();
         $paginator = $this->getContainer()->get('knp_paginator');

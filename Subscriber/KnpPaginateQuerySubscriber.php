@@ -97,7 +97,7 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
                 throw new \UnexpectedValueException(sprintf('Cannot sort by [%s] as it is not in the whitelist', $sortField));
             }
         }
-        
+
         return [$sortField, $sortDirection];
     }
 }
