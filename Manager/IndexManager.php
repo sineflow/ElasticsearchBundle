@@ -462,7 +462,7 @@ class IndexManager
     {
         try {
             if (false === $this->getUseAliases()) {
-                throw new Exception('Index rebuilding is not supported, unless you use aliases');
+                throw new Exception(sprintf('Index rebuilding is not supported for "%s", unless you use aliases', $this->getBaseIndexName()));
             }
 
             $oldIndex = $this->getLiveIndexPreparedForRebuilding($cancelExistingRebuild);
