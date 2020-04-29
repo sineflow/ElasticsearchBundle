@@ -5,3 +5,5 @@
 /phpunit.xml
 /composer.lock
 /var/
+
+.idea
