@@ -3,7 +3,7 @@
 {% block toolbar %}
     {% set profiler_markup_version = profiler_markup_version|default(1) %}
 
-    {% if collector.querycount > 0 %}
+    {% if collector.queryCount > 0 %}
 
         {% set icon %}
             {% if profiler_markup_version == 1 %}
@@ -81,7 +81,7 @@
 
     {% else %}
 
-        <span class="label {{ collector.querycount == 0 ? 'disabled' }}">
+        <span class="label {{ collector.queryCount == 0 ? 'disabled' }}">
             <span class="icon">
             {{ include('@SineflowElasticsearch/Profiler/elasticsearch.svg') }}
             </span>
@@ -186,7 +186,7 @@ To enable it, set 'sfes.profiler_backtrace_enabled' to true.</pre>
 
     <h2>Index managers</h2>
     {% if collector.indexManagers %}
-        {% include '@WebProfiler/Profiler/table.html.twig' with {data: collector.indexManagers} only %}
+        {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.indexManagers }, with_context = false) }}
     {% else %}
         <p>
             <em>No managers.</em>
