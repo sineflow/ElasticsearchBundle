@@ -25,6 +25,11 @@ class ElasticsearchProfiler extends DataCollector
      */
     private $indexManagers = [];
 
+    public function __construct()
+    {
+        $this->reset();
+    }
+
     /**
      * Adds logger to look for collector handler.
      *
@@ -41,9 +46,6 @@ class ElasticsearchProfiler extends DataCollector
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         $this->data['indexManagers'] = $this->cloneVar($this->indexManagers);
-        $this->data['queryCount'] = 0;  // The queries count
-        $this->data['time'] = .0;       // Total time for all queries in ms.
-        $this->data['queries'] = [];    // Array with all the queries
 
         /** @var Logger $logger */
         foreach ($this->loggers as $logger) {
@@ -61,7 +63,12 @@ class ElasticsearchProfiler extends DataCollector
      */
     public function reset()
     {
-        $this->data = [];
+        $this->data = [
+            'indexManagers' => [],  // The list of all defined index managers
+            'queryCount' => 0,      // The queries count
+            'time' => .0,           // Total time for all queries in ms.
+            'queries' => [],        // Array with all the queries
+        ];
     }
 
     /**
