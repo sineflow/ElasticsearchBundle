@@ -6,12 +6,12 @@ use Monolog\Logger;
 use Sineflow\ElasticsearchBundle\Profiler\Handler\CollectionHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
+use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 /**
  * Data collector for profiling elasticsearch bundle.
  */
-class ElasticsearchProfiler implements DataCollectorInterface
+class ElasticsearchProfiler extends DataCollector
 {
     const UNDEFINED_ROUTE = 'undefined_route';
 
@@ -21,24 +21,14 @@ class ElasticsearchProfiler implements DataCollectorInterface
     private $loggers = [];
 
     /**
-     * @var array Queries array.
-     */
-    private $queries = [];
-
-    /**
-     * @var int Query count.
-     */
-    private $count = 0;
-
-    /**
-     * @var float Time all queries took in ms.
-     */
-    private $time = .0;
-
-    /**
      * @var array Registered index managers.
      */
     private $indexManagers = [];
+
+    public function __construct()
+    {
+        $this->reset();
+    }
 
     /**
      * Adds logger to look for collector handler.
@@ -55,6 +45,8 @@ class ElasticsearchProfiler implements DataCollectorInterface
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
+        $this->data['indexManagers'] = $this->cloneVar($this->indexManagers);
+
         /** @var Logger $logger */
         foreach ($this->loggers as $logger) {
             foreach ($logger->getHandlers() as $handler) {
@@ -71,9 +63,12 @@ class ElasticsearchProfiler implements DataCollectorInterface
      */
     public function reset()
     {
-        $this->queries = [];
-        $this->count = 0;
-        $this->time = 0;
+        $this->data = [
+            'indexManagers' => [],  // The list of all defined index managers
+            'queryCount' => 0,      // The queries count
+            'time' => .0,           // Total time for all queries in ms.
+            'queries' => [],        // Array with all the queries
+        ];
     }
 
     /**
@@ -83,7 +78,7 @@ class ElasticsearchProfiler implements DataCollectorInterface
      */
     public function getTime()
     {
-        return round($this->time * 1000, 2);
+        return round($this->data['time'] * 1000, 2);
     }
 
     /**
@@ -93,7 +88,7 @@ class ElasticsearchProfiler implements DataCollectorInterface
      */
     public function getQueryCount()
     {
-        return $this->count;
+        return $this->data['queryCount'];
     }
 
     /**
@@ -109,7 +104,7 @@ class ElasticsearchProfiler implements DataCollectorInterface
      */
     public function getQueries()
     {
-        return $this->queries;
+        return $this->data['queries'];
     }
 
     /**
@@ -117,7 +112,7 @@ class ElasticsearchProfiler implements DataCollectorInterface
      */
     public function getIndexManagers()
     {
-        return $this->indexManagers;
+        return $this->data['indexManagers']->getValue();
     }
 
     /**
@@ -145,13 +140,13 @@ class ElasticsearchProfiler implements DataCollectorInterface
      */
     private function handleRecords($records)
     {
-        $this->count += count($records) / 2;
+        $this->data['queryCount'] += count($records) / 2;
         $queryBody = '';
         $rawRequest = '';
         foreach ($records as $record) {
             // First record will never have context.
             if (!empty($record['context'])) {
-                $this->time += $record['context']['duration'];
+                $this->data['time'] += $record['context']['duration'];
                 $route = !empty($record['extra']['route']) ? $record['extra']['route'] : self::UNDEFINED_ROUTE;
                 $this->addQuery($route, $record, $queryBody, $rawRequest);
             } else {
@@ -188,7 +183,7 @@ class ElasticsearchProfiler implements DataCollectorInterface
             $senseRequest .= "\n".trim($queryBody, " '");
         }
 
-        $this->queries[$route][] = array_merge(
+        $this->data['queries'][$route][] = array_merge(
             [
                 'time' => $record['context']['duration'] * 1000,
                 'curlRequest' => $rawRequest,

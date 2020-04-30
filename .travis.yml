@@ -1,17 +1,16 @@
 language: php
 php:
-  - '7.1'
   - '7.2'
   - '7.3'
 
 env:
   global:
-    - SYMFONY_VERSION="~3.4" ES_FILENAME_SUFFIX="-linux-x86_64"
+    - SYMFONY_VERSION="~4.4" ES_FILENAME_SUFFIX="-linux-x86_64"
   matrix:
     - ES_VERSION="7.2.1"
-    - ES_VERSION="7.2.1" SYMFONY_VERSION="~4.0"
+    - ES_VERSION="7.2.1" SYMFONY_VERSION="~3.4"
     - ES_VERSION="7.3.0"
-    - ES_VERSION="7.3.0" SYMFONY_VERSION="~4.0"
+    - ES_VERSION="7.3.0" SYMFONY_VERSION="~3.4"
 
 install:
   - composer require --no-update symfony/symfony:${SYMFONY_VERSION}
