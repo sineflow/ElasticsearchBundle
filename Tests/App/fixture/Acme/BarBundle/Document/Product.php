@@ -5,6 +5,7 @@ namespace Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document
 use Sineflow\ElasticsearchBundle\Annotation as ES;
 use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
 use Sineflow\ElasticsearchBundle\Document\MLProperty;
+use Sineflow\ElasticsearchBundle\Result\ObjectIterator;
 
 /**
  * Product document for testing.
@@ -47,7 +48,7 @@ class Product extends AbstractDocument
     public $category;
 
     /**
-     * @var ObjCategory[]
+     * @var ObjCategory[]|ObjectIterator<ObjCategory>
      * @ES\Property(type="object", name="related_categories", multiple=true, objectName="AcmeBarBundle:ObjCategory")
      */
     public $relatedCategories;

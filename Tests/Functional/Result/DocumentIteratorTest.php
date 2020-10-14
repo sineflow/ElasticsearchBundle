@@ -30,15 +30,15 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
                             'title' => 'Bar',
                             'tags' => [
                                 ['tagname' => 'first tag'],
-                                ['tagname' => 'second tag']
-                            ]
+                                ['tagname' => 'second tag'],
+                            ],
                         ],
                         'related_categories' => [
                             [
                                 'title' => 'Acme',
                                 'tags' => [
-                                    ['tagname' => 'tutu']
-                                ]
+                                    ['tagname' => 'tutu'],
+                                ],
                             ],
                             [
                                 'title' => 'Doodle',
@@ -67,7 +67,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
                     ],
                     [
                         '_id' => '54321',
-                    ]
+                    ],
                 ],
             ],
         ];
@@ -127,7 +127,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
         $expected = [
             'Foo Product',
             'Bar Product',
-            '3rd Product'
+            '3rd Product',
         ];
         while ($iterator->valid()) {
             $this->assertEquals($i, $iterator->key());
@@ -150,6 +150,36 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
         $iterator = $repo->find(['query' => ['match_all' => (object) []]], Finder::RESULTS_OBJECT);
 
         $this->assertNull($iterator->current());
+    }
+
+    /**
+     * Make sure null is returned when field doesn't exist or is empty and ObjectIterator otherwise
+     */
+    public function testNestedObjectIterator()
+    {
+        /** @var Repository $repo */
+        $repo = $this->getIndexManager('bar')->getRepository();
+        /** @var DocumentIterator $iterator */
+        $products = $repo->find(['query' => ['match_all' => (object) []]], Finder::RESULTS_OBJECT);
+
+        $this->assertCount(4, $products);
+        /** @var Product $product */
+        foreach ($products as $product) {
+            $this->assertContains($product->id, ['1', '2', '3', '54321']);
+            switch ($product->id) {
+                case '54321':
+                    $this->assertNull($product->relatedCategories);
+                    break;
+                case '3':
+                    $this->assertInstanceOf(ObjectIterator::class, $product->relatedCategories);
+                    $this->assertNull($product->relatedCategories->current());
+                    break;
+                default:
+                    $this->assertInstanceOf(ObjectIterator::class, $product->relatedCategories);
+                    $this->assertCount(2, $product->relatedCategories);
+                    $this->assertInstanceOf(ObjCategory::class, $product->relatedCategories->current());
+            }
+        }
     }
 
     /**
@@ -193,10 +223,10 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
                     'text' => ['prodcut foot'],
                     'term' => [
                         'size' => 3,
-                        'field' => 'title'
-                    ]
-                ]
-            ]
+                        'field' => 'title',
+                    ],
+                ],
+            ],
         ], Finder::RESULTS_OBJECT);
 
         $suggestions = $iterator->getSuggestions();
