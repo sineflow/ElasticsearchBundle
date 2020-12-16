@@ -32,6 +32,7 @@
         "symfony/stopwatch": "^3.4 || ^4.0",
         "symfony/phpunit-bridge": "^3.4 || ^4.0",
         "symfony/browser-kit": "^3.4 || ^4.0",
+        "doctrine/orm": "^2.6.3",
 
         "monolog/monolog": "^1.0",
         "knplabs/knp-paginator-bundle": "^4.0 || ^5.0",
