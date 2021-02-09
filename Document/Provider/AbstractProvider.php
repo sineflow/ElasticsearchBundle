@@ -9,7 +9,6 @@ use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
  */
 abstract class AbstractProvider implements ProviderInterface
 {
-
     /**
      * @var string The type the provider is for
      */
@@ -48,4 +47,15 @@ abstract class AbstractProvider implements ProviderInterface
      * @return DocumentInterface|array
      */
     abstract public function getDocument($id);
+
+    /**
+     * Returns the number of Elasticsearch documents to persist in a single bulk request
+     * If null is returned, the 'bulk_batch_size' of the Connection will be used
+     *
+     * @return int|null
+     */
+    public function getPersistRequestBatchSize() : ?int
+    {
+        return null;
+    }
 }

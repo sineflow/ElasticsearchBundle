@@ -34,4 +34,12 @@ interface ProviderInterface
      * @return DocumentInterface|array
      */
     public function getDocument($id);
+
+    /**
+     * Returns the number of Elasticsearch documents to persist in a single bulk request
+     * If null is returned, the 'bulk_batch_size' of the Connection will be used
+     *
+     * @return int|null
+     */
+    public function getPersistRequestBatchSize() : ?int;
 }

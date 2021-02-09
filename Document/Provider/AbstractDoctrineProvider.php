@@ -3,7 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Document\Provider;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 
@@ -13,7 +13,7 @@ use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 abstract class AbstractDoctrineProvider extends AbstractProvider
 {
     /**
-     * @var EntityManager
+     * @var EntityManagerInterface
      */
     protected $em;
 
@@ -38,10 +38,10 @@ abstract class AbstractDoctrineProvider extends AbstractProvider
     protected $sourceDataHydration = AbstractQuery::HYDRATE_OBJECT;
 
     /**
-     * @param string        $documentClass The type the provider is for
-     * @param EntityManager $em            The Doctrine entity manager
+     * @param string                 $documentClass The type the provider is for
+     * @param EntityManagerInterface $em            The Doctrine entity manager
      */
-    public function __construct($documentClass, EntityManager $em)
+    public function __construct($documentClass, EntityManagerInterface $em)
     {
         parent::__construct($documentClass);
         $this->em = $em;

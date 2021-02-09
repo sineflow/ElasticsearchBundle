@@ -51,7 +51,7 @@ class ObjectIterator implements \Countable, \Iterator
      */
     public function current()
     {
-        return $this->convertToObject($this->objects[$this->key()]);
+        return isset($this->objects[$this->key()]) ? $this->convertToObject($this->objects[$this->key()]) : null;
     }
 
     /**

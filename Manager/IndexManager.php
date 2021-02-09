@@ -684,15 +684,15 @@ class IndexManager
      */
     protected function copyDataToNewIndex(string $newIndex, string $oldIndex)
     {
-        $batchSize = $this->connection->getConnectionSettings()['bulk_batch_size'];
-
         // Make sure we don't autocommit on every item in the bulk request
         $autocommit = $this->getConnection()->isAutocommit();
         $this->getConnection()->setAutocommit(false);
 
-        $typeDataProvider = $this->getDataProvider();
+        $indexDataProvider = $this->getDataProvider();
+        $batchSize = $indexDataProvider->getPersistRequestBatchSize() ?? $this->connection->getConnectionSettings()['bulk_batch_size'];
+
         $i = 1;
-        foreach ($typeDataProvider->getDocuments() as $document) {
+        foreach ($indexDataProvider->getDocuments() as $document) {
             // Temporarily override the write alias with the new physical index name, so rebuilding only happens in the new index
             $originalWriteAlias = $this->writeAlias;
             $this->setWriteAlias($newIndex);
