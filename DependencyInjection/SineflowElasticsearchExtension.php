@@ -35,7 +35,7 @@ class SineflowElasticsearchExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
 
-        $container->setParameter('sfes.document_dir', $config['document_dir']);
+        $container->setParameter('sfes.entity_locations', $config['entity_locations']);
         $container->setParameter('sfes.connections', $config['connections']);
         $container->setParameter('sfes.indices', $config['indices']);
     }

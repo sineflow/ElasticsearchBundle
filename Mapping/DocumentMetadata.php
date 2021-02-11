@@ -37,7 +37,7 @@ class DocumentMetadata
      */
     protected function configureOptions(OptionsResolver $optionsResolver)
     {
-        $optionsResolver->setRequired(['type', 'properties', 'fields', 'propertiesMetadata', 'repositoryClass', 'className', 'shortClassName']);
+        $optionsResolver->setRequired(['type', 'properties', 'fields', 'propertiesMetadata', 'repositoryClass', 'className']);
     }
 
     /**
@@ -99,14 +99,6 @@ class DocumentMetadata
     public function getClassName()
     {
         return $this->metadata['className'];
-    }
-
-    /**
-     * @return string Class name in short notation (e.g. AppBundle:Product)
-     */
-    public function getShortClassName()
-    {
-        return $this->metadata['shortClassName'];
     }
 
     /**

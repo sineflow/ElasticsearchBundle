@@ -41,7 +41,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
 
         $this->assertSame('_doc', $res['type']);
     }
-    
+
     public function testParse()
     {
         $reflection = new \ReflectionClass('Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product');
@@ -376,7 +376,6 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                 ],
                 'repositoryClass' => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\Repository\\ProductRepository',
                 'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\Product',
-                'shortClassName' => 'AcmeBarBundle:Product',
         ];
 
         $this->assertEquals($expected, $res);

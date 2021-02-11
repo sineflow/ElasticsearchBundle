@@ -11,6 +11,14 @@ framework:
         resource: ~
 
 sineflow_elasticsearch:
+    entity_locations:
+        AcmeBarBundle:
+            directory: '%kernel.project_dir%/Tests/App/fixture/Acme/BarBundle/Document'
+            namespace: 'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document'
+        AcmeFooBundle:
+            directory: '%kernel.project_dir%/Tests/App/fixture/Acme/FooBundle/Document/'
+            namespace: 'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document'
+
     connections:
         default:
             hosts: '%elasticsearch_hosts%'
