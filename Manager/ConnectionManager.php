@@ -9,7 +9,7 @@ use Sineflow\ElasticsearchBundle\DTO\BulkQueryItem;
 use Sineflow\ElasticsearchBundle\Event\Events;
 use Sineflow\ElasticsearchBundle\Event\PostCommitEvent;
 use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * This class interacts with elasticsearch using injected client.
@@ -220,7 +220,7 @@ class ConnectionManager
         }
 
         if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(Events::POST_COMMIT, new PostCommitEvent($response, $this));
+            $this->eventDispatcher->dispatch(new PostCommitEvent($response, $this), Events::POST_COMMIT);
         }
     }
 

@@ -5,7 +5,7 @@ namespace Sineflow\ElasticsearchBundle\Manager;
 use Elasticsearch\ClientBuilder;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Elasticsearch connection factory class
