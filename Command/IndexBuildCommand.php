@@ -86,5 +86,7 @@ class IndexBuildCommand extends Command
                 )
             );
         }
+
+        return 0;
     }
 }

@@ -69,5 +69,7 @@ class IndexCreateCommand extends Command
                 )
             );
         }
+
+        return 0;
     }
 }
