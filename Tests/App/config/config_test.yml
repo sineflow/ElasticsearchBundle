@@ -9,6 +9,7 @@ framework:
     test: ~
     router:
         resource: ~
+        utf8: true
 
 sineflow_elasticsearch:
     entity_locations:
