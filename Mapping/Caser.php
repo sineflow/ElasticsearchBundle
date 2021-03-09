@@ -2,8 +2,6 @@
 
 namespace Sineflow\ElasticsearchBundle\Mapping;
 
-use Doctrine\Common\Inflector\Inflector;
-
 /**
  * Utility for string case transformations.
  */
@@ -18,7 +16,7 @@ class Caser
      */
     public static function camel($string)
     {
-        return Inflector::camelize($string);
+        return lcfirst(str_replace([' ', '_', '-'], '', ucwords($string, ' _-')));
     }
 
     /**

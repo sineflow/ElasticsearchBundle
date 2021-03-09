@@ -23,7 +23,6 @@
         "symfony/http-kernel": "^3.4 || ^4.0",
 
         "doctrine/annotations": "^1.2",
-        "doctrine/inflector": "^1.0",
         "doctrine/cache": "^1.4",
         "elasticsearch/elasticsearch": "^7.0"
     },
