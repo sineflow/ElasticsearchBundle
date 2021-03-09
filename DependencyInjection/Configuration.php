@@ -176,7 +176,7 @@ class Configuration implements ConfigurationInterface
                         ->prototype('variable')->end()
                     ->end()
                     ->scalarNode('class')
-                        ->info('The entity class representing the documents in the index. Can be specified either in a short notation (e.g AppBundle:Product) or a class FQN')
+                        ->info('The entity class representing the documents in the index. Can be specified either in a short notation (e.g App:Product) or a class FQN')
                         ->isRequired()
                         ->cannotBeEmpty()
                     ->end()

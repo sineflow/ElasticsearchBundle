@@ -61,13 +61,13 @@ class Finder
     /**
      * Returns a document by identifier
      *
-     * @param string $documentClass In short notation (i.e AppBundle:Product)
+     * @param string $documentClass FQN or short notation (i.e App:Product)
      * @param string $id
      * @param int    $resultType
      *
      * @return mixed
      */
-    public function get($documentClass, $id, $resultType = self::RESULTS_OBJECT)
+    public function get(string $documentClass, string $id, int $resultType = self::RESULTS_OBJECT)
     {
         $indexManagerName = current($this->documentMetadataCollector->getIndexManagersForDocumentClasses([$documentClass]));
 
@@ -151,21 +151,23 @@ class Finder
      * Executes a scroll request, based on a given scrollId.
      * Returns false when there are no more hits
      *
-     * @param array  $documentClasses The ES entities involved in the scrolled search
-     * @param string $scrollId        (in/out param) The Scroll ID as returned from the Scan request or a previous Scroll request
-     * @param string $scrollTime      The time to keep the scroll window open
-     * @param int    $resultsType     Bitmask value determining how the results are returned
-     * @param int    $totalHits       (out param) The total hits of the query response
+     * @param array    $documentClasses The ES entities involved in the scrolled search
+     * @param string   $scrollId        (in/out param) The Scroll ID as returned from the Scan request or a previous Scroll request
+     * @param string   $scrollTime      The time to keep the scroll window open
+     * @param int      $resultsType     Bitmask value determining how the results are returned
+     * @param int|null $totalHits       (out param) The total hits of the query response
      *
      * @return mixed
      */
-    public function scroll(array $documentClasses, &$scrollId, $scrollTime = self::SCROLL_TIME, $resultsType = self::RESULTS_OBJECT, &$totalHits = null)
+    public function scroll(array $documentClasses, string &$scrollId, string $scrollTime = self::SCROLL_TIME, int $resultsType = self::RESULTS_OBJECT, ?int &$totalHits = null)
     {
         $client = $this->getConnection($documentClasses)->getClient();
 
         $params = [
-            'scroll_id' => $scrollId,
-            'scroll' => $scrollTime,
+            'body' => [
+                'scroll_id' => $scrollId,
+                'scroll' => $scrollTime,
+            ],
         ];
 
         $raw = $client->scroll($params);
@@ -186,7 +188,7 @@ class Finder
      *
      * @return int
      */
-    public function count(array $documentClasses, array $searchBody = [], array $additionalRequestParams = [])
+    public function count(array $documentClasses, array $searchBody = [], array $additionalRequestParams = []): int
     {
         $client = $this->getConnection($documentClasses)->getClient();
 
@@ -211,7 +213,7 @@ class Finder
 
     /**
      * Returns an array with the Elasticsearch indices to be queried,
-     * based on the given document classes in short notation (AppBundle:Product) or FQN
+     * based on the given document classes in short notation (App:Product) or FQN
      *
      * @param array $documentClasses
      *
@@ -238,7 +240,7 @@ class Finder
      *
      * @return array|DocumentIterator
      */
-    public function parseResult($raw, $resultsType, array $documentClasses = null)
+    public function parseResult(array $raw, int $resultsType, array $documentClasses = null)
     {
         switch ($resultsType & self::BITMASK_RESULT_TYPES) {
             case self::RESULTS_OBJECT:
@@ -270,7 +272,7 @@ class Finder
      *
      * @return IndicesToDocumentClasses
      */
-    private function getIndicesToDocumentClasses(array $documentClasses)
+    private function getIndicesToDocumentClasses(array $documentClasses): IndicesToDocumentClasses
     {
         $indicesToDocumentClasses = new IndicesToDocumentClasses();
         $documentClassToIndexManagerMap = $this->documentMetadataCollector->getIndexManagersForDocumentClasses($documentClasses);
@@ -299,7 +301,7 @@ class Finder
      *
      * @return array
      */
-    private function convertToNormalizedArray($data)
+    private function convertToNormalizedArray(array $data): array
     {
         if (array_key_exists('_source', $data)) {
             return $data['_source'];
@@ -330,9 +332,9 @@ class Finder
      *
      * @param array $documentClasses
      *
-     * @return ConnectionManager
+     * @return ConnectionManager|null
      */
-    private function getConnection(array $documentClasses)
+    private function getConnection(array $documentClasses): ?ConnectionManager
     {
         $connection = null;
         foreach ($documentClasses as $documentClass) {

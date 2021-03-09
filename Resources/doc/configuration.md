@@ -56,7 +56,7 @@ sineflow_elasticsearch:
         products:
             extends: _base
             name: dev_products
-            class: AppBundle:Product
+            class: App:Product
 
 ```
 

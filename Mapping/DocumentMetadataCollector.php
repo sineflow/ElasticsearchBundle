@@ -119,7 +119,7 @@ class DocumentMetadataCollector
 
     /**
      * Returns metadata for the specified document class name.
-     * Class can also be specified in short notation (e.g AppBundle:Product)
+     * Class can also be specified in short notation (e.g App:Product)
      *
      * @param string $documentClass
      *
@@ -138,7 +138,7 @@ class DocumentMetadataCollector
 
     /**
      * Returns metadata for the specified object class name
-     * Class can also be specified in short notation (e.g AppBundle:ObjCategory)
+     * Class can also be specified in short notation (e.g App:ObjCategory)
      *
      * @param string $objectClass
      *

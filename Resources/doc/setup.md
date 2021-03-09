@@ -41,17 +41,17 @@ class AppKernel extends Kernel
 sineflow_elasticsearch:
     connections:
         default:
-            hosts: [127.0.0.1:9200]           
+            hosts: [127.0.0.1:9200]
     indices:
         customer:
             name: dev_customer
             connection: default
-            class: AppBundle:Customer
+            class: App:Customer
 ```
 
 > This is the very basic example only, for a more detailed description of configuration options, please take a look at the [configuration](configuration.md) chapter.
 
-A couple of things to note in this example: `dev_customer` is the name of the physical index in Elasticsearch and `AppBundle:Customer` represents the class where the document type mapping is defined. (more info at [the mapping chapter](mapping.md)).
+A couple of things to note in this example: `dev_customer` is the name of the physical index in Elasticsearch and `App:Customer` represents the class where the document type mapping is defined. (more info at [the mapping chapter](mapping.md)).
 
 
 ### Step 4: Define your Elasticsearch types as `Document` objects
@@ -61,7 +61,7 @@ The bundle uses `Document` objects to represent Elasticsearch documents. Now let
 ```php
 
 <?php
-namespace AppBundle\Document;
+namespace App\Document;
 
 use Sineflow\ElasticsearchBundle\Annotation as ES;
 use Sineflow\ElasticsearchBundle\Document\AbstractDocument;

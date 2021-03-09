@@ -2,12 +2,12 @@
 
 > To proceed with steps bellow it is necessary to read the [mapping](mapping.md) topic and have defined documents in the bundle.
 
-For all steps below we assume that there is an `AppBundle` with the `Product` document and that you have an index manager defined to manage that document.
+For all steps below we assume that there is an `App` entity location with the `Product` document and that you have an index manager defined to manage that document.
 
 ```php
 
 <?php
-//AppBundle:Product
+//App:Product
 use Sineflow\ElasticsearchBundle\Annotation as ES;
 use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
 
@@ -32,7 +32,7 @@ sineflow_elasticsearch:
         products:
             extends: _base
             name: acme_products
-            class: AppBundle:Product
+            class: App:Product
 ```
 
 ## Index manager
@@ -46,7 +46,7 @@ $im = $this->get('sfes.index.product');
 
 ## Repositories
 
-When you need to work with documents in the index, you can do so through the Repository class of an entity. 
+When you need to work with documents in the index, you can do so through the Repository class of an entity.
 The default Repository is mostly a convenience class, as its methods are also available either through the IndexManager or the Finder services. However it may be useful to have type-specific methods in your own custom repositories.
 You can get a document's repository through the index manager that manages it:
 
@@ -114,7 +114,7 @@ For more information about that, see [data providers](dataproviders.md).
 
 ## Bulk operations
 
-It is important to note that you have to explicitly call `commit()` of the connection, after create, update, delete or reindex operations. This allows you to do multiple operations as a single bulk request, which in certain situation greatly increases performance by reducing network round trips. 
+It is important to note that you have to explicitly call `commit()` of the connection, after create, update, delete or reindex operations. This allows you to do multiple operations as a single bulk request, which in certain situation greatly increases performance by reducing network round trips.
 This behaviour can be changed though, by turning **on** the autocommit mode of the connection.
 
 ```php

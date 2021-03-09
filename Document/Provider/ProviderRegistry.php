@@ -90,7 +90,7 @@ class ProviderRegistry implements ContainerAwareInterface
     /**
      * Gets the provider for a type.
      *
-     * @param string $documentClass FQN or alias (e.g AppBundle:Entity)
+     * @param string $documentClass FQN or alias (e.g App:Entity)
      *
      * @return ProviderInterface
      *

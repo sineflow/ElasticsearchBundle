@@ -253,17 +253,15 @@ class IndexManager
     }
 
     /**
-     * Returns the data provider object for a type (provided in short class notation, e.g AppBundle:Product)
+     * Returns the data provider object for an index
      *
      * @return ProviderInterface
      */
-    public function getDataProvider()
+    public function getDataProvider(): ProviderInterface
     {
-        $provider = $this->providerRegistry->getProviderInstance(
+        return $this->providerRegistry->getProviderInstance(
             $this->getDocumentClass()
         );
-
-        return $provider;
     }
 
     /**

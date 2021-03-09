@@ -17,11 +17,11 @@ class IndicesToDocumentClassesTest extends TestCase
     {
         $obj = new IndicesToDocumentClasses();
 
-        $obj->set('my_real_index', 'AppBundle:Entity');
-        $this->assertEquals('AppBundle:Entity', $obj->get('my_real_index'));
+        $obj->set('my_real_index', 'App:Entity');
+        $this->assertEquals('App:Entity', $obj->get('my_real_index'));
 
         $this->assertThrows(\InvalidArgumentException::class, function () use ($obj) {
-            $obj->set(null, 'AppBundle:Entity');
+            $obj->set(null, 'App:Entity');
         });
 
         $this->assertThrows(\InvalidArgumentException::class, function () use ($obj) {
@@ -30,12 +30,12 @@ class IndicesToDocumentClassesTest extends TestCase
 
         $obj = new IndicesToDocumentClasses();
 
-        $obj->set(null, 'AppBundle:Entity');
-        $this->assertEquals('AppBundle:Entity', $obj->get('second_real_index'));
-        $this->assertEquals('AppBundle:Entity', $obj->get('non_existing_index'));
+        $obj->set(null, 'App:Entity');
+        $this->assertEquals('App:Entity', $obj->get('second_real_index'));
+        $this->assertEquals('App:Entity', $obj->get('non_existing_index'));
 
         $this->assertThrows(\InvalidArgumentException::class, function () use ($obj) {
-            $obj->set('my_real_index', 'AppBundle:Entity');
+            $obj->set('my_real_index', 'App:Entity');
         });
     }
 }

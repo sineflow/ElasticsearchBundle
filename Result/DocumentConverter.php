@@ -41,7 +41,7 @@ class DocumentConverter
      * Converts raw array (as returned by the Elasticsearch client) to document.
      *
      * @param array  $rawData
-     * @param string $documentClass Document class in short notation (e.g. AppBundle:Product)
+     * @param string $documentClass Document class FQN or in short notation (e.g. App:Product)
      *
      * @return DocumentInterface
      */

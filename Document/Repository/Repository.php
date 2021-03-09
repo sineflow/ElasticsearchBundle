@@ -19,7 +19,7 @@ class Repository
     private $indexManager;
 
     /**
-     * The document class in short notation (e.g. AppBundle:Product)
+     * The document class FQN or in short notation (e.g. App:Product)
      *
      * @var string
      */

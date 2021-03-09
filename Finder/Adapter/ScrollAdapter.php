@@ -21,7 +21,7 @@ class ScrollAdapter
     private $documentClasses;
 
     /**
-     * @var int
+     * @var string
      */
     private $scrollId;
 
@@ -100,9 +100,10 @@ class ScrollAdapter
      * or throws an exception, if no scrolls have been retrieved yet
      *
      * @return int
+     *
      * @throws Exception
      */
-    public function getTotalHits()
+    public function getTotalHits(): int
     {
         if (is_null($this->totalHits)) {
             throw new Exception(sprintf('You must call getNextScrollResults() at least once, before you can get the total hits'));

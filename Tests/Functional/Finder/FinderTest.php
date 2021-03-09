@@ -108,9 +108,10 @@ class FinderTest extends AbstractElasticsearchTestCase
 
     public function testGetById()
     {
+        /** @var Finder $finder */
         $finder = $this->getContainer()->get('sfes.finder');
 
-        $docAsObject = $finder->get('AcmeBarBundle:Product', 'doc1');
+        $docAsObject = $finder->get(Product::class, 'doc1');
         $this->assertInstanceOf(Product::class, $docAsObject);
         $this->assertEquals('aaa', $docAsObject->title);
 

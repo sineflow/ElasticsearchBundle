@@ -1,13 +1,13 @@
 # Mapping
 
-The Elasticsearch bundle requires document mapping definitions to create the correct index schema and be able to convert data to objects and vice versa - think Doctrine. 
+The Elasticsearch bundle requires document mapping definitions to create the correct index schema and be able to convert data to objects and vice versa - think Doctrine.
 
 ## Document class annotations
 
 Elasticsearch type mappings are defined using annotations within document entity classes that implement DocumentInterface:
 ```php
 <?php
-namespace AppBundle\Document;
+namespace App\Document;
 
 use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
 use Sineflow\ElasticsearchBundle\Annotation as ES;
@@ -35,10 +35,10 @@ The class representing a document must be annotated as `@ES\Document`. The follo
 
 - `repositoryClass` Allows you to specify a specific repository class for this document. If not specified, the default repository class is used.
 ```
-repositoryClass="AppBundle\Document\Repository\ProductRepository"
+repositoryClass="App\Document\Repository\ProductRepository"
 ```
 
-- `options` Allows to specify any type option supported by Elasticsearch, such as [\_all](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-all-field.html), [dynamic_templates](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-templates.html), [dynamic_date_formats](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-field-mapping.html#date-detection), etc. 
+- `options` Allows to specify any type option supported by Elasticsearch, such as [\_all](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-all-field.html), [dynamic_templates](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-templates.html), [dynamic_date_formats](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-field-mapping.html#date-detection), etc.
 
 ### Property annotation
 
@@ -55,7 +55,7 @@ multilanguage=true
 
 - `objectName` When the field type is `object` or `nested`, this property must be specified, as it specifies which class defines the (nested) object.
 ```
-objectName="AppBundle:ObjAlias"
+objectName="App:ObjAlias"
 ```
 
 - `multiple` Relevant only for `object` and `nested` fields. It specifies whether the field contains a single object or multiple ones.
@@ -63,10 +63,10 @@ objectName="AppBundle:ObjAlias"
 multiple=true
 ```
 
-- `options` An array of literal options, sent to Elasticsearch as they are. The only exception is with multilanguage properties, where further processing is applied. 
+- `options` An array of literal options, sent to Elasticsearch as they are. The only exception is with multilanguage properties, where further processing is applied.
 ```
 options={
-    "analyzer":"my_special_analyzer", 
+    "analyzer":"my_special_analyzer",
     "null_value":0
 }
 ```
@@ -94,7 +94,7 @@ Sometimes, you may have a field that is available in more than one language. Thi
 ```
 > Note the use of `{lang}` placeholder in the options.
 
-When you have a property definition like that, there will not be a field `name` in your index, but instead there will be `name-en`, `name-fr`, `name-de`, etc. where the suffixes are taken from the available languages in your application. 
+When you have a property definition like that, there will not be a field `name` in your index, but instead there will be `name-en`, `name-fr`, `name-de`, etc. where the suffixes are taken from the available languages in your application.
 There will also be a field `name-default`, whose default mapping of `type:keyword;ignore_above:256` you can optionally override by specifying alternative `multilanguageDefaultOptions`.
 
 You may also use the special `{lang}` placeholder in the options array, as often you would need to specify different analyzers, depending on the language. For more information on how that works, see [multilanguage support](i18n.md).
@@ -152,7 +152,7 @@ Object classes are almost the same as document classes:
 
 ```php
 <?php
-namespace AppBundle\Document;
+namespace App\Document;
 
 use Sineflow\ElasticsearchBundle\Document\ObjectInterface;
 use Sineflow\ElasticsearchBundle\Annotation as ES;

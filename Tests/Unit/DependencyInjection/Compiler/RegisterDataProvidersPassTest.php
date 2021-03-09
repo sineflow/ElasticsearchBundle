@@ -30,14 +30,14 @@ class RegisterDataProvidersPassTest extends TestCase
                     [
                         0 =>
                             [
-                                'type' => 'AppBundle:MyType',
+                                'type' => 'App:MyType',
                             ],
                     ],
                     'app.es.data_provider.mytype2' =>
                     [
                         0 =>
                             [
-                                'type' => 'AppBundle:MyType2',
+                                'type' => 'App:MyType2',
                             ],
                     ],
             ]
@@ -120,11 +120,11 @@ class RegisterDataProvidersPassTest extends TestCase
                     [
                         0 =>
                             [
-                                'type' => 'AppBundle:MyType1',
+                                'type' => 'App:MyType1',
                             ],
                             1 =>
                             [
-                                'type' => 'AppBundle:MyType2',
+                                'type' => 'App:MyType2',
                             ],
                     ],
             ]
@@ -154,8 +154,8 @@ class RegisterDataProvidersPassTest extends TestCase
             ->expects($this->exactly(2))
             ->method('addMethodCall')
             ->withConsecutive(
-                array($this->equalTo('addProvider'), $this->equalTo(['AppBundle:MyType1', 'app.es.data_provider.dummy'])),
-                array($this->equalTo('addProvider'), $this->equalTo(['AppBundle:MyType2', 'app.es.data_provider.dummy']))
+                array($this->equalTo('addProvider'), $this->equalTo(['App:MyType1', 'app.es.data_provider.dummy'])),
+                array($this->equalTo('addProvider'), $this->equalTo(['App:MyType2', 'app.es.data_provider.dummy']))
             );
 
         $compilerPass = new RegisterDataProvidersPass();

@@ -48,7 +48,7 @@ $searchBody = [
         'match_all' => (object) []
     ]
 ];
-$finder->find(['AppBundle:Product', 'AppBundle:Deals'], $searchBody);
+$finder->find(['App:Product', 'App:Deals'], $searchBody);
 ```
 > You may specify the same options as when using Repository::find(), except you need to specify all entities to search in as the first parameter.
 
@@ -62,7 +62,7 @@ $finder->find(['AppBundle:Product', 'AppBundle:Deals'], $searchBody);
 
 ## Using a query builder to generate the search query
 
-Instead of passing a raw array for the search query you may use the DSL component by ONGR.io. It is a very convenient and structured way of generating your search queries.  
+Instead of passing a raw array for the search query you may use the DSL component by ONGR.io. It is a very convenient and structured way of generating your search queries.
 For more information and documentation, have a look here: [Elasticsearch DSL](https://github.com/ongr-io/ElasticsearchDSL/blob/master/docs/index.md)
 
 ## Paginating results using KNP Paginator
@@ -70,14 +70,14 @@ For more information and documentation, have a look here: [Elasticsearch DSL](ht
 If you want to use [KNP paginator](https://github.com/KnpLabs/KnpPaginatorBundle) to show paginated results, the bundle has integrated support for it. You just need to pass the **Finder::ADAPTER_KNP** flag to the search results type, regardless of whether you are using the find() method of the **sfes.finder** service, or a **Repository** instance:
 
 ```php
-// AppBundle\Controller\ProductsController::listAction()
+// App\Controller\ProductsController::listAction()
 
 $page = 1;
 $recordsPerPage = 10;
 //...
 $finder = $this->get('sfes.finder');
 $results = $finder->find(
-    ['AppBundle:Product'], 
+    ['App:Product'],
     $searchQuery,
     Finder::RESULTS_OBJECT | Finder::ADAPTER_KNP
 );
@@ -107,18 +107,18 @@ Then you can use the adapter's **getNextScrollResults()** method to get the next
 ```
 $finder = $this->get('sfes.finder');
 $scrollAdapter = $finder->find(
-    ['AppBundle:Product'], 
-    $searchQuery, 
-    Finder::RESULTS_RAW | Finder::ADAPTER_SCROLL, 
+    ['App:Product'],
+    $searchQuery,
+    Finder::RESULTS_RAW | Finder::ADAPTER_SCROLL,
     ['size' => 1000, 'scroll' => '5m']
 );
 
 while (false !== ($matches = $scrollAdapter->getNextScrollResults())) {
     foreach ($matches['hits']['hits'] as $rawDoc) {
-        // Do stuff with the document 
+        // Do stuff with the document
         // ...
     }
 }
 ```
-> You can optionally specify the chunk `size` and `scroll` time as additional params to the find() method. The defaults are `10` and `1m` 
+> You can optionally specify the chunk `size` and `scroll` time as additional params to the find() method. The defaults are `10` and `1m`
 > **Tip:** The **Finder::ADAPTER_SCROLL** works with any type of results, but you would usually want speed when you use it, so the most efficient way would be to get the raw results.
