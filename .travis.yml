@@ -2,18 +2,19 @@ language: php
 php:
   - '7.2'
   - '7.3'
+  - '8.0'
 
 env:
   global:
-    - SYMFONY_VERSION="~4.4" ES_FILENAME_SUFFIX="-linux-x86_64"
+    - SYMFONY_VERSION="~5.0" ES_FILENAME_SUFFIX="-linux-x86_64"
   matrix:
     - ES_VERSION="7.2.1"
-    - ES_VERSION="7.2.1" SYMFONY_VERSION="~3.4"
-    - ES_VERSION="7.3.0"
-    - ES_VERSION="7.3.0" SYMFONY_VERSION="~3.4"
+    - ES_VERSION="7.2.1" SYMFONY_VERSION="~4.4"
+    - ES_VERSION="7.11.1"
+    - ES_VERSION="7.11.1" SYMFONY_VERSION="~4.4"
 
 install:
-  - composer require --no-update symfony/symfony:${SYMFONY_VERSION}
+  - composer require --no-update symfony/framework-bundle:${SYMFONY_VERSION}
   - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}${ES_FILENAME_SUFFIX}.tar.gz
   - tar -xzf elasticsearch-${ES_VERSION}${ES_FILENAME_SUFFIX}.tar.gz
   - ./elasticsearch-${ES_VERSION}/bin/elasticsearch > /dev/null 2>&1 &
