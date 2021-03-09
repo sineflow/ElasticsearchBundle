@@ -78,12 +78,12 @@ class IndexManager
     /**
      * @var string The alias where data should be read from
      */
-    protected $readAlias = null;
+    protected $readAlias;
 
     /**
      * @var string The alias where data should be written to
      */
-    protected $writeAlias = null;
+    protected $writeAlias;
 
     /**
      * @var EventDispatcherInterface
@@ -100,7 +100,7 @@ class IndexManager
      * @param array                     $indexSettings
      */
     public function __construct(
-        $managerName,
+        string $managerName,
         ConnectionManager $connection,
         DocumentMetadataCollector $metadataCollector,
         ProviderRegistry $providerRegistry,
@@ -128,7 +128,7 @@ class IndexManager
     /**
      * @return EventDispatcherInterface
      */
-    public function getEventDispatcher()
+    public function getEventDispatcher(): EventDispatcherInterface
     {
         return $this->eventDispatcher;
     }
@@ -136,7 +136,7 @@ class IndexManager
     /**
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function setEventDispatcher($eventDispatcher)
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -144,7 +144,7 @@ class IndexManager
     /**
      * @return array
      */
-    public function getIndexMapping()
+    public function getIndexMapping(): array
     {
         if (is_null($this->indexMapping)) {
             $this->indexMapping = $this->buildIndexMapping($this->managerName);
@@ -160,7 +160,7 @@ class IndexManager
      *
      * @return array
      */
-    private function buildIndexMapping($indexManagerName)
+    private function buildIndexMapping(string $indexManagerName): array
     {
         $index = ['index' => $this->indexSettings['name']];
 
@@ -177,7 +177,7 @@ class IndexManager
     /**
      * @return string
      */
-    public function getManagerName()
+    public function getManagerName(): string
     {
         return $this->managerName;
     }
@@ -185,7 +185,7 @@ class IndexManager
     /**
      * @return bool
      */
-    public function getUseAliases()
+    public function getUseAliases(): bool
     {
         return $this->useAliases;
     }
@@ -195,7 +195,7 @@ class IndexManager
      *
      * @return string
      */
-    public function getReadAlias()
+    public function getReadAlias(): string
     {
         return $this->readAlias;
     }
@@ -205,7 +205,7 @@ class IndexManager
      *
      * @return string
      */
-    public function getWriteAlias()
+    public function getWriteAlias(): string
     {
         return $this->writeAlias;
     }
@@ -213,7 +213,7 @@ class IndexManager
     /**
      * @param string $writeAlias
      */
-    private function setWriteAlias($writeAlias)
+    private function setWriteAlias(string $writeAlias)
     {
         $this->writeAlias = $writeAlias;
     }
@@ -223,7 +223,7 @@ class IndexManager
      *
      * @return ConnectionManager
      */
-    public function getConnection()
+    public function getConnection(): ConnectionManager
     {
         return $this->connection;
     }
@@ -233,7 +233,7 @@ class IndexManager
      *
      * @return Repository
      */
-    public function getRepository()
+    public function getRepository(): Repository
     {
         $documentMetadata = $this->metadataCollector->getDocumentMetadataForIndex($this->managerName);
 
@@ -272,7 +272,7 @@ class IndexManager
      *
      * @return string
      */
-    private function getBaseIndexName()
+    private function getBaseIndexName(): string
     {
         return $this->indexSettings['name'];
     }
@@ -282,7 +282,7 @@ class IndexManager
      *
      * @return string
      */
-    private function getUniqueIndexName()
+    private function getUniqueIndexName(): string
     {
         $indexName = $baseName = $this->getBaseIndexName().'_'.date('YmdHis');
 
@@ -297,13 +297,13 @@ class IndexManager
     }
 
     /**
-     * @param string $alias
+     * @param string|null $alias
      *
      * @return array
      *
      * @throws IndexOrAliasNotFoundException
      */
-    private function getIndicesForAlias(?string $alias)
+    private function getIndicesForAlias(?string $alias): array
     {
         if (true === $this->getUseAliases()) {
             $aliases = $this->getConnection()->getAliases();
@@ -330,7 +330,7 @@ class IndexManager
      *
      * @throws IndexOrAliasNotFoundException
      */
-    public function getReadIndices()
+    public function getReadIndices(): array
     {
         return $this->getIndicesForAlias($this->readAlias);
     }
@@ -343,7 +343,7 @@ class IndexManager
      *
      * @throws IndexOrAliasNotFoundException
      */
-    public function getWriteIndices()
+    public function getWriteIndices(): array
     {
         return $this->getIndicesForAlias($this->writeAlias);
     }
@@ -357,7 +357,7 @@ class IndexManager
      * @throws IndexOrAliasNotFoundException If there are no indices for the read or write alias
      * @throws InvalidLiveIndexException     If live index is not found or there are more than one
      */
-    public function getLiveIndex()
+    public function getLiveIndex(): string
     {
         $indexName = null;
 
@@ -455,6 +455,8 @@ class IndexManager
      * @param bool $deleteOld             If set, the old index will be deleted upon successful rebuilding
      * @param bool $cancelExistingRebuild If set, any indices that the write alias points to (except the live one)
      *                                    will be deleted before the new build starts
+     *
+     * @throws ElasticsearchException
      */
     public function rebuildIndex($deleteOld = false, $cancelExistingRebuild = false)
     {
@@ -519,7 +521,7 @@ class IndexManager
      *
      * @param string|int $id
      */
-    public function reindex($id)
+    public function reindex(string $id)
     {
         $documentClass = $this->getDocumentClass();
 
@@ -559,10 +561,8 @@ class IndexManager
      *
      * @param string $id Document ID to remove.
      */
-    public function delete($id)
+    public function delete(string $id)
     {
-        $documentMetadata = $this->metadataCollector->getDocumentMetadata($this->indexSettings['class']);
-
         $this->getConnection()->addBulkOperation(
             'delete',
             $this->writeAlias,
@@ -580,14 +580,12 @@ class IndexManager
      *
      * @param string $id          Document id to update.
      * @param array  $fields      Fields array to update (ignored if script is specified).
-     * @param string $script      Script to update fields.
+     * @param null   $script      Script to update fields.
      * @param array  $queryParams Additional params to pass with the payload (upsert, doc_as_upsert, _source, etc.)
      * @param array  $metaParams  Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
      */
-    public function update($id, array $fields = [], $script = null, array $queryParams = [], array $metaParams = [])
+    public function update(string $id, array $fields = [], $script = null, array $queryParams = [], array $metaParams = [])
     {
-        $documentMetadata = $this->metadataCollector->getDocumentMetadata($this->indexSettings['class']);
-
         // Add the id of the updated document to the meta params for the bulk request
         $metaParams = array_merge(
             $metaParams,
@@ -642,8 +640,6 @@ class IndexManager
      */
     public function persistRaw(array $documentArray, array $metaParams = [])
     {
-        $documentMetadata = $this->metadataCollector->getDocumentMetadata($this->indexSettings['class']);
-
         // Remove any read-only meta fields from array to be persisted
         unset($documentArray['_score']);
 
@@ -664,7 +660,7 @@ class IndexManager
      *
      * @return string
      */
-    protected function createNewIndexWithUniqueName()
+    protected function createNewIndexWithUniqueName(): string
     {
         $settings = $this->getIndexMapping();
         $newIndex = $this->getUniqueIndexName();
@@ -721,12 +717,12 @@ class IndexManager
     /**
      * Verify index and aliases state and try to recover if state is not ok
      *
-     * @param bool   $cancelExistingRebuild
-     * @param string $retryForException     (internal) Set on recursive calls to the exception class thrown
+     * @param bool $cancelExistingRebuild
+     * @param null $retryForException     (internal) Set on recursive calls to the exception class thrown
      *
      * @return string The live (aka "hot") index name
      */
-    protected function getLiveIndexPreparedForRebuilding($cancelExistingRebuild, $retryForException = null)
+    protected function getLiveIndexPreparedForRebuilding(bool $cancelExistingRebuild, $retryForException = null): string
     {
         try {
             // Make sure the index and both aliases are properly set
@@ -772,7 +768,7 @@ class IndexManager
      *
      * @return string
      */
-    protected function getDocumentClass()
+    protected function getDocumentClass(): string
     {
         return $this->metadataCollector->getDocumentMetadata($this->indexSettings['class'])->getClassName();
     }

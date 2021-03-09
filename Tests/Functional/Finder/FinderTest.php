@@ -50,7 +50,7 @@ class FinderTest extends AbstractElasticsearchTestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

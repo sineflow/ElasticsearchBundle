@@ -72,7 +72,7 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -88,8 +88,8 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
     /**
      * Returns index manager instance with injected connection if does not exist creates new one.
      *
-     * @param string $name          Index manager name
-     * @param bool   $createIndex   Whether to drop and recreate the index
+     * @param string $name        Index manager name
+     * @param bool   $createIndex Whether to drop and recreate the index
      *
      * @return IndexManager
      *
@@ -129,6 +129,7 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
      * Return whether a given index manager has already been created in the current class instance
      *
      * @param $name
+     *
      * @return bool
      */
     protected function hasCreatedIndexManager($name)

@@ -25,6 +25,9 @@ class ElasticsearchProfiler extends DataCollector
      */
     private $indexManagers = [];
 
+    /**
+     * ElasticsearchProfiler constructor.
+     */
     public function __construct()
     {
         $this->reset();
@@ -43,11 +46,10 @@ class ElasticsearchProfiler extends DataCollector
     /**
      * {@inheritDoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->data['indexManagers'] = $this->cloneVar($this->indexManagers);
 
-        /** @var Logger $logger */
         foreach ($this->loggers as $logger) {
             foreach ($logger->getHandlers() as $handler) {
                 if ($handler instanceof CollectionHandler) {
@@ -74,9 +76,9 @@ class ElasticsearchProfiler extends DataCollector
     /**
      * Returns total time queries took.
      *
-     * @return string
+     * @return float
      */
-    public function getTime()
+    public function getTime(): float
     {
         return round($this->data['time'] * 1000, 2);
     }
@@ -86,7 +88,7 @@ class ElasticsearchProfiler extends DataCollector
      *
      * @return int
      */
-    public function getQueryCount()
+    public function getQueryCount(): int
     {
         return $this->data['queryCount'];
     }
@@ -102,7 +104,7 @@ class ElasticsearchProfiler extends DataCollector
      *
      * @return array
      */
-    public function getQueries()
+    public function getQueries(): array
     {
         return $this->data['queries'];
     }
@@ -110,7 +112,7 @@ class ElasticsearchProfiler extends DataCollector
     /**
      * @return array
      */
-    public function getIndexManagers()
+    public function getIndexManagers(): array
     {
         return $this->data['indexManagers']->getValue();
     }
@@ -118,7 +120,7 @@ class ElasticsearchProfiler extends DataCollector
     /**
      * @param array $indexManagers
      */
-    public function setIndexManagers($indexManagers)
+    public function setIndexManagers(array $indexManagers)
     {
         foreach ($indexManagers as $name => $manager) {
             $this->indexManagers[$name] = sprintf('sfes.index.%s', $name);
@@ -128,7 +130,7 @@ class ElasticsearchProfiler extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'sfes.profiler';
     }
@@ -138,7 +140,7 @@ class ElasticsearchProfiler extends DataCollector
      *
      * @param array $records
      */
-    private function handleRecords($records)
+    private function handleRecords(array $records)
     {
         $this->data['queryCount'] += count($records) / 2;
         $queryBody = '';

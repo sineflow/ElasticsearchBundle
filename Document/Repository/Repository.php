@@ -50,7 +50,7 @@ class Repository
      * @param Finder                    $finder
      * @param DocumentMetadataCollector $metadataCollector
      */
-    public function __construct(IndexManager $indexManager, $documentClass, Finder $finder, DocumentMetadataCollector $metadataCollector)
+    public function __construct(IndexManager $indexManager, string $documentClass, Finder $finder, DocumentMetadataCollector $metadataCollector)
     {
         $this->indexManager = $indexManager;
         $this->documentClass = $documentClass;
@@ -70,7 +70,7 @@ class Repository
      *
      * @return IndexManager
      */
-    public function getIndexManager()
+    public function getIndexManager(): IndexManager
     {
         return $this->indexManager;
     }
@@ -81,9 +81,9 @@ class Repository
      * @param string $id         Document Id to find.
      * @param int    $resultType Result type returned.
      *
-     * @return DocumentInterface|null
+     * @return mixed
      */
-    public function getById($id, $resultType = Finder::RESULTS_OBJECT)
+    public function getById(string $id, $resultType = Finder::RESULTS_OBJECT)
     {
         return $this->finder->get($this->documentClass, $id, $resultType);
     }
@@ -111,7 +111,7 @@ class Repository
      *
      * @return int
      */
-    public function count(array $searchBody = [], array $additionalRequestParams = [])
+    public function count(array $searchBody = [], array $additionalRequestParams = []): int
     {
         return $this->finder->count([$this->documentClass], $searchBody, $additionalRequestParams);
     }
@@ -120,9 +120,9 @@ class Repository
      * Rebuilds the data of a document and adds it to a bulk request for the next commit.
      * Depending on the connection autocommit mode, the change may be committed right away.
      *
-     * @param int $id
+     * @param string $id
      */
-    public function reindex($id)
+    public function reindex(string $id): void
     {
         $this->indexManager->reindex($id);
     }
@@ -133,7 +133,7 @@ class Repository
      *
      * @param string $id Document ID to remove.
      */
-    public function delete($id)
+    public function delete(string $id): void
     {
         $this->indexManager->delete($id);
     }
@@ -143,10 +143,10 @@ class Repository
      *
      * @param string $id     Document id to update.
      * @param array  $fields Fields array to update (ignored if script is specified).
-     * @param string $script Script to update fields.
+     * @param null   $script Script to update fields.
      * @param array  $params Additional parameters to pass to the client.
      */
-    public function update($id, array $fields = [], $script = null, array $params = [])
+    public function update(string $id, array $fields = [], $script = null, array $params = []): void
     {
         $this->indexManager->update($id, $fields, $script, $params);
     }
@@ -157,7 +157,7 @@ class Repository
      *
      * @param DocumentInterface $document The document entity to index in ES
      */
-    public function persist(DocumentInterface $document)
+    public function persist(DocumentInterface $document): void
     {
         $this->indexManager->persist($document);
     }
@@ -168,7 +168,7 @@ class Repository
      *
      * @param array $documentArray The document to index in ES
      */
-    public function persistRaw(array $documentArray)
+    public function persistRaw(array $documentArray): void
     {
         $this->indexManager->persistRaw($documentArray);
     }
