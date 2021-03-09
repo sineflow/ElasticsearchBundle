@@ -18,7 +18,7 @@ use Sineflow\ElasticsearchBundle\Exception\InvalidLiveIndexException;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Sineflow\ElasticsearchBundle\Result\DocumentConverter;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Manager class.
@@ -628,7 +628,7 @@ class IndexManager
     public function persist(DocumentInterface $document, array $metaParams = [])
     {
         if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(Events::PRE_PERSIST, new PrePersistEvent($document, $this->getConnection()));
+            $this->eventDispatcher->dispatch(new PrePersistEvent($document, $this->getConnection()), Events::PRE_PERSIST);
         }
 
         $documentArray = $this->documentConverter->convertToArray($document);

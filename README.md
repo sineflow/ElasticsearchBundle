@@ -27,9 +27,6 @@ Installation instructions and documentation of the bundle can be found [here](Re
 | >= 5.0, < 6.0         | ~5.0                        |
 | >= 2.0, < 5.0         | >= 0.9, < 1.0               |
 
-## Breaking changes in version 6.2
-TODO
-
 ## Breaking changes in version 5
 - Finder::ADAPTER_SCANSCROLL renamed to Finder::ADAPTER_SCROLL
 - class ScanScrollAdapter renamed to ScrollAdapter

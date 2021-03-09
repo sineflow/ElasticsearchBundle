@@ -96,7 +96,6 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
             ],
         'repositoryClass'    => null,
         'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\FooBundle\\Document\\Customer',
-        'shortClassName'     => 'AcmeFooBundle:Customer',
     ];
 
     private $expectedProductMetadata = [
@@ -416,7 +415,6 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
             ],
         'repositoryClass'    => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\Repository\\ProductRepository',
         'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\Product',
-        'shortClassName'     => 'AcmeBarBundle:Product',
     ];
 
     protected function setUp()

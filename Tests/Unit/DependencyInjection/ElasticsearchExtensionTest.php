@@ -31,7 +31,13 @@ class ElasticsearchExtensionTest extends TestCase
     {
         $parameters = [
             'sineflow_elasticsearch' => [
-                'document_dir' => 'ElasticSearch/Document',
+                'entity_locations' => [
+                    'AcmeBarBundle' => [
+                        'directory' => 'Tests/App/fixture/Acme/BarBundle/Document',
+                        'namespace' => 'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document',
+                    ],
+                ],
+
                 'connections' => [
                     'test1' => [
                         'hosts' => [
@@ -71,6 +77,13 @@ class ElasticsearchExtensionTest extends TestCase
                         'class' => 'testBundle:Foo',
                     ],
                 ],
+            ],
+        ];
+
+        $expectedEntityLocations = [
+            'AcmeBarBundle' => [
+                'directory' => 'Tests/App/fixture/Acme/BarBundle/Document',
+                'namespace' => 'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document',
             ],
         ];
 
@@ -115,6 +128,7 @@ class ElasticsearchExtensionTest extends TestCase
 
         $out[] = [
             $parameters,
+            $expectedEntityLocations,
             $expectedConnections,
             $expectedManagers,
         ];
@@ -126,16 +140,16 @@ class ElasticsearchExtensionTest extends TestCase
      * Check if load adds parameters to container as expected.
      *
      * @param array $parameters
+     * @param array $expectedEntityLocations
      * @param array $expectedConnections
      * @param array $expectedManagers
      *
      * @dataProvider getData
      */
-    public function testLoad($parameters, $expectedConnections, $expectedManagers)
+    public function testLoad($parameters, $expectedEntityLocations, $expectedConnections, $expectedManagers)
     {
         $container = new ContainerBuilder();
         class_exists('testClass') ? : eval('class testClass {}');
-        $container->setParameter('kernel.bundles', ['testBundle' => 'testClass']);
         $container->setParameter('kernel.cache_dir', '');
         $container->setParameter('kernel.logs_dir', '');
         $container->setParameter('kernel.debug', true);
@@ -143,6 +157,12 @@ class ElasticsearchExtensionTest extends TestCase
         $extension->load(
             $parameters,
             $container
+        );
+
+        $this->assertEquals(
+            $expectedEntityLocations,
+            $container->getParameter('sfes.entity_locations'),
+            'Incorrect entity_locations parameter.'
         );
 
         $this->assertEquals(

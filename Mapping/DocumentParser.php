@@ -98,7 +98,6 @@ class DocumentParser
                 'propertiesMetadata' => $this->getPropertiesMetadata($documentReflection),
                 'repositoryClass' => $classAnnotation->repositoryClass,
                 'className' => $documentReflection->getName(),
-                'shortClassName' => $this->documentLocator->getShortClassName($documentReflection->getName()),
             ];
         }
 

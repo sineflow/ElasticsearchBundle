@@ -6,7 +6,7 @@ use Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Sineflow\ElasticsearchBundle\Result\DocumentConverter;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Factory for index manager services

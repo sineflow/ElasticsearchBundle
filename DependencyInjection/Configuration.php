@@ -17,15 +17,12 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('sineflow_elasticsearch');
+        $treeBuilder = new TreeBuilder('sineflow_elasticsearch');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
-                ->scalarNode('document_dir')
-                    ->info("Sets directory name from which documents will be loaded from bundles.'Document' by default")
-                    ->defaultValue('Document')
-                ->end()
+            ->append($this->getEntityLocationsNode())
             ->append($this->getConnectionsNode())
             ->append($this->getIndicesNode())
 
@@ -41,10 +38,45 @@ class Configuration implements ConfigurationInterface
      *
      * @throws InvalidConfigurationException
      */
-    private function getConnectionsNode()
+    private function getEntityLocationsNode(): NodeDefinition
     {
-        $builder = new TreeBuilder();
-        $node = $builder->root('connections');
+        $builder = new TreeBuilder('entity_locations');
+        $node = $builder->getRootNode();
+
+        $node
+            ->isRequired()
+            ->requiresAtLeastOneElement()
+            ->useAttributeAsKey('id')
+            ->info('Defines locations of Elasticsearch entities')
+            ->prototype('array')
+                ->children()
+                    ->scalarNode('directory')
+                        ->info('The path to where the Elasticsearch entities are')
+                        ->isRequired()
+                        ->cannotBeEmpty()
+                    ->end()
+                    ->scalarNode('namespace')
+                        ->info('The namespace of the entities in this location')
+                        ->isRequired()
+                        ->cannotBeEmpty()
+                    ->end()
+                ->end()
+            ->end();
+
+        return $node;
+    }
+
+    /**
+     * Connections configuration node.
+     *
+     * @return NodeDefinition
+     *
+     * @throws InvalidConfigurationException
+     */
+    private function getConnectionsNode(): NodeDefinition
+    {
+        $builder = new TreeBuilder('connections');
+        $node = $builder->getRootNode();
 
         $node
             ->isRequired()
@@ -85,10 +117,10 @@ class Configuration implements ConfigurationInterface
      *
      * @return NodeDefinition
      */
-    private function getIndicesNode()
+    private function getIndicesNode(): NodeDefinition
     {
-        $builder = new TreeBuilder();
-        $node = $builder->root('indices');
+        $builder = new TreeBuilder('indices');
+        $node = $builder->getRootNode();
 
         $node
             ->isRequired()

@@ -8,121 +8,49 @@ namespace Sineflow\ElasticsearchBundle\Mapping;
 class DocumentLocator
 {
     /**
-     * @var array All bundles available in the application
+     * @var array All locations of Elasticsearch entities available in the application
      */
-    private $bundles = [];
+    private $entityLocations = [];
 
     /**
-     * @var array All bundle names indexed by their namespaces
+     * @param array $entityLocations Parameter sfes.entity_locations
      */
-    private $bundleNamesByNamespace = [];
-
-    /**
-     * @var string Directory in bundle to load documents from.
-     */
-    private $documentDir = 'Document';
-
-    /**
-     * @param array $bundles Parameter kernel.bundles from service container.
-     */
-    public function __construct(array $bundles)
+    public function __construct(array $entityLocations)
     {
-        $this->bundles = $bundles;
-
-        foreach ($bundles as $bundleName => $bundleClass) {
-            $this->bundleNamesByNamespace[substr($bundleClass, 0, strrpos($bundleClass, '\\'))] = $bundleName;
-        }
-    }
-
-    /**
-     * Document directory in bundle to load documents from.
-     *
-     * @param string $documentDir
-     */
-    public function setDocumentDir($documentDir)
-    {
-        $this->documentDir = $documentDir;
-    }
-
-    /**
-     * Returns directory name in which documents should be put.
-     *
-     * @return string
-     */
-    public function getDocumentDir()
-    {
-        return $this->documentDir;
+        $this->entityLocations = $entityLocations;
     }
 
     /**
      * Returns list of existing directories within all application bundles that are possible locations for ES documents
      *
      * @return array
-     *
-     * @throws \ReflectionException
      */
-    public function getAllDocumentDirs()
+    public function getAllDocumentDirs(): array
     {
-        $dirs = [];
-        foreach ($this->bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $filename = $reflection->getFileName();
-            $dir = dirname($filename).'/'.$this->getDocumentDir();
-            if (file_exists($dir)) {
-                $dirs[] = $dir;
-            }
-        }
-
-        return $dirs;
+        return array_column($this->entityLocations, 'directory');
     }
 
     /**
      * Returns the document class name from short syntax
      * or the class name as it is, if it is already fully qualified
      *
-     * @param string $className Short syntax for class name (e.g AppBundle:Product)
+     * @param string $fullClassName FQN of an entity class or a short syntax (e.g App:Product)
      *
      * @return string Fully qualified class name
      *
      * @throws \UnexpectedValueException
      */
-    public function resolveClassName($className)
+    public function resolveClassName(string $fullClassName): string
     {
-        if (strpos($className, ':') !== false) {
-            list($bundleName, $document) = explode(':', $className);
-
-            if (array_key_exists($bundleName, $this->bundles)) {
-                $bundleClass = $this->bundles[$bundleName];
-            } else {
-                throw new \UnexpectedValueException(sprintf('Bundle "%s" does not exist.', $bundleName));
+        if (strpos($fullClassName, ':') !== false) {
+            // Resolve short syntax into an FQN
+            [$locationAlias, $className] = explode(':', $fullClassName);
+            if (!array_key_exists($locationAlias, $this->entityLocations)) {
+                throw new \UnexpectedValueException(sprintf('Location "%s" does not exist.', $locationAlias));
             }
-
-            $className = substr($bundleClass, 0, strrpos($bundleClass, '\\') + 1)
-                .str_replace('/', '\\', $this->getDocumentDir()).'\\'.$document;
+            $fullClassName = rtrim($this->entityLocations[$locationAlias]['namespace'], '\\') . '\\' . $className;
         }
 
-        return $className;
-    }
-
-    /**
-     * Return the short name for a fully qualified document class name
-     * or the name as it is, if it is already a short name
-     *
-     * @param string $className Fully qualified class name
-     *
-     * @return string Class name in short notation (e.g. AppBundle:Product)
-     */
-    public function getShortClassName($className)
-    {
-        if (strpos($className, ':') === false) {
-            if (!preg_match('/^([a-z0-9\\\\]+)\\\\'.preg_quote(str_replace('/', '\\', $this->getDocumentDir()), '/').'\\\\([a-z0-9]+)$/i', $className, $matches)
-                || !isset($this->bundleNamesByNamespace[$matches[1]])) {
-                throw new \UnexpectedValueException(sprintf('Class "%s" is not a valid document entity', $className));
-            }
-
-            $className = $this->bundleNamesByNamespace[$matches[1]].':'.$matches[2];
-        }
-
-        return $className;
+        return $fullClassName;
     }
 }

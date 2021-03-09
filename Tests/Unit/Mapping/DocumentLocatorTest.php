@@ -17,7 +17,16 @@ class DocumentLocatorTest extends TestCase
 
     protected function setUp()
     {
-        $this->locator = new DocumentLocator($this->getBundles());
+        $this->locator = new DocumentLocator([
+            'AcmeBarBundle' => [
+                'directory' => 'Tests/App/fixture/Acme/BarBundle/Document',
+                'namespace' => 'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document',
+            ],
+            'AcmeFooBundle' => [
+                'directory' => 'Tests/App/fixture/Acme/FooBundle/Document',
+                'namespace' => 'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document',
+            ],
+        ]);
     }
 
     /**
@@ -90,15 +99,6 @@ class DocumentLocatorTest extends TestCase
     }
 
     /**
-     * Tests setAllDocumentDir and getAllDocumentDir
-     */
-    public function testGetSetDocumentDir()
-    {
-        $this->locator->setDocumentDir('Doc');
-        $this->assertEquals('Doc', $this->locator->getDocumentDir());
-    }
-
-    /**
      * Tests getAllDocumentDirs
      */
     public function testGetAllDocumentDirs()
@@ -117,38 +117,5 @@ class DocumentLocatorTest extends TestCase
     public function testResolveClassName($className, $expectedClassName)
     {
         $this->assertEquals($expectedClassName, $this->locator->resolveClassName($className));
-    }
-
-    /**
-     * @param string $className
-     * @param string $expectedShortClassName
-     *
-     * @dataProvider getShortClassNameDataProvider
-     */
-    public function testGetShortClassName($className, $expectedShortClassName)
-    {
-        $this->assertEquals($expectedShortClassName, $this->locator->getShortClassName($className));
-    }
-
-    /**
-     * @param string $className
-     *
-     * @dataProvider getShortClassNameExceptionsDataProvider
-     * @expectedException \UnexpectedValueException
-     */
-    public function testGetShortClassNameExceptions($className)
-    {
-        $this->locator->getShortClassName($className);
-    }
-
-    /**
-     * @return array
-     */
-    private function getBundles()
-    {
-        return [
-            'AcmeFooBundle' => 'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\AcmeFooBundle',
-            'AcmeBarBundle' => 'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\AcmeBarBundle',
-        ];
     }
 }

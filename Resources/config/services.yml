@@ -56,9 +56,8 @@ services:
             - '@Sineflow\ElasticsearchBundle\Result\DocumentConverter'
 
     Sineflow\ElasticsearchBundle\Mapping\DocumentLocator:
-        arguments: ['%kernel.bundles%']
-        calls:
-            - [setDocumentDir, ['%sfes.document_dir%']]
+        arguments:
+            - '%sfes.entity_locations%'
 
     Sineflow\ElasticsearchBundle\Mapping\DocumentParser:
         arguments:
