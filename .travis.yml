@@ -20,6 +20,9 @@ install:
   - ./elasticsearch-${ES_VERSION}/bin/elasticsearch > /dev/null 2>&1 &
   - composer install --dev --no-interaction
 
+before_script:
+  - export XDEBUG_MODE=coverage
+
 script:
   - vendor/bin/simple-phpunit --coverage-clover=Tests/App/build/clover.xml 2>/dev/null
   - vendor/bin/phpcs -np --standard=PSR2 --ignore=vendor/,Tests/App/,var/ ./
