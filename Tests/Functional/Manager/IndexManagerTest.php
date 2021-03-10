@@ -80,7 +80,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithoutAliases = $this->getIndexManager('bar', false);
         $imWithoutAliases->createIndex();
 
-        $index = $imWithoutAliases->getConnection()->getClient()->indices()->getAliases(['index' => 'sineflow-esb-test-bar']);
+        $index = $imWithoutAliases->getConnection()->getClient()->indices()->getAlias(['index' => 'sineflow-esb-test-bar']);
         $this->assertCount(1, $index, 'Index was not created');
         $this->assertCount(0, current($index)['aliases'], 'Index should not have any aliases pointing to it');
     }

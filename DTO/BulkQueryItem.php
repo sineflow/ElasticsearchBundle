@@ -36,7 +36,7 @@ class BulkQueryItem
      * @param array  $query      Bulk item query (aka optional_source in the ES docs)
      * @param array  $metaParams Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
      */
-    public function __construct($operation, $index, array $query, array $metaParams = [])
+    public function __construct(string $operation, string $index, array $query, array $metaParams = [])
     {
         if (!in_array($operation, ['index', 'create', 'update', 'delete'])) {
             throw new InvalidArgumentException(sprintf('Invalid bulk operation "%s" specified', $operation));
@@ -61,7 +61,7 @@ class BulkQueryItem
     /**
      * @return string
      */
-    public function getIndex()
+    public function getIndex(): string
     {
         return $this->index;
     }
@@ -69,7 +69,7 @@ class BulkQueryItem
     /**
      * @return array
      */
-    public function getQuery()
+    public function getQuery(): array
     {
         return $this->query;
     }
@@ -81,7 +81,7 @@ class BulkQueryItem
      *
      * @return array
      */
-    public function getLines($forceIndex = null)
+    public function getLines($forceIndex = null): array
     {
         $result = [];
 

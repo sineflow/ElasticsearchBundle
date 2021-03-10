@@ -63,7 +63,7 @@ class ConnectionManager
      * @param Client $client             Elasticsearch client.
      * @param array  $connectionSettings Settings array.
      */
-    public function __construct($connectionName, Client $client, $connectionSettings)
+    public function __construct(string $connectionName, Client $client, array $connectionSettings)
     {
         $this->connectionName = $connectionName;
         $this->client = $client;
@@ -84,7 +84,7 @@ class ConnectionManager
     /**
      * @return LoggerInterface|null
      */
-    public function getLogger()
+    public function getLogger(): ?LoggerInterface
     {
         return $this->logger;
     }
@@ -92,7 +92,7 @@ class ConnectionManager
     /**
      * @return string
      */
-    public function getConnectionName()
+    public function getConnectionName(): string
     {
         return $this->connectionName;
     }
@@ -100,7 +100,7 @@ class ConnectionManager
     /**
      * @return Client
      */
-    public function getClient()
+    public function getClient(): Client
     {
         return $this->client;
     }
@@ -108,7 +108,7 @@ class ConnectionManager
     /**
      * @return array
      */
-    public function getConnectionSettings()
+    public function getConnectionSettings(): array
     {
         return $this->connectionSettings;
     }
@@ -116,7 +116,7 @@ class ConnectionManager
     /**
      * @return bool
      */
-    public function isAutocommit()
+    public function isAutocommit(): bool
     {
         return $this->autocommit;
     }
@@ -124,7 +124,7 @@ class ConnectionManager
     /**
      * @param bool $autocommit
      */
-    public function setAutocommit($autocommit)
+    public function setAutocommit(bool $autocommit)
     {
         // If the autocommit mode is being turned on, commit any pending bulk items
         if (!$this->autocommit && $autocommit) {
@@ -137,7 +137,7 @@ class ConnectionManager
     /**
      * @return EventDispatcherInterface
      */
-    public function getEventDispatcher()
+    public function getEventDispatcher(): EventDispatcherInterface
     {
         return $this->eventDispatcher;
     }
@@ -145,7 +145,7 @@ class ConnectionManager
     /**
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function setEventDispatcher($eventDispatcher)
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -158,7 +158,7 @@ class ConnectionManager
      * @param array  $query      Bulk item query (aka optional_source in the ES docs)
      * @param array  $metaParams Additional meta data params for the bulk item
      */
-    public function addBulkOperation($operation, $index, array $query, array $metaParams = [])
+    public function addBulkOperation(string $operation, string $index, array $query, array $metaParams = [])
     {
         $this->bulkQueries[] = new BulkQueryItem($operation, $index, $query, $metaParams);
     }
@@ -168,7 +168,7 @@ class ConnectionManager
      *
      * @return int
      */
-    public function getBulkOperationsCount()
+    public function getBulkOperationsCount(): int
     {
         return count($this->bulkQueries);
     }
@@ -228,7 +228,7 @@ class ConnectionManager
      *
      * @return array
      */
-    private function getBulkRequest()
+    private function getBulkRequest(): array
     {
         // Go through each bulk query item
         $bulkRequest = [];
@@ -261,7 +261,7 @@ class ConnectionManager
      *
      * @return int The errors count
      */
-    private function logBulkRequestErrors($responseItems)
+    private function logBulkRequestErrors(array $responseItems): int
     {
         $errorsCount = 0;
         foreach ($responseItems as $responseItem) {
@@ -305,11 +305,11 @@ class ConnectionManager
      *
      * @return array The ES aliases
      */
-    public function getAliases()
+    public function getAliases(): array
     {
         $aliases = [];
         // Get all indices and their linked aliases and invert the results
-        $indices = $this->getClient()->indices()->getAliases();
+        $indices = $this->getClient()->indices()->getAlias();
         foreach ($indices as $index => $data) {
             foreach ($data['aliases'] as $alias => $aliasData) {
                 $aliases[$alias][$index] = [];
@@ -333,7 +333,7 @@ class ConnectionManager
      *
      * @throws InvalidArgumentException
      */
-    public function existsIndexOrAlias(array $params)
+    public function existsIndexOrAlias(array $params): bool
     {
         if (!isset($params['index'])) {
             throw new InvalidArgumentException('Required parameter "index" missing');
@@ -342,7 +342,7 @@ class ConnectionManager
         $indicesAndAliasesToCheck = array_flip(explode(',', $params['index']));
 
         // Get all available indices with their aliases
-        $allAliases = $this->getClient()->indices()->getAliases();
+        $allAliases = $this->getClient()->indices()->getAlias();
         foreach ($allAliases as $index => $data) {
             if (isset($indicesAndAliasesToCheck[$index])) {
                 unset($indicesAndAliasesToCheck[$index]);
@@ -376,7 +376,7 @@ class ConnectionManager
      *
      * @throws InvalidArgumentException
      */
-    public function existsAlias(array $params)
+    public function existsAlias(array $params): bool
     {
         if (!isset($params['name'])) {
             throw new InvalidArgumentException('Required parameter "name" missing');
@@ -385,7 +385,7 @@ class ConnectionManager
         $aliasesToCheck = explode(',', $params['name']);
 
         // Get all available indexes with their aliases
-        $allAliases = $this->getClient()->indices()->getAliases();
+        $allAliases = $this->getClient()->indices()->getAlias();
         foreach ($allAliases as $index => $data) {
             foreach ($aliasesToCheck as $aliasToCheck) {
                 if (isset($data['aliases'][$aliasToCheck])) {
