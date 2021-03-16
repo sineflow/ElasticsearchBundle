@@ -92,7 +92,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $this->assertInstanceOf(Product::class, $pagination->offsetGet(0));
         $this->assertEquals(3, $pagination->offsetGet(0)->id);
         $this->assertEquals(10, $pagination->getCustomParameter('aggregations')['avg_price']['value']);
-        $this->assertInternalType('array', $pagination->getCustomParameter('suggestions'));
+        $this->assertIsArray($pagination->getCustomParameter('suggestions'));
 
         // Test array results
 
@@ -118,7 +118,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $this->assertEquals(3, $pagination->current()['_id']);
         $this->assertEquals('3rd Product', $pagination->current()['_source']['title']);
         $this->assertEquals(10, $pagination->getCustomParameter('aggregations')['avg_price']['value']);
-        $this->assertInternalType('array', $pagination->getCustomParameter('suggestions'));
+        $this->assertIsArray($pagination->getCustomParameter('suggestions'));
     }
 
     public function testPaginationSorting()
@@ -149,9 +149,6 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $this->assertEquals(54321, $pagination->current()->id);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testInvalidResultsType()
     {
         /** @var Repository $repo */
@@ -161,6 +158,8 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $query = ['query' => ['match_all' => (object) []]];
 
         $adapter = $repo->find($query, Finder::ADAPTER_KNP);
+
+        $this->expectException(\InvalidArgumentException::class);
         $paginator->paginate($adapter);
     }
 }

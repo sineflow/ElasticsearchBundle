@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Profiler;
 
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product;
@@ -10,6 +11,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
 {
+    use ArraySubsetAsserts;
+
     /**
      * {@inheritdoc}
      */

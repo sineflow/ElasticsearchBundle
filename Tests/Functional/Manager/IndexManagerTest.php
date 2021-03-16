@@ -4,8 +4,8 @@ namespace Sineflow\ElasticsearchBundle\Tests\Functional\Manager;
 
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Sineflow\ElasticsearchBundle\Document\Repository\Repository;
+use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
 use Sineflow\ElasticsearchBundle\Exception\Exception;
-use Sineflow\ElasticsearchBundle\Exception\IndexRebuildingException;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
@@ -116,13 +116,12 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases->getConnection()->getClient()->indices()->getAlias(['name' => 'sineflow-esb-test-customer,sineflow-esb-test-customer_write']);
     }
 
-    /**
-     * @expectedException Exception
-     */
     public function testGetLiveIndexWhenNoIndexExists()
     {
         /** @var IndexManager $imWithAliases */
         $imWithAliases = $this->getIndexManager('customer', false);
+
+        $this->expectException(Exception::class);
         $imWithAliases->getLiveIndex();
     }
 
@@ -131,7 +130,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         /** @var IndexManager $imWithAliases */
         $imWithAliases = $this->getIndexManager('customer');
         $liveIndex = $imWithAliases->getLiveIndex();
-        $this->assertRegExp('/^sineflow-esb-test-customer_[0-9_]+$/', $liveIndex);
+        $this->assertMatchesRegularExpression('/^sineflow-esb-test-customer_[0-9_]+$/', $liveIndex);
 
         /** @var IndexManager $imWithoutAliases */
         $imWithoutAliases = $this->getIndexManager('bar');
@@ -139,12 +138,10 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('sineflow-esb-test-bar', $liveIndex);
     }
 
-    /**
-     * @expectedException Exception
-     */
     public function testRebuildIndexWithoutAliases()
     {
         $imWithoutAliases = $this->getIndexManager('bar');
+        $this->expectException(Exception::class);
         $imWithoutAliases->rebuildIndex();
     }
 
@@ -283,14 +280,12 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('Alicia', $doc->name);
     }
 
-    /**
-     * @expectedException \Sineflow\ElasticsearchBundle\Exception\BulkRequestException
-     */
     public function testUpdateInexistingDoc()
     {
         $imWithAliases = $this->getIndexManager('customer');
         $imWithAliases->getConnection()->setAutocommit(true);
 
+        $this->expectException(BulkRequestException::class);
         $imWithAliases->update('non-existing-id', [
             'name' => 'Alicia'
         ]);

@@ -15,7 +15,7 @@ class DocumentLocatorTest extends TestCase
      */
     protected $locator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->locator = new DocumentLocator([
             'AcmeBarBundle' => [

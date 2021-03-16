@@ -66,8 +66,6 @@ class RegisterDataProvidersPassTest extends TestCase
 
     /**
      * Test registering a provider that does not have a type tag set
-     *
-     * @expectedException \InvalidArgumentException
      */
     public function testProcessWithProviderWithoutTypeTag()
     {
@@ -103,6 +101,7 @@ class RegisterDataProvidersPassTest extends TestCase
             );
 
         $compilerPass = new RegisterDataProvidersPass();
+        $this->expectException(\InvalidArgumentException::class);
         $compilerPass->process($containerMock);
     }
 

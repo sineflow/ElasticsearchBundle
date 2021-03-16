@@ -16,7 +16,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
      */
     private $documentParser;
 
-    public function setUp()
+    public function setUp(): void
     {
         $reader = new AnnotationReader;
         $locator = $this->getContainer()->get('sfes.document_locator');

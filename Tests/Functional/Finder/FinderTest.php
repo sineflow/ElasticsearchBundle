@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Finder;
 
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Finder\Adapter\KnpPaginatorAdapter;
 use Sineflow\ElasticsearchBundle\Result\DocumentIterator;
@@ -14,6 +15,8 @@ use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Custo
  */
 class FinderTest extends AbstractElasticsearchTestCase
 {
+    use ArraySubsetAsserts;
+
     /**
      * {@inheritdoc}
      */
@@ -66,7 +69,7 @@ class FinderTest extends AbstractElasticsearchTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

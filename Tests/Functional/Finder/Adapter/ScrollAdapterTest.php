@@ -91,7 +91,7 @@ class ScrollAdapterTest extends AbstractElasticsearchTestCase
         $prevId = null;
         while (false !== ($matches = $scrollAdapter->getNextScrollResults())) {
             foreach ($matches as $id => $doc) {
-                $this->assertInternalType('array', $doc);
+                $this->assertIsArray($doc);
                 $this->assertArrayHasKey('title', $doc, 'Document array returned');
                 $this->assertNotEquals($prevId, $id, 'Document returned is the same as the previous one');
                 $i++;
@@ -118,7 +118,7 @@ class ScrollAdapterTest extends AbstractElasticsearchTestCase
         while (false !== ($matches = $scrollAdapter->getNextScrollResults())) {
             $this->assertArrayHasKey('hits', $matches, 'Raw results returned');
             foreach ($matches['hits']['hits'] as $doc) {
-                $this->assertInternalType('array', $doc);
+                $this->assertIsArray($doc);
                 $this->assertArrayHasKey('_id', $doc, 'Document array returned');
                 $this->assertEquals($doc['_id'], $doc['sort'][0], 'The correct sort order is not applied');
                 $this->assertNotEquals($prevId, $doc['_id'], 'Document returned is the same as the previous one');

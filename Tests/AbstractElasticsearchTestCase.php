@@ -18,7 +18,7 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->getContainer();
     }

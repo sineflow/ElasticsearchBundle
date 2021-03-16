@@ -2,8 +2,10 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Result;
 
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Sineflow\ElasticsearchBundle\Document\MLProperty;
 use Sineflow\ElasticsearchBundle\Exception\DocumentConversionException;
+use Sineflow\ElasticsearchBundle\Result\DocumentConverter;
 use Sineflow\ElasticsearchBundle\Result\ObjectIterator;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\ObjCategory;
@@ -11,6 +13,8 @@ use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Produ
 
 class DocumentConverterTest extends AbstractContainerAwareTestCase
 {
+    use ArraySubsetAsserts;
+
     private $fullDocArray = [
         '_id' => 'doc1',
         'title' => 'Foo Product',
@@ -257,6 +261,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
                 ],
         ];
 
+        /** @var DocumentConverter $converter */
         $converter = $this->getContainer()->get('sfes.document_converter');
 
         /** @var Product $product */

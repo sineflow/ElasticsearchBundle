@@ -56,8 +56,8 @@ class DocumentConverter
                 break;
 
             case isset($rawData['fields']):
-                $data = array_map('reset', $rawData['fields']);
-                /** Check for partial fields as well (@see https://www.elastic.co/guide/en/elasticsearch/reference/1.4/search-request-fields.html) */
+                $data = array_map('current', $rawData['fields']);
+                /** Check for returned fields as well (@see https://www.elastic.co/guide/en/elasticsearch/reference/7.11/search-fields.html#docvalue-fields) */
                 // TODO: when partial fields of nested objects are selected, partial objects should be constructed
                 foreach ($data as $key => $field) {
                     if (is_array($field)) {

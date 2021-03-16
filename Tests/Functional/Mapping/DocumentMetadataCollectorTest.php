@@ -417,7 +417,7 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
         'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\Product',
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->indexManagers = $this->getContainer()->getParameter('sfes.indices');
         $this->docLocator    = $this->getContainer()->get('sfes.document_locator');

@@ -18,7 +18,7 @@ abstract class AbstractContainerAwareTestCase extends KernelTestCase
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cachedContainer = null;
     }

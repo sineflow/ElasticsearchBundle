@@ -94,8 +94,6 @@ class PropertyTest extends TestCase
 
     /**
      * Test that exception is thrown when language is specified but there are no index analyzers set
-     *
-     * @expectedException \InvalidArgumentException
      */
     public function testDumpNoAnalyzersException()
     {
@@ -114,13 +112,12 @@ class PropertyTest extends TestCase
             'language' => 'en',
         ];
 
+        $this->expectException(\InvalidArgumentException::class);
         $type->dump($settings);
     }
 
     /**
      * Test that exception is thrown when no default language analyzer is set
-     *
-     * @expectedException \LogicException
      */
     public function testDumpNoDefaultException()
     {
@@ -144,6 +141,7 @@ class PropertyTest extends TestCase
             ],
         ];
 
+        $this->expectException(\LogicException::class);
         $type->dump($settings);
     }
 }
