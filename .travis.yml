@@ -23,6 +23,7 @@ before_script:
   - export XDEBUG_MODE=coverage
 
 script:
+  - wget -q --waitretry=1 --retry-connrefused -T 10 -O - http://127.0.0.1:9200
   - vendor/bin/simple-phpunit --coverage-clover=Tests/App/build/clover.xml 2>/dev/null
   - vendor/bin/phpcs -np --standard=PSR2 --ignore=vendor/,Tests/App/,var/ ./
 

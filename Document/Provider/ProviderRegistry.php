@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
- * References persistence providers for each index and type.
+ * References persistence providers for each index.
  */
 class ProviderRegistry implements ContainerAwareInterface
 {
@@ -53,9 +53,9 @@ class ProviderRegistry implements ContainerAwareInterface
 
 
     /**
-     * Registers a provider service for the specified type entity.
+     * Registers a provider service for the specified document class.
      *
-     * @param string $documentClass The FQN or alias to the type entity
+     * @param string $documentClass The FQN or alias to the document class
      * @param string $providerId    The provider service id
      */
     public function addProvider(string $documentClass, string $providerId) : void
@@ -64,9 +64,9 @@ class ProviderRegistry implements ContainerAwareInterface
     }
 
     /**
-     * Unsets registered provider for the specified type entity.
+     * Unsets registered provider for the specified document class.
      *
-     * @param string $documentClass The FQN or alias to the type entity
+     * @param string $documentClass The FQN or alias to the document class
      */
     public function removeProvider(string $documentClass) : void
     {
@@ -74,9 +74,9 @@ class ProviderRegistry implements ContainerAwareInterface
     }
 
     /**
-     * Gets registered provider service id for the specified type entity.
+     * Gets registered provider service id for the specified document class.
      *
-     * @param string $documentClass The FQN or alias to the type entity
+     * @param string $documentClass The FQN or alias to the document class
      *
      * @return string|null
      */
@@ -88,13 +88,13 @@ class ProviderRegistry implements ContainerAwareInterface
     }
 
     /**
-     * Gets the provider for a type.
+     * Gets the provider for a document class.
      *
      * @param string $documentClass FQN or alias (e.g App:Entity)
      *
      * @return ProviderInterface
      *
-     * @throws \InvalidArgumentException if no provider was registered for the type
+     * @throws \InvalidArgumentException if no provider was registered for the document class
      */
     public function getProviderInstance(string $documentClass) : ProviderInterface
     {

@@ -38,10 +38,10 @@ abstract class AbstractDoctrineProvider extends AbstractProvider
     protected $sourceDataHydration = AbstractQuery::HYDRATE_OBJECT;
 
     /**
-     * @param string                 $documentClass The type the provider is for
+     * @param string                 $documentClass The document class the provider is for
      * @param EntityManagerInterface $em            The Doctrine entity manager
      */
-    public function __construct($documentClass, EntityManagerInterface $em)
+    public function __construct(string $documentClass, EntityManagerInterface $em)
     {
         parent::__construct($documentClass);
         $this->em = $em;
@@ -50,7 +50,7 @@ abstract class AbstractDoctrineProvider extends AbstractProvider
     /**
      * @param int $batchSize
      */
-    public function setBatchSize($batchSize)
+    public function setBatchSize(int $batchSize)
     {
         $this->batchSize = $batchSize;
     }
@@ -60,7 +60,7 @@ abstract class AbstractDoctrineProvider extends AbstractProvider
      *
      * @return Query
      */
-    abstract public function getQuery();
+    abstract public function getQuery(): Query;
 
     /**
      * Converts a Doctrine entity to Elasticsearch entity

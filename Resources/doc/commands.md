@@ -12,7 +12,7 @@ Creates a new index in Elasticsearch for the specified manager with the configur
 
 Command name: `sineflow:es:index:build <index_manager_name>`
 
-Rebuilds the data in the specified index, using the configured data providers for each type in the index.  If no data providers are configured, by default a *self* provider is registered for each type, so the index would be rebuilt from itself - useful when mapping has changed and you need to update it.
+Rebuilds the data in the specified index, using the configured data provider. If no data provider is configured, by default a *self* provider is registered, so the index would be rebuilt from itself - useful when mapping has changed, and you need to update it.
 
 An important thing to note is that currently this command will only work if you have set `use_aliases: true` in your index configuration. What it does is, it creates a new index and points the *write* alias to it, as well as to the old one.
 When building the new index is complete without errors, both read and write aliases are pointed to it and removed from the old one.

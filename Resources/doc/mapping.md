@@ -4,7 +4,7 @@ The Elasticsearch bundle requires document mapping definitions to create the cor
 
 ## Document class annotations
 
-Elasticsearch type mappings are defined using annotations within document entity classes that implement DocumentInterface:
+Elasticsearch index mappings are defined using annotations within document entity classes that implement DocumentInterface:
 ```php
 <?php
 namespace App\Document;
@@ -45,8 +45,6 @@ repositoryClass="App\Document\Repository\ProductRepository"
 Each field within the document is specified using the `@ES\Property` annotation. The following properties are supported inside that annotation:
 
 - `name` Specifies the name of the field (required).
-
-- `type` Specifies the type of the field in Elasticsearch (required).
 
 - `multilanguage` A flag that specifies whether the field will be multilanguage. For more information, see [declaring multilanguage properties](#mlproperties).
 ```

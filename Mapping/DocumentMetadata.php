@@ -41,11 +41,11 @@ class DocumentMetadata
     }
 
     /**
-     * Retrieves type mapping for the Elasticsearch client
+     * Retrieves index mapping for the Elasticsearch client
      *
      * @return array
      */
-    public function getClientMapping()
+    public function getClientMapping(): array
     {
         $mapping = array_filter(
             array_merge(
@@ -64,7 +64,7 @@ class DocumentMetadata
     /**
      * @return array
      */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->metadata['properties'];
     }
@@ -72,7 +72,7 @@ class DocumentMetadata
     /**
      * @return array
      */
-    public function getPropertiesMetadata()
+    public function getPropertiesMetadata(): array
     {
         return $this->metadata['propertiesMetadata'];
     }
@@ -80,7 +80,7 @@ class DocumentMetadata
     /**
      * @return array
      */
-    public function getFields()
+    public function getFields(): array
     {
         return $this->metadata['fields'];
     }
@@ -88,7 +88,7 @@ class DocumentMetadata
     /**
      * @return string|null
      */
-    public function getRepositoryClass()
+    public function getRepositoryClass(): ?string
     {
         return $this->metadata['repositoryClass'];
     }
@@ -96,16 +96,8 @@ class DocumentMetadata
     /**
      * @return string
      */
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->metadata['className'];
-    }
-
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->metadata['type'];
     }
 }

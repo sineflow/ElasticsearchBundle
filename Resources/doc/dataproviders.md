@@ -4,7 +4,7 @@ Simply put, data providers are the sources of data for your Elasticsearch indice
 
 By default, each index is assigned a default *self* data provider (`ElasticsearchProvider`), which retrieves the data from the Elasticsearch index itself. This is useful when you want to rebuild the index (like if you changed the mapping and want to update it).
 
-In order to define your own custom data provider for a certain type, you have to create a service that implements `ProviderInterface` and tag it as `sfes.provider`, specifying the entity it is for in the `type` argument:
+In order to define your own custom data provider for an index, you have to create a service that implements `ProviderInterface` and tag it as `sfes.provider`, specifying the entity it is for in the `type` argument:
 
 ```
 services:

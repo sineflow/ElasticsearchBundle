@@ -39,7 +39,7 @@ $productsCount = $repo->count($searchBody);
 
 ## Searching in multiple types and indices
 
-It is convenient to search in a single type as shown above, but sometime you may wish to search in multiple indices and/or types. The finder service comes in play:
+It is convenient to search in a single index as shown above, but sometime you may wish to search in multiple indices. The finder service comes in play:
 
 ```php
 $finder = $this->get('sfes.finder');

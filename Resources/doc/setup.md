@@ -51,7 +51,7 @@ sineflow_elasticsearch:
 
 > This is the very basic example only, for a more detailed description of configuration options, please take a look at the [configuration](configuration.md) chapter.
 
-A couple of things to note in this example: `dev_customer` is the name of the physical index in Elasticsearch and `App:Customer` represents the class where the document type mapping is defined. (more info at [the mapping chapter](mapping.md)).
+A couple of things to note in this example: `dev_customer` is the name of the physical index in Elasticsearch and `App:Customer` represents the class where the document mapping is defined. (more info at [the mapping chapter](mapping.md)).
 
 
 ### Step 4: Define your Elasticsearch types as `Document` objects

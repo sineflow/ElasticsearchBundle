@@ -10,14 +10,14 @@ use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 abstract class AbstractProvider implements ProviderInterface
 {
     /**
-     * @var string The type the provider is for
+     * @var string The document class the provider is for
      */
     private $documentClass;
 
     /**
-     * @param string $documentClass The type the provider is for
+     * @param string $documentClass The document class the provider is for
      */
-    public function __construct($documentClass)
+    public function __construct(string $documentClass)
     {
         $this->documentClass = $documentClass;
     }

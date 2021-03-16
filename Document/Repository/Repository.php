@@ -31,7 +31,7 @@ class Repository
     protected $finder;
 
     /**
-     * The type metadata
+     * The document metadata
      *
      * @var DocumentMetadata
      */

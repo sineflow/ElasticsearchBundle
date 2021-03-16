@@ -30,7 +30,7 @@ class DocumentConverter
      * @param DocumentMetadataCollector $metadataCollector
      * @param string                    $languageSeparator
      */
-    public function __construct(DocumentMetadataCollector $metadataCollector, $languageSeparator)
+    public function __construct(DocumentMetadataCollector $metadataCollector, string $languageSeparator)
     {
         $this->metadataCollector = $metadataCollector;
         $this->languageSeparator = $languageSeparator;
@@ -45,7 +45,7 @@ class DocumentConverter
      *
      * @return DocumentInterface
      */
-    public function convertToDocument($rawData, $documentClass)
+    public function convertToDocument(array $rawData, string $documentClass)
     {
         // Get document metadata
         $metadata = $this->metadataCollector->getDocumentMetadata($documentClass);
@@ -94,7 +94,7 @@ class DocumentConverter
      *
      * @return ObjectInterface
      */
-    public function assignArrayToObject(array $array, ObjectInterface $object, array $propertiesMetadata)
+    public function assignArrayToObject(array $array, ObjectInterface $object, array $propertiesMetadata): ObjectInterface
     {
         foreach ($propertiesMetadata as $esField => $propertyMetadata) {
             // Skip fields from the mapping that have no value set, unless they are multilanguage fields
@@ -160,8 +160,10 @@ class DocumentConverter
      * @param array           $propertiesMetadata
      *
      * @return array
+     *
+     * @throws \ReflectionException
      */
-    public function convertToArray(ObjectInterface $object, $propertiesMetadata = [])
+    public function convertToArray(ObjectInterface $object, $propertiesMetadata = []): array
     {
         if (empty($propertiesMetadata)) {
             $propertiesMetadata = $this->metadataCollector->getObjectPropertiesMetadata(get_class($object));
@@ -209,18 +211,18 @@ class DocumentConverter
     }
 
     /**
-     * Check if object is the correct type
+     * Check if object is the correct class
      *
      * @param ObjectInterface $object
-     * @param array           $expectedClass
+     * @param string          $expectedClass
      *
      * @throws \InvalidArgumentException
      */
-    private function checkObjectType(ObjectInterface $object, $expectedClass)
+    private function checkObjectType(ObjectInterface $object, string $expectedClass)
     {
         if (get_class($object) !== $expectedClass) {
             throw new \InvalidArgumentException(
-                sprintf('Expected object of type "%s", got "%s"', $expectedClass, get_class($object))
+                sprintf('Expected object of "%s", got "%s"', $expectedClass, get_class($object))
             );
         }
     }

@@ -23,7 +23,7 @@ class ElasticsearchProvider extends AbstractProvider
     protected $sourceIndexManager;
 
     /**
-     * @var string The type the data is coming from
+     * @var string The document class the data is coming from
      */
     protected $sourceDocumentClass;
 
@@ -38,13 +38,17 @@ class ElasticsearchProvider extends AbstractProvider
     protected $chunkSize = 500;
 
     /**
-     * @param string                    $documentClass       The type the provider is for
+     * @param string                    $documentClass       The document class the provider is for
      * @param DocumentMetadataCollector $metadataCollector   The metadata collector
      * @param IndexManager              $sourceIndexManager  The index manager of the data source
-     * @param string                    $sourceDocumentClass The type the data is coming from
+     * @param string                    $sourceDocumentClass The document class the data is coming from
      */
-    public function __construct($documentClass, DocumentMetadataCollector $metadataCollector, IndexManager $sourceIndexManager, $sourceDocumentClass)
-    {
+    public function __construct(
+        string $documentClass,
+        DocumentMetadataCollector $metadataCollector,
+        IndexManager $sourceIndexManager,
+        string $sourceDocumentClass
+    ) {
         parent::__construct($documentClass);
         $this->sourceIndexManager = $sourceIndexManager;
         $this->metadataCollector = $metadataCollector;
@@ -87,7 +91,7 @@ class ElasticsearchProvider extends AbstractProvider
      *
      * @return array
      */
-    public function getDocument($id)
+    public function getDocument($id): array
     {
         $params = [
             'index' => $this->sourceIndexManager->getLiveIndex(),
