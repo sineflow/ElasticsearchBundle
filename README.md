@@ -2,12 +2,11 @@
 
 ![License](https://img.shields.io/github/license/sineflow/elasticsearchbundle.svg) [![Latest Stable Version](https://img.shields.io/github/release/sineflow/elasticsearchbundle.svg)](https://packagist.org/packages/sineflow/elasticsearch-bundle) [![Build Status](https://travis-ci.org/sineflow/ElasticsearchBundle.svg?branch=master)](https://travis-ci.org/sineflow/ElasticsearchBundle) [![Coverage Status](https://coveralls.io/repos/sineflow/ElasticsearchBundle/badge.svg?branch=master&service=github)](https://coveralls.io/github/sineflow/ElasticsearchBundle?branch=master) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/e15da9f2-32b4-4ede-ade6-20f93f8ba076/mini.png)](https://insight.sensiolabs.com/projects/e15da9f2-32b4-4ede-ade6-20f93f8ba076)
 
-This bundle was initially based on the Elasticsearch bundle by ONGR.io, however a different vision about how some things are handled, and some additional core requirements eventually turned it into a separate project.
+Originally a fork of ongr/elasticsearch-bundle, now a project of its own.
 
 ## Key points
 
 - Uses the official [elasticsearch-php](https://github.com/elastic/elasticsearch-php) client
-- Integrates with Symfony 3.4+
 - Uses Doctrine-like entity declarations for Elasticsearch documents
 - Supports multilanguage documents
 - Supports searching in multiple indices
@@ -20,12 +19,13 @@ Installation instructions and documentation of the bundle can be found [here](Re
 
 ## Version matrix
 
-| Elasticsearch version | ElasticsearchBundle version |
-| --------------------- | --------------------------- |
-| >= 6.2                | ~6.2                        |
-| >= 6.0, < 6.2         | ~6.1.0                      |
-| >= 5.0, < 6.0         | ~5.0                        |
-| >= 2.0, < 5.0         | >= 0.9, < 1.0               |
+| ElasticsearchBundle | Elasticsearch  | Symfony     | PHP         |
+| ------------------- | -------------- | ----------- | ----------- |
+| ~7.0                | >= 7.0         | 4.4+ / 5.0+ | 7.3+ / 8.0+ |
+| ~6.2                | >= 6.2, < 7.0  | 3.4+ / 4.0+ | 7.3+        |
+| ~6.1.0              | >= 6.0, < 6.2  |             |             |
+| ~5.0                | >= 5.0, < 6.0  |             |             |
+| >= 0.9, < 1.0       | >= 2.0, < 5.0  |             |             |
 
 ## Breaking changes in version 5
 - Finder::ADAPTER_SCANSCROLL renamed to Finder::ADAPTER_SCROLL

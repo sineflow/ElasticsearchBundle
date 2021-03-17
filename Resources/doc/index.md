@@ -1,6 +1,6 @@
 ## What is it?
 
-The ElasticsearchBundle uses the [official PHP client for Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/client/php-api/current/index.html) to allow for easy integration of Elasticsearch into Symfony2 applications. 
+The ElasticsearchBundle uses the [official PHP client for Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/client/php-api/current/index.html) to allow for easy integration of Elasticsearch into Symfony applications.
 
 #### Getting started
 * [Setup](setup.md)

@@ -6,7 +6,7 @@
 Assuming you have [Composer](https://getcomposer.org) installed globally, enter your project directory and execute the following command to download the latest stable version of this bundle:
 
 ```
-$ composer require sineflow/elasticsearch-bundle "~0.4"
+$ composer require sineflow/elasticsearch-bundle "^7.0"
 ```
 
 > NOTE: Replace version accordingly. Latest release is [![Latest Stable Version](https://poser.pugx.org/sineflow/elasticsearch-bundle/v/stable)](https://packagist.org/packages/sineflow/elasticsearch-bundle)
