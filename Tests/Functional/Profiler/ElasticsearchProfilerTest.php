@@ -82,10 +82,6 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
      */
     public function testCorrectDataLogged()
     {
-        $this->markTestSkipped(
-            'Skipped until this is fixed: https://github.com/elastic/elasticsearch-php/issues/1113'
-        );
-
         $imWithoutAliases = $this->getIndexManager('bar');
         $imWithoutAliases->getConnection()->setAutocommit(true);
         $imWithoutAliases->getRepository()->getById(3);
@@ -100,8 +96,8 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
 
         $this->assertArraySubset(
             [
-                "curlRequest" => "curl -XPOST 'http://".implode(':', $esHostAndPort)."/sineflow-esb-test-bar/_search?pretty=true' -d '{\"query\":{\"ids\":{\"values\":[3]}},\"version\":true}'",
-                "senseRequest" => "POST /sineflow-esb-test-bar/_search\n{\"query\":{\"ids\":{\"values\":[3]}},\"version\":true}",
+                "curlRequest" => "curl -XPOST 'http://".implode(':', $esHostAndPort)."/sineflow-esb-test-bar/_search?pretty=true' -d '{\"query\":{\"ids\":{\"values\":[\"3\"]}},\"version\":true}'",
+                "senseRequest" => "POST /sineflow-esb-test-bar/_search\n{\"query\":{\"ids\":{\"values\":[\"3\"]}},\"version\":true}",
                 "backtrace" => null,
                 "scheme" => "http",
                 "host" => $esHostAndPort[0],
