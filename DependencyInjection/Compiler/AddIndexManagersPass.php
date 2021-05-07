@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\DependencyInjection\Compiler;
 
+use Sineflow\ElasticsearchBundle\Manager\IndexManagerInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -48,10 +49,14 @@ class AddIndexManagersPass implements CompilerPassInterface
                 ]
             );
 
+            $indexManagerId = sprintf('sfes.index.%s', $indexManagerName);
             $container->setDefinition(
-                sprintf('sfes.index.%s', $indexManagerName),
+                $indexManagerId,
                 $indexManagerDefinition
             )->setPublic(true);
+
+            // Allow autowiring of index managers based on the argument name
+            $container->registerAliasForArgument($indexManagerId, IndexManagerInterface::class, $indexManagerName . 'IndexManager');
         }
     }
 }

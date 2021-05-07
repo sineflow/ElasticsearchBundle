@@ -23,7 +23,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * Manager class.
  */
-class IndexManager
+class IndexManager implements IndexManagerInterface
 {
     /**
      * @var string The unique manager name (the key from the index configuration)
