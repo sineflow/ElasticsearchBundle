@@ -8,7 +8,6 @@ parameters:
     sfes.mlproperty.language_separator: '-'
 
     sfes.provider_self.class: Sineflow\ElasticsearchBundle\Document\Provider\ElasticsearchProvider
-    sfes.index_manager.class: Sineflow\ElasticsearchBundle\Manager\IndexManager
 
 services:
     _defaults:
@@ -33,15 +32,20 @@ services:
         calls:
             - [ setContainer, [ '@Symfony\Component\DependencyInjection\ContainerInterface' ]]
 
-    Sineflow\ElasticsearchBundle\Manager\IndexManagerFactory:
+    Sineflow\ElasticsearchBundle\Manager\IndexManager:
+        abstract: true
         arguments:
+            - # manager name
+            - # index settings
+            - # connection
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector'
             - '@Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry'
             - '@Sineflow\ElasticsearchBundle\Finder\Finder'
             - '@Sineflow\ElasticsearchBundle\Result\DocumentConverter'
-            - '%sfes.mlproperty.language_separator%'
         calls:
             - [setEventDispatcher, ['@event_dispatcher']]
+
+    Sineflow\ElasticsearchBundle\Manager\IndexManagerInterface: '@Sineflow\ElasticsearchBundle\Manager\IndexManager'
 
     Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry:
         arguments:

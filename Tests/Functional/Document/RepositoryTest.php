@@ -5,7 +5,7 @@ namespace Functional\Document;
 use Jchook\AssertThrows\AssertThrows;
 use Sineflow\ElasticsearchBundle\Document\Repository\Repository;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
-use Sineflow\ElasticsearchBundle\Manager\IndexManager;
+use Sineflow\ElasticsearchBundle\Manager\IndexManagerInterface;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product;
@@ -21,7 +21,7 @@ class RepositoryTest extends AbstractElasticsearchTestCase
     private $repository;
 
     /**
-     * @var IndexManager
+     * @var IndexManagerInterface
      */
     private $indexManager;
 
@@ -82,7 +82,7 @@ class RepositoryTest extends AbstractElasticsearchTestCase
 
     public function testGetIndexManager()
     {
-        $this->assertInstanceOf(IndexManager::class, $this->repository->getIndexManager());
+        $this->assertInstanceOf(IndexManagerInterface::class, $this->repository->getIndexManager());
     }
 
     public function testGetById()

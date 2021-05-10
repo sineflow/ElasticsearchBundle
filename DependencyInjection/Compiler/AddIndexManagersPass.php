@@ -4,10 +4,9 @@ namespace Sineflow\ElasticsearchBundle\DependencyInjection\Compiler;
 
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Registers index manager service definitions
@@ -31,23 +30,10 @@ class AddIndexManagersPass implements CompilerPassInterface
                 throw new InvalidConfigurationException(sprintf('There is no ES connection with name %s', $indexSettings['connection']));
             }
 
-            $indexManagerClass = $container->getParameter('sfes.index_manager.class');
-            $indexManagerDefinition = new Definition(
-                $indexManagerClass,
-                [
-                    $indexManagerClass,
-                    $indexManagerName,
-                    $container->findDefinition($connectionService),
-                    $indexSettings,
-                ]
-            );
-
-            $indexManagerDefinition->setFactory(
-                [
-                    new Reference('sfes.index_manager_factory'),
-                    'createManager',
-                ]
-            );
+            $indexManagerDefinition = new ChildDefinition(IndexManagerInterface::class);
+            $indexManagerDefinition->replaceArgument(0, $indexManagerName);
+            $indexManagerDefinition->replaceArgument(1, $indexSettings);
+            $indexManagerDefinition->replaceArgument(2, $container->findDefinition($connectionService));
 
             $indexManagerId = sprintf('sfes.index.%s', $indexManagerName);
             $container->setDefinition(

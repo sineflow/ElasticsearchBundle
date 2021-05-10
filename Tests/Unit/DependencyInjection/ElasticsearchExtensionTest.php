@@ -7,7 +7,6 @@ use Sineflow\ElasticsearchBundle\DependencyInjection\SineflowElasticsearchExtens
 use Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManagerFactory;
-use Sineflow\ElasticsearchBundle\Manager\IndexManagerFactory;
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
@@ -179,7 +178,6 @@ class ElasticsearchExtensionTest extends TestCase
         $expectedServiceDefinitions = [
             DocumentConverter::class,
             ProviderRegistry::class,
-            IndexManagerFactory::class,
             IndexManagerRegistry::class,
             Finder::class,
             DocumentLocator::class,

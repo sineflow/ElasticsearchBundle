@@ -4,7 +4,6 @@ services:
 
     sfes.document_converter: '@Sineflow\ElasticsearchBundle\Result\DocumentConverter'
     sfes.provider_registry: '@Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry'
-    sfes.index_manager_factory: '@Sineflow\ElasticsearchBundle\Manager\IndexManagerFactory'
     sfes.index_manager_registry: '@Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry'
     sfes.finder: '@Sineflow\ElasticsearchBundle\Finder\Finder'
     sfes.document_locator: '@Sineflow\ElasticsearchBundle\Mapping\DocumentLocator'

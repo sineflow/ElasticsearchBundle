@@ -4,7 +4,7 @@ namespace Sineflow\ElasticsearchBundle\Document\Repository;
 
 use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
-use Sineflow\ElasticsearchBundle\Manager\IndexManager;
+use Sineflow\ElasticsearchBundle\Manager\IndexManagerInterface;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadata;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 
@@ -14,7 +14,7 @@ use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 class Repository
 {
     /**
-     * @var IndexManager
+     * @var IndexManagerInterface
      */
     private $indexManager;
 
@@ -45,12 +45,12 @@ class Repository
     /**
      * Constructor.
      *
-     * @param IndexManager              $indexManager
+     * @param IndexManagerInterface     $indexManager
      * @param string                    $documentClass
      * @param Finder                    $finder
      * @param DocumentMetadataCollector $metadataCollector
      */
-    public function __construct(IndexManager $indexManager, string $documentClass, Finder $finder, DocumentMetadataCollector $metadataCollector)
+    public function __construct(IndexManagerInterface $indexManager, string $documentClass, Finder $finder, DocumentMetadataCollector $metadataCollector)
     {
         $this->indexManager = $indexManager;
         $this->documentClass = $documentClass;
@@ -68,9 +68,9 @@ class Repository
     /**
      * Returns elasticsearch manager used in the repository.
      *
-     * @return IndexManager
+     * @return IndexManagerInterface
      */
-    public function getIndexManager(): IndexManager
+    public function getIndexManager(): IndexManagerInterface
     {
         return $this->indexManager;
     }

@@ -101,12 +101,12 @@ class IndexManager implements IndexManagerInterface
      */
     public function __construct(
         string $managerName,
+        array $indexSettings,
         ConnectionManager $connection,
         DocumentMetadataCollector $metadataCollector,
         ProviderRegistry $providerRegistry,
         Finder $finder,
-        DocumentConverter $documentConverter,
-        array $indexSettings
+        DocumentConverter $documentConverter
     ) {
         $this->managerName = $managerName;
         $this->connection = $connection;
@@ -768,7 +768,7 @@ class IndexManager implements IndexManagerInterface
      *
      * @return string
      */
-    protected function getDocumentClass(): string
+    public function getDocumentClass(): string
     {
         return $this->metadataCollector->getDocumentMetadata($this->indexSettings['class'])->getClassName();
     }
