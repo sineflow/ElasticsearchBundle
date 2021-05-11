@@ -3,6 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Command;
 
 use Sineflow\ElasticsearchBundle\Command\IndexCreateCommand;
+use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -82,7 +83,7 @@ class IndexCreateCommandTest extends AbstractCommandTestCase
      */
     protected function getCommand()
     {
-        $registry = $this->getContainer()->get('sfes.index_manager_registry');
+        $registry = $this->getContainer()->get(IndexManagerRegistry::class);
         $command = new IndexCreateCommand($registry);
 
         return $command;

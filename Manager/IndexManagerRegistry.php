@@ -39,7 +39,7 @@ class IndexManagerRegistry implements ContainerAwareInterface
      *
      * @throws InvalidIndexManagerException If service does not exist or is the wrong class
      */
-    public function get(string $name)
+    public function get(string $name): IndexManagerInterface
     {
         $serviceName = sprintf('sfes.index.%s', $name);
         if (!$this->container->has($serviceName)) {

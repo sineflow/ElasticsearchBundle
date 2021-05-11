@@ -112,7 +112,7 @@ class FinderTest extends AbstractElasticsearchTestCase
     public function testGetById()
     {
         /** @var Finder $finder */
-        $finder = $this->getContainer()->get('sfes.finder');
+        $finder = $this->getContainer()->get(Finder::class);
 
         $docAsObject = $finder->get(Product::class, 'doc1');
         $this->assertInstanceOf(Product::class, $docAsObject);
@@ -135,7 +135,7 @@ class FinderTest extends AbstractElasticsearchTestCase
 
     public function testGetByIdWhenHavingAnotherReadOnlyIndex()
     {
-        $finder = $this->getContainer()->get('sfes.finder');
+        $finder = $this->getContainer()->get(Finder::class);
 
         $doc = $finder->get(Customer::class, 111);
 
@@ -145,7 +145,7 @@ class FinderTest extends AbstractElasticsearchTestCase
 
     public function testFindInMultipleTypesAndIndices()
     {
-        $finder = $this->getContainer()->get('sfes.finder');
+        $finder = $this->getContainer()->get(Finder::class);
 
         $searchBody = [
             'query' => [
@@ -184,7 +184,7 @@ class FinderTest extends AbstractElasticsearchTestCase
 
     public function testFindForKNPPaginator()
     {
-        $finder = $this->getContainer()->get('sfes.finder');
+        $finder = $this->getContainer()->get(Finder::class);
 
         $searchBody = [
             'query' => [
@@ -206,7 +206,7 @@ class FinderTest extends AbstractElasticsearchTestCase
 
     public function testCount()
     {
-        $finder = $this->getContainer()->get('sfes.finder');
+        $finder = $this->getContainer()->get(Finder::class);
 
         $searchBody = [
             'query' => [
@@ -222,7 +222,7 @@ class FinderTest extends AbstractElasticsearchTestCase
 
     public function testGetTargetIndices()
     {
-        $finder = $this->getContainer()->get('sfes.finder');
+        $finder = $this->getContainer()->get(Finder::class);
 
         $res = $finder->getTargetIndices(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer']);
 

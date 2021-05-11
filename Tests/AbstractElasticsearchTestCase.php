@@ -16,14 +16,6 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
     private $indexManagers = [];
 
     /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        $this->getContainer();
-    }
-
-    /**
      * Can be overwritten in child class to populate elasticsearch index with the data.
      *
      * Example:

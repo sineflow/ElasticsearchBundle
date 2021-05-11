@@ -420,8 +420,8 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
     protected function setUp(): void
     {
         $this->indexManagers = $this->getContainer()->getParameter('sfes.indices');
-        $this->docLocator    = $this->getContainer()->get('sfes.document_locator');
-        $this->docParser     = $this->getContainer()->get('sfes.document_parser');
+        $this->docLocator    = $this->getContainer()->get(DocumentLocator::class);
+        $this->docParser     = $this->getContainer()->get(DocumentParser::class);
         $this->cache         = $this->getContainer()->get('sfes.cache_engine');
 
         $this->metadataCollector = new DocumentMetadataCollector($this->indexManagers, $this->docLocator, $this->docParser, $this->cache, true);

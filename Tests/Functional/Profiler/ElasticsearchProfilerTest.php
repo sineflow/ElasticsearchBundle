@@ -82,6 +82,10 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
      */
     public function testCorrectDataLogged()
     {
+        $this->markTestSkipped(
+            'Skipped until this is fixed: https://github.com/elastic/elasticsearch-php/issues/1113'
+        );
+
         $imWithoutAliases = $this->getIndexManager('bar');
         $imWithoutAliases->getConnection()->setAutocommit(true);
         $imWithoutAliases->getRepository()->getById(3);
@@ -143,9 +147,9 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
     /**
      * @return ElasticsearchProfiler
      */
-    private function getCollector()
+    private function getCollector(): ElasticsearchProfiler
     {
-        $collector = $this->getContainer()->get('sfes.profiler');
+        $collector = $this->getContainer()->get('test.'.ElasticsearchProfiler::class);
         $collector->collect(new Request(), new Response());
 
         return $collector;

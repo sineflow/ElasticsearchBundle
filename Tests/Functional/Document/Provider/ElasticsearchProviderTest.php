@@ -3,6 +3,7 @@
 namespace Functional\Document\Provider;
 
 use Sineflow\ElasticsearchBundle\Document\Provider\ElasticsearchProvider;
+use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 
 class ElasticsearchProviderTest extends AbstractElasticsearchTestCase
@@ -64,7 +65,7 @@ class ElasticsearchProviderTest extends AbstractElasticsearchTestCase
     {
         return new ElasticsearchProvider(
             'AcmeBarBundle:Product',
-            $this->getContainer()->get('sfes.document_metadata_collector'),
+            $this->getContainer()->get(DocumentMetadataCollector::class),
             $this->getIndexManager('bar'),
             'AcmeBarBundle:Product'
         );

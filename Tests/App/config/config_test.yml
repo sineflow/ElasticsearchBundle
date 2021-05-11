@@ -87,3 +87,8 @@ services:
     sfes.index.blah: # some index manager service that is not actually an index manager
         class: Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\LanguageProvider
         public: true
+
+    # Since the profiler is not used by any service inside the bundle, it is removed from the container unless I explicitly make it public
+    test.Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler:
+        alias: 'Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler'
+        public: true

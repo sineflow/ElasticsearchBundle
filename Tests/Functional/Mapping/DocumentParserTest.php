@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Mapping;
 
+use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentParser;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -19,7 +20,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
     public function setUp(): void
     {
         $reader = new AnnotationReader;
-        $locator = $this->getContainer()->get('sfes.document_locator');
+        $locator = $this->getContainer()->get(DocumentLocator::class);
         $separator = $this->getContainer()->getParameter('sfes.mlproperty.language_separator');
         $this->documentParser = new DocumentParser($reader, $locator, $separator);
         $this->documentParser->setLanguageProvider($this->getContainer()->get('app.es.language_provider'));

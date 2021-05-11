@@ -3,6 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Command;
 
 use Sineflow\ElasticsearchBundle\Command\IndexBuildCommand;
+use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 
 /**
  * Class IndexBuildCommandTest
@@ -47,7 +48,7 @@ class IndexBuildCommandTest extends AbstractCommandTestCase
      */
     protected function getCommand()
     {
-        $registry = $this->getContainer()->get('sfes.index_manager_registry');
+        $registry = $this->getContainer()->get(IndexManagerRegistry::class);
         $command = new IndexBuildCommand($registry);
 
         return $command;

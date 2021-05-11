@@ -5,8 +5,8 @@ namespace Sineflow\ElasticsearchBundle\Tests\Unit\DependencyInjection\Compiler;
 use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\MappingPass;
 use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\RegisterDataProvidersPass;
+use Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * Unit tests for AddConnectionsPass.
@@ -22,7 +22,7 @@ class RegisterDataProvidersPassTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $containerMock->method('hasDefinition')->with('sfes.provider_registry')->willReturn(true);
+        $containerMock->method('hasDefinition')->with(ProviderRegistry::class)->willReturn(true);
 
         $containerMock->expects($this->exactly(1))->method('findTaggedServiceIds')->willReturn(
             [
@@ -33,7 +33,7 @@ class RegisterDataProvidersPassTest extends TestCase
                                 'type' => 'App:MyType',
                             ],
                     ],
-                    'app.es.data_provider.mytype2' =>
+                'app.es.data_provider.mytype2' =>
                     [
                         0 =>
                             [
@@ -48,8 +48,8 @@ class RegisterDataProvidersPassTest extends TestCase
                 $this->returnCallback(
                     function ($parameter) {
                         switch ($parameter) {
-                            case 'sfes.provider_registry':
-                                return new Definition('\Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry');
+                            case ProviderRegistry::class:
+                                return new Definition(ProviderRegistry::class);
                             case 'app.es.data_provider.mytype':
                             case 'app.es.data_provider.mytype2':
                                 return new Definition('\Sineflow\ElasticsearchBundle\Document\Provider\ElasticsearchProvider');
@@ -73,7 +73,7 @@ class RegisterDataProvidersPassTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $containerMock->method('hasDefinition')->with('sfes.provider_registry')->willReturn(true);
+        $containerMock->method('hasDefinition')->with(ProviderRegistry::class)->willReturn(true);
 
         $containerMock->expects($this->exactly(1))->method('findTaggedServiceIds')->willReturn(
             [
@@ -89,8 +89,8 @@ class RegisterDataProvidersPassTest extends TestCase
                 $this->returnCallback(
                     function ($parameter) {
                         switch ($parameter) {
-                            case 'sfes.provider_registry':
-                                return new Definition('\Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry');
+                            case ProviderRegistry::class:
+                                return new Definition(ProviderRegistry::class);
                             case 'app.es.data_provider.notype':
                                 return new Definition('\Sineflow\ElasticsearchBundle\Document\Provider\ElasticsearchProvider');
                             default:
@@ -111,7 +111,7 @@ class RegisterDataProvidersPassTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $containerMock->method('hasDefinition')->with('sfes.provider_registry')->willReturn(true);
+        $containerMock->method('hasDefinition')->with(ProviderRegistry::class)->willReturn(true);
 
         $containerMock->expects($this->exactly(1))->method('findTaggedServiceIds')->willReturn(
             [
@@ -138,7 +138,7 @@ class RegisterDataProvidersPassTest extends TestCase
                 $this->returnCallback(
                     function ($parameter) use ($providerDefinitionMock) {
                         switch ($parameter) {
-                            case 'sfes.provider_registry':
+                            case ProviderRegistry::class:
                                 return $providerDefinitionMock;
                             case 'app.es.data_provider.dummy':
                                 return new Definition('\Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Provider\OrderProvider');

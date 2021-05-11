@@ -5,6 +5,7 @@ namespace Sineflow\ElasticsearchBundle\Tests\Functional\Result;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Sineflow\ElasticsearchBundle\Document\MLProperty;
 use Sineflow\ElasticsearchBundle\Exception\DocumentConversionException;
+use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Sineflow\ElasticsearchBundle\Result\DocumentConverter;
 use Sineflow\ElasticsearchBundle\Result\ObjectIterator;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
@@ -34,8 +35,8 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
 
     public function testAssignArrayToObjectWithNestedSingleValueInsteadOfArray()
     {
-        $converter = $this->getContainer()->get('sfes.document_converter');
-        $metadataCollector = $this->getContainer()->get('sfes.document_metadata_collector');
+        $converter = $this->getContainer()->get('Sineflow\ElasticsearchBundle\Result\DocumentConverter');
+        $metadataCollector = $this->getContainer()->get(DocumentMetadataCollector::class);
 
         // Raw doc with a single object value where an array of objects is expected according to metadata def
         $rawDoc = [
@@ -59,8 +60,8 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
 
     public function testAssignArrayToObjectWithNestedSingleValueArrayInsteadOfSingleValue()
     {
-        $converter = $this->getContainer()->get('sfes.document_converter');
-        $metadataCollector = $this->getContainer()->get('sfes.document_metadata_collector');
+        $converter = $this->getContainer()->get(DocumentConverter::class);
+        $metadataCollector = $this->getContainer()->get(DocumentMetadataCollector::class);
 
         // Raw doc with array of single object where a single object value is expected according to metadata def
         $rawDoc = [
@@ -85,8 +86,8 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
 
     public function testAssignArrayToObjectWithNestedMultiValueArrayInsteadOfSingleValue()
     {
-        $converter = $this->getContainer()->get('sfes.document_converter');
-        $metadataCollector = $this->getContainer()->get('sfes.document_metadata_collector');
+        $converter = $this->getContainer()->get(DocumentConverter::class);
+        $metadataCollector = $this->getContainer()->get(DocumentMetadataCollector::class);
 
         // Raw doc with array of many objects where a single object value is expected according to metadata def
         $rawDoc = [
@@ -117,8 +118,8 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
 
     public function testAssignArrayToObjectWithAllFieldsCorrectlySet()
     {
-        $converter = $this->getContainer()->get('sfes.document_converter');
-        $metadataCollector = $this->getContainer()->get('sfes.document_metadata_collector');
+        $converter = $this->getContainer()->get(DocumentConverter::class);
+        $metadataCollector = $this->getContainer()->get(DocumentMetadataCollector::class);
 
         $rawDoc = $this->fullDocArray;
 
@@ -144,8 +145,8 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
 
     public function testAssignArrayToObjectWithEmptyFields()
     {
-        $converter = $this->getContainer()->get('sfes.document_converter');
-        $metadataCollector = $this->getContainer()->get('sfes.document_metadata_collector');
+        $converter = $this->getContainer()->get(DocumentConverter::class);
+        $metadataCollector = $this->getContainer()->get(DocumentMetadataCollector::class);
 
         $rawDoc = [];
 
@@ -163,8 +164,8 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
 
     public function testAssignArrayToObjectWithEmptyMultipleNestedField()
     {
-        $converter = $this->getContainer()->get('sfes.document_converter');
-        $metadataCollector = $this->getContainer()->get('sfes.document_metadata_collector');
+        $converter = $this->getContainer()->get(DocumentConverter::class);
+        $metadataCollector = $this->getContainer()->get(DocumentMetadataCollector::class);
 
         $rawDoc = [
             'related_categories' => [],
@@ -185,7 +186,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
      */
     public function testConvertToArray(Product $product)
     {
-        $converter = $this->getContainer()->get('sfes.document_converter');
+        $converter = $this->getContainer()->get('Sineflow\ElasticsearchBundle\Result\DocumentConverter');
 
         $arr = $converter->convertToArray($product);
 
@@ -219,7 +220,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
                 ],
         );
 
-        $converter = $this->getContainer()->get('sfes.document_converter');
+        $converter = $this->getContainer()->get('Sineflow\ElasticsearchBundle\Result\DocumentConverter');
 
         /** @var Product $product */
         $product = $converter->convertToDocument($rawFromEs, 'AcmeBarBundle:Product');
@@ -262,7 +263,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         ];
 
         /** @var DocumentConverter $converter */
-        $converter = $this->getContainer()->get('sfes.document_converter');
+        $converter = $this->getContainer()->get(DocumentConverter::class);
 
         /** @var Product $product */
         $product = $converter->convertToDocument($rawFromEs, 'AcmeBarBundle:Product');

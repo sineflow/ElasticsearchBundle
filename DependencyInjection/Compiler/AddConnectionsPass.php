@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\DependencyInjection\Compiler;
 
+use Sineflow\ElasticsearchBundle\Manager\ConnectionManagerFactory;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -32,7 +33,7 @@ class AddConnectionsPass implements CompilerPassInterface
             );
             $connectionDefinition->setFactory(
                 [
-                    new Reference('sfes.connection_factory'),
+                    new Reference(ConnectionManagerFactory::class),
                     'createConnectionManager',
                 ]
             );

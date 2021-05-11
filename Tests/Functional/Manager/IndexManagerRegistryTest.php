@@ -16,7 +16,7 @@ class IndexManagerRegistryTest extends AbstractContainerAwareTestCase
     public function testGet()
     {
         /** @var IndexManagerRegistry $registry */
-        $registry = $this->getContainer()->get('sfes.index_manager_registry');
+        $registry = $this->getContainer()->get(IndexManagerRegistry::class);
 
         $im = $registry->get('customer');
         $this->assertInstanceOf(IndexManagerInterface::class, $im);
@@ -30,7 +30,7 @@ class IndexManagerRegistryTest extends AbstractContainerAwareTestCase
 
     public function testGetByEntity()
     {
-        $registry = $this->getContainer()->get('sfes.index_manager_registry');
+        $registry = $this->getContainer()->get(IndexManagerRegistry::class);
 
         $product = new Product();
         $im = $registry->getByEntity($product);

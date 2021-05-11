@@ -1,5 +1,4 @@
 imports:
-    - { resource: legacy_aliases.yml }
     - { resource: services_commands.yml }
 
 parameters:

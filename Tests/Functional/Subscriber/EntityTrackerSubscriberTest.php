@@ -3,6 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Subscriber;
 
 use Sineflow\ElasticsearchBundle\Finder\Finder;
+use Sineflow\ElasticsearchBundle\Result\DocumentConverter;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Customer;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Log;
@@ -17,7 +18,7 @@ class EntityTrackerSubscriberTest extends AbstractElasticsearchTestCase
      */
     public function testPersistWithSeveralBulkOps()
     {
-        $converter = $this->getContainer()->get('sfes.document_converter');
+        $converter = $this->getContainer()->get(DocumentConverter::class);
 
         $imWithAliases = $this->getIndexManager('customer');
 
@@ -82,7 +83,7 @@ class EntityTrackerSubscriberTest extends AbstractElasticsearchTestCase
         $this->assertEquals(123, $log->id);
 
         // Get the customer from ES by name
-        $finder = $this->getContainer()->get('sfes.finder');
+        $finder = $this->getContainer()->get(Finder::class);
         $searchBody = ['query' => ['match' => ['name' => 'batman']]];
         $docs = $finder->find(['AcmeFooBundle:Customer'], $searchBody, Finder::RESULTS_OBJECT);
         $this->assertCount(1, $docs);

@@ -2,6 +2,8 @@
 
 namespace Sineflow\ElasticsearchBundle\DependencyInjection\Compiler;
 
+use Sineflow\ElasticsearchBundle\LanguageProvider\LanguageProviderInterface;
+use Sineflow\ElasticsearchBundle\Mapping\DocumentParser;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
@@ -30,11 +32,11 @@ class RegisterLanguageProviderPass implements CompilerPassInterface
         // Make sure the class implements LanguageProviderInterface
         $providerClass = $providerDefinition->getClass();
         $reflectionClass = new \ReflectionClass($providerClass);
-        if (!$reflectionClass->implementsInterface('Sineflow\ElasticsearchBundle\LanguageProvider\LanguageProviderInterface')) {
+        if (!$reflectionClass->implementsInterface(LanguageProviderInterface::class)) {
             throw new \InvalidArgumentException(sprintf('Language provider "%s" must implement LanguageProviderInterface.', $providerClass));
         }
 
-        $documentParser = $container->findDefinition('sfes.document_parser');
+        $documentParser = $container->findDefinition(DocumentParser::class);
         $documentParser->addMethodCall('setLanguageProvider', [$providerDefinition]);
     }
 }

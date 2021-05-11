@@ -62,8 +62,8 @@ class RepositoryTest extends AbstractElasticsearchTestCase
     {
         parent::setUp();
 
-        $this->finder            = $this->getContainer()->get('sfes.finder');
-        $this->metadataCollector = $this->getContainer()->get('sfes.document_metadata_collector');
+        $this->finder            = $this->getContainer()->get(Finder::class);
+        $this->metadataCollector = $this->getContainer()->get(DocumentMetadataCollector::class);
         $this->indexManager      = $this->getContainer()->get('sfes.index.bar');
 
         $this->indexManager->getConnection()->setAutocommit(true);

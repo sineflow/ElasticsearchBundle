@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\DependencyInjection\Compiler;
 
+use Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
@@ -23,7 +24,7 @@ class RegisterDataProvidersPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $registry = $container->findDefinition('sfes.provider_registry');
+        $registry = $container->findDefinition(ProviderRegistry::class);
         $providers = $container->findTaggedServiceIds('sfes.provider');
 
         foreach ($providers as $providerId => $tags) {

@@ -42,12 +42,12 @@ $productsCount = $repo->count($searchBody);
 It is convenient to search in a single index as shown above, but sometime you may wish to search in multiple indices. The finder service comes in play:
 
 ```php
-$finder = $this->get('sfes.finder');
 $searchBody = [
     'query' => [
         'match_all' => (object) []
     ]
 ];
+/** @var \Sineflow\ElasticsearchBundle\Finder\Finder $finder */
 $finder->find(['App:Product', 'App:Deals'], $searchBody);
 ```
 > You may specify the same options as when using Repository::find(), except you need to specify all entities to search in as the first parameter.
@@ -67,7 +67,7 @@ For more information and documentation, have a look here: [Elasticsearch DSL](ht
 
 ## Paginating results using KNP Paginator
 
-If you want to use [KNP paginator](https://github.com/KnpLabs/KnpPaginatorBundle) to show paginated results, the bundle has integrated support for it. You just need to pass the **Finder::ADAPTER_KNP** flag to the search results type, regardless of whether you are using the find() method of the **sfes.finder** service, or a **Repository** instance:
+If you want to use [KNP paginator](https://github.com/KnpLabs/KnpPaginatorBundle) to show paginated results, the bundle has integrated support for it. You just need to pass the **Finder::ADAPTER_KNP** flag to the search results type, regardless of whether you are using the find() method of the **Finder** service, or a **Repository** instance:
 
 ```php
 // App\Controller\ProductsController::listAction()
@@ -75,7 +75,7 @@ If you want to use [KNP paginator](https://github.com/KnpLabs/KnpPaginatorBundle
 $page = 1;
 $recordsPerPage = 10;
 //...
-$finder = $this->get('sfes.finder');
+/** @var \Sineflow\ElasticsearchBundle\Finder\Finder $finder */
 $results = $finder->find(
     ['App:Product'],
     $searchQuery,
@@ -99,13 +99,13 @@ return $this->render('template.twig', array(
 ## Using scroll to retrieve documents
 
 When you need to retrieve a lot of documents in the most efficient way, using the [Scroll](https://www.elastic.co/guide/en/elasticsearch/reference/5.6/search-request-scroll.html#scroll-search-context) API is the way to go.
-You just need to pass the **Finder::ADAPTER_SCROLL** flag to the search results type, regardless of whether you are using the find() method of the **sfes.finder** service, or a **Repository** instance.
+You just need to pass the **Finder::ADAPTER_SCROLL** flag to the search results type, regardless of whether you are using the find() method of the **Finder** service, or a **Repository** instance.
 That will give you a ScrollAdapter object, instead of actual results.
 Then you can use the adapter's **getNextScrollResults()** method to get the next scroll results until there are no more.
 
 
 ```
-$finder = $this->get('sfes.finder');
+/** @var \Sineflow\ElasticsearchBundle\Finder\Finder $finder */
 $scrollAdapter = $finder->find(
     ['App:Product'],
     $searchQuery,

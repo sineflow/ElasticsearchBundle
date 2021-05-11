@@ -30,11 +30,12 @@ abstract class AbstractContainerAwareTestCase extends KernelTestCase
      *
      * @return ContainerInterface
      */
-    protected function getContainer($kernelOptions = [])
+    protected function getContainer(array $kernelOptions = []): ContainerInterface
     {
         if (!$this->cachedContainer) {
             static::bootKernel($kernelOptions);
-            $this->cachedContainer = static::$kernel->getContainer();
+            // gets the special container that allows fetching private services
+            $this->cachedContainer = static::$container;
         }
 
         return $this->cachedContainer;
