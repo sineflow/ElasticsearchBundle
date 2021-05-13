@@ -1,12 +1,13 @@
 parameters:
     elasticsearch_hosts:
-        - '127.0.0.1:9200'
+        - '192.168.56.115:9200'
 
 # Framework Configuration
 framework:
     translator: { fallbacks: [en] }
     secret: "SUPER-TOP-SECRET"
-    test: ~
+    test: true
+    profiler: { enabled: true }
     router:
         resource: ~
         utf8: true

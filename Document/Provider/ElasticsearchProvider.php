@@ -4,7 +4,7 @@ namespace Sineflow\ElasticsearchBundle\Document\Provider;
 
 use Sineflow\ElasticsearchBundle\Finder\Adapter\ScrollAdapter;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
-use Sineflow\ElasticsearchBundle\Manager\IndexManagerInterface;
+use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 
 /**
@@ -40,13 +40,13 @@ class ElasticsearchProvider extends AbstractProvider
     /**
      * @param string                    $documentClass       The document class the provider is for
      * @param DocumentMetadataCollector $metadataCollector   The metadata collector
-     * @param IndexManagerInterface     $sourceIndexManager  The index manager of the data source
+     * @param IndexManager              $sourceIndexManager  The index manager of the data source
      * @param string                    $sourceDocumentClass The document class the data is coming from
      */
     public function __construct(
         string $documentClass,
         DocumentMetadataCollector $metadataCollector,
-        IndexManagerInterface $sourceIndexManager,
+        IndexManager $sourceIndexManager,
         string $sourceDocumentClass
     ) {
         parent::__construct($documentClass);

@@ -3,7 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Tests;
 
 use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
-use Sineflow\ElasticsearchBundle\Manager\IndexManagerInterface;
+use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 
 /**
  * Base test which creates unique connection to test with.
@@ -11,7 +11,7 @@ use Sineflow\ElasticsearchBundle\Manager\IndexManagerInterface;
 abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestCase
 {
     /**
-     * @var IndexManagerInterface[] Holds used index managers.
+     * @var IndexManager[] Holds used index managers.
      */
     private $indexManagers = [];
 
@@ -43,7 +43,7 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
     /**
      * Populates elasticsearch with data.
      *
-     * @param IndexManagerInterface $indexManager
+     * @param IndexManager $indexManager
      * @param array        $data
      */
     protected function populateElasticsearchWithData($indexManager, array $data)
@@ -83,7 +83,7 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
      * @param string $name        Index manager name
      * @param bool   $createIndex Whether to drop and recreate the index
      *
-     * @return IndexManagerInterface
+     * @return IndexManager
      *
      * @throws \LogicException
      */
@@ -95,7 +95,7 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
             throw new \LogicException(sprintf('Index manager "%s" does not exist', $name));
         }
 
-        /** @var IndexManagerInterface $indexManager */
+        /** @var IndexManager $indexManager */
         $indexManager = $this
             ->getContainer()
             ->get($serviceName);

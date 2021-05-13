@@ -3,7 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Manager;
 
 use Sineflow\ElasticsearchBundle\Exception\InvalidIndexManagerException;
-use Sineflow\ElasticsearchBundle\Manager\IndexManagerInterface;
+use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product;
@@ -19,7 +19,7 @@ class IndexManagerRegistryTest extends AbstractContainerAwareTestCase
         $registry = $this->getContainer()->get(IndexManagerRegistry::class);
 
         $im = $registry->get('customer');
-        $this->assertInstanceOf(IndexManagerInterface::class, $im);
+        $this->assertInstanceOf(IndexManager::class, $im);
 
         $this->expectException(InvalidIndexManagerException::class);
         $im = $registry->get('blah');
@@ -34,7 +34,7 @@ class IndexManagerRegistryTest extends AbstractContainerAwareTestCase
 
         $product = new Product();
         $im = $registry->getByEntity($product);
-        $this->assertInstanceOf(IndexManagerInterface::class, $im);
+        $this->assertInstanceOf(IndexManager::class, $im);
         $this->assertEquals('bar', $im->getManagerName());
     }
 }

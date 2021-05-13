@@ -2,11 +2,12 @@
 
 namespace Sineflow\ElasticsearchBundle\DependencyInjection\Compiler;
 
-use Sineflow\ElasticsearchBundle\Manager\IndexManagerInterface;
+use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Registers index manager service definitions
@@ -30,10 +31,11 @@ class AddIndexManagersPass implements CompilerPassInterface
                 throw new InvalidConfigurationException(sprintf('There is no ES connection with name %s', $indexSettings['connection']));
             }
 
-            $indexManagerDefinition = new ChildDefinition(IndexManagerInterface::class);
+            $indexManagerDefinition = new ChildDefinition('sfes.index_manager_prototype');
             $indexManagerDefinition->replaceArgument(0, $indexManagerName);
             $indexManagerDefinition->replaceArgument(1, $indexSettings);
-            $indexManagerDefinition->replaceArgument(2, $container->findDefinition($connectionService));
+            $indexManagerDefinition->replaceArgument(2, new Reference($connectionService));
+            $indexManagerDefinition->addMethodCall('setEventDispatcher', [new Reference('event_dispatcher')]);
 
             $indexManagerId = sprintf('sfes.index.%s', $indexManagerName);
             $container->setDefinition(
@@ -41,8 +43,8 @@ class AddIndexManagersPass implements CompilerPassInterface
                 $indexManagerDefinition
             )->setPublic(true);
 
-            // Allow autowiring of index managers based on the argument name
-            $container->registerAliasForArgument($indexManagerId, IndexManagerInterface::class, $indexManagerName . 'IndexManager');
+            // Allow auto-wiring of index managers based on the argument name
+            $container->registerAliasForArgument($indexManagerId, IndexManager::class, $indexManagerName . 'IndexManager');
         }
     }
 }

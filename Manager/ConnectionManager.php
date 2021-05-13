@@ -3,6 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Manager;
 
 use Elasticsearch\Client;
+use Elasticsearch\ClientBuilder;
 use Elasticsearch\Common\Exceptions\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Sineflow\ElasticsearchBundle\DTO\BulkQueryItem;
@@ -44,7 +45,12 @@ class ConnectionManager
     /**
      * @var LoggerInterface
      */
-    private $logger = null;
+    private $logger;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $tracer;
 
     /**
      * @var bool
@@ -60,13 +66,11 @@ class ConnectionManager
      * Construct.
      *
      * @param string $connectionName     The unique connection name
-     * @param Client $client             Elasticsearch client.
      * @param array  $connectionSettings Settings array.
      */
-    public function __construct(string $connectionName, Client $client, array $connectionSettings)
+    public function __construct(string $connectionName, array $connectionSettings)
     {
         $this->connectionName = $connectionName;
-        $this->client = $client;
         $this->connectionSettings = $connectionSettings;
         $this->bulkQueries = [];
         $this->bulkParams = [];
@@ -90,6 +94,22 @@ class ConnectionManager
     }
 
     /**
+     * @param LoggerInterface $tracer
+     */
+    public function setTracer(LoggerInterface $tracer)
+    {
+        $this->tracer = $tracer;
+    }
+
+    /**
+     * @return LoggerInterface|null
+     */
+    public function getTracer(): ?LoggerInterface
+    {
+        return $this->tracer;
+    }
+
+    /**
      * @return string
      */
     public function getConnectionName(): string
@@ -102,6 +122,18 @@ class ConnectionManager
      */
     public function getClient(): Client
     {
+        if (!$this->client) {
+            $clientBuilder = ClientBuilder::create();
+            $clientBuilder->setHosts($this->connectionSettings['hosts']);
+            if ($this->tracer) {
+                $clientBuilder->setTracer($this->tracer);
+            }
+            if ($this->logger) {
+                $clientBuilder->setLogger($this->logger);
+            }
+            $this->client = $clientBuilder->build();
+        }
+
         return $this->client;
     }
 
@@ -196,7 +228,7 @@ class ConnectionManager
      *
      * @throws BulkRequestException
      */
-    public function commit($forceRefresh = true)
+    public function commit(bool $forceRefresh = true)
     {
         if (empty($this->bulkQueries)) {
             return;
@@ -270,7 +302,7 @@ class ConnectionManager
             $actionResult = reset($responseItem);
 
             // If there was an error on that item
-            if (!empty($actionResult['error'])) {
+            if (!empty($actionResult['error']) && $this->logger) {
                 $errorsCount++;
                 $this->logger->error(sprintf('Bulk %s item failed', $action), $actionResult);
             }

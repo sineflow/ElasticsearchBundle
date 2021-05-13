@@ -2,7 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Command;
 
-use Sineflow\ElasticsearchBundle\Manager\IndexManagerInterface;
+use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -16,7 +16,7 @@ abstract class AbstractCommandTestCase extends AbstractContainerAwareTestCase
     /**
      * @param string $name
      *
-     * @return IndexManagerInterface
+     * @return IndexManager
      */
     protected function getIndexManager($name)
     {

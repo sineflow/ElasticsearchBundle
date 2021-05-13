@@ -18,6 +18,25 @@ services:
         # if you need to do this, you can override this setting on individual services
         public: false
 
+    sfes.connection_manager_prototype:
+        abstract: true
+        class: Sineflow\ElasticsearchBundle\Manager\ConnectionManager
+        arguments:
+            - # connection name
+            - # connection settings
+
+    sfes.index_manager_prototype:
+        abstract: true
+        class: Sineflow\ElasticsearchBundle\Manager\IndexManager
+        arguments:
+            - # manager name
+            - # index settings
+            - # connection
+            - '@Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector'
+            - '@Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry'
+            - '@Sineflow\ElasticsearchBundle\Finder\Finder'
+            - '@Sineflow\ElasticsearchBundle\Result\DocumentConverter'
+
     Sineflow\ElasticsearchBundle\Result\DocumentConverter:
         arguments:
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector'
@@ -30,21 +49,6 @@ services:
             - '%sfes.provider_self.class%'
         calls:
             - [ setContainer, [ '@Symfony\Component\DependencyInjection\ContainerInterface' ]]
-
-    Sineflow\ElasticsearchBundle\Manager\IndexManager:
-        abstract: true
-        arguments:
-            - # manager name
-            - # index settings
-            - # connection
-            - '@Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector'
-            - '@Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry'
-            - '@Sineflow\ElasticsearchBundle\Finder\Finder'
-            - '@Sineflow\ElasticsearchBundle\Result\DocumentConverter'
-        calls:
-            - [setEventDispatcher, ['@event_dispatcher']]
-
-    Sineflow\ElasticsearchBundle\Manager\IndexManagerInterface: '@Sineflow\ElasticsearchBundle\Manager\IndexManager'
 
     Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry:
         arguments:
@@ -80,14 +84,6 @@ services:
         arguments:
             - '@request_stack'
             - '%sfes.profiler_backtrace_enabled%'
-
-    Sineflow\ElasticsearchBundle\Manager\ConnectionManagerFactory:
-        arguments:
-            - '%kernel.debug%'
-            - '@sfes.logger.trace'
-            - '@sfes.logger.log'
-        calls:
-            - [setEventDispatcher, ['@event_dispatcher']]
 
     Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler:
         calls:

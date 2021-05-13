@@ -8,7 +8,7 @@ use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
 use Sineflow\ElasticsearchBundle\Exception\Exception;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
-use Sineflow\ElasticsearchBundle\Manager\IndexManagerInterface;
+use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Repository\ProductRepository;
@@ -118,7 +118,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
 
     public function testGetLiveIndexWhenNoIndexExists()
     {
-        /** @var IndexManagerInterface $imWithAliases */
+        /** @var IndexManager $imWithAliases */
         $imWithAliases = $this->getIndexManager('customer', false);
 
         $this->expectException(Exception::class);
@@ -127,12 +127,12 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
 
     public function testGetLiveIndex()
     {
-        /** @var IndexManagerInterface $imWithAliases */
+        /** @var IndexManager $imWithAliases */
         $imWithAliases = $this->getIndexManager('customer');
         $liveIndex = $imWithAliases->getLiveIndex();
         $this->assertMatchesRegularExpression('/^sineflow-esb-test-customer_[0-9_]+$/', $liveIndex);
 
-        /** @var IndexManagerInterface $imWithoutAliases */
+        /** @var IndexManager $imWithoutAliases */
         $imWithoutAliases = $this->getIndexManager('bar');
         $liveIndex = $imWithoutAliases->getLiveIndex();
         $this->assertEquals('sineflow-esb-test-bar', $liveIndex);

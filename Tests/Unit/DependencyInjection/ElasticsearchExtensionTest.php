@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\DependencyInjection\SineflowElasticsearchExtension;
 use Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
-use Sineflow\ElasticsearchBundle\Manager\ConnectionManagerFactory;
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
@@ -184,10 +183,11 @@ class ElasticsearchExtensionTest extends TestCase
             DocumentParser::class,
             DocumentMetadataCollector::class,
             CollectionHandler::class,
-            ConnectionManagerFactory::class,
             ElasticsearchProfiler::class,
             KnpPaginateQuerySubscriber::class,
             EntityTrackerSubscriber::class,
+            'sfes.connection_manager_prototype',
+            'sfes.index_manager_prototype',
         ];
         foreach ($expectedServiceDefinitions as $expectedServiceDefinition) {
             $this->assertTrue(

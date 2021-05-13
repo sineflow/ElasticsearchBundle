@@ -35,11 +35,11 @@ class IndexManagerRegistry implements ContainerAwareInterface
      *
      * @param string $name
      *
-     * @return IndexManagerInterface
+     * @return IndexManager
      *
      * @throws InvalidIndexManagerException If service does not exist or is the wrong class
      */
-    public function get(string $name): IndexManagerInterface
+    public function get(string $name): IndexManager
     {
         $serviceName = sprintf('sfes.index.%s', $name);
         if (!$this->container->has($serviceName)) {
@@ -48,8 +48,8 @@ class IndexManagerRegistry implements ContainerAwareInterface
 
         $indexManager = $this->container->get($serviceName);
 
-        if (!$indexManager instanceof IndexManagerInterface) {
-            throw new InvalidIndexManagerException(sprintf('Manager must be instance of [%s], [%s] given', IndexManagerInterface::class, get_class($indexManager)));
+        if (!$indexManager instanceof IndexManager) {
+            throw new InvalidIndexManagerException(sprintf('Manager must be instance of [%s], [%s] given', IndexManager::class, get_class($indexManager)));
         }
 
         return $indexManager;
@@ -60,9 +60,9 @@ class IndexManagerRegistry implements ContainerAwareInterface
      *
      * @param DocumentInterface $entity
      *
-     * @return IndexManagerInterface
+     * @return IndexManager
      */
-    public function getByEntity(DocumentInterface $entity): IndexManagerInterface
+    public function getByEntity(DocumentInterface $entity): IndexManager
     {
         $indexManagerName = $this->metadataCollector->getDocumentClassIndex(get_class($entity));
 
@@ -72,7 +72,7 @@ class IndexManagerRegistry implements ContainerAwareInterface
     /**
      * Get all index manager instances defined
      *
-     * @return \Generator|IndexManagerInterface[]
+     * @return \Generator|IndexManager[]
      */
     public function getAll() : \Generator
     {
