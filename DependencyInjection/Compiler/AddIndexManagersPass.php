@@ -36,12 +36,13 @@ class AddIndexManagersPass implements CompilerPassInterface
             $indexManagerDefinition->replaceArgument(1, $indexSettings);
             $indexManagerDefinition->replaceArgument(2, new Reference($connectionService));
             $indexManagerDefinition->addMethodCall('setEventDispatcher', [new Reference('event_dispatcher')]);
+            $indexManagerDefinition->addTag('sfes.index_manager');
 
             $indexManagerId = sprintf('sfes.index.%s', $indexManagerName);
             $container->setDefinition(
                 $indexManagerId,
                 $indexManagerDefinition
-            )->setPublic(true);
+            );
 
             // Allow auto-wiring of index managers based on the argument name
             $container->registerAliasForArgument($indexManagerId, IndexManager::class, $indexManagerName . 'IndexManager');

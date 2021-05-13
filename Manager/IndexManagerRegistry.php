@@ -5,13 +5,12 @@ namespace Sineflow\ElasticsearchBundle\Manager;
 use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\Exception\InvalidIndexManagerException;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * Class to get defined index manager services
  */
-class IndexManagerRegistry implements ContainerAwareInterface
+class IndexManagerRegistry
 {
     use ContainerAwareTrait;
 
@@ -21,13 +20,20 @@ class IndexManagerRegistry implements ContainerAwareInterface
     private $metadataCollector;
 
     /**
+     * @var iterable<IndexManager>
+     */
+    private $indexManagers;
+
+    /**
      * Constructor
      *
      * @param DocumentMetadataCollector $metadataCollector
+     * @param iterable                  $indexManagers
      */
-    public function __construct(DocumentMetadataCollector $metadataCollector)
+    public function __construct(DocumentMetadataCollector $metadataCollector, iterable $indexManagers)
     {
         $this->metadataCollector = $metadataCollector;
+        $this->indexManagers = $indexManagers;
     }
 
     /**
@@ -41,18 +47,13 @@ class IndexManagerRegistry implements ContainerAwareInterface
      */
     public function get(string $name): IndexManager
     {
-        $serviceName = sprintf('sfes.index.%s', $name);
-        if (!$this->container->has($serviceName)) {
-            throw new InvalidIndexManagerException(sprintf('No manager is defined for [%s] index', $name));
+        foreach ($this->indexManagers as $indexManager) {
+            if ($indexManager->getManagerName() === $name) {
+                return $indexManager;
+            }
         }
 
-        $indexManager = $this->container->get($serviceName);
-
-        if (!$indexManager instanceof IndexManager) {
-            throw new InvalidIndexManagerException(sprintf('Manager must be instance of [%s], [%s] given', IndexManager::class, get_class($indexManager)));
-        }
-
-        return $indexManager;
+        throw new InvalidIndexManagerException(sprintf('No manager is defined for [%s] index', $name));
     }
 
     /**
@@ -72,13 +73,10 @@ class IndexManagerRegistry implements ContainerAwareInterface
     /**
      * Get all index manager instances defined
      *
-     * @return \Generator|IndexManager[]
+     * @return iterable<IndexManager>
      */
-    public function getAll() : \Generator
+    public function getAll(): iterable
     {
-        $indexManagerNames = $this->metadataCollector->getIndexManagersForDocumentClasses();
-        foreach ($indexManagerNames as $indexManagerName) {
-            yield $this->get($indexManagerName);
-        }
+        return $this->indexManagers;
     }
 }

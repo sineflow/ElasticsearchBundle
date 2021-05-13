@@ -37,6 +37,11 @@ services:
             - '@Sineflow\ElasticsearchBundle\Finder\Finder'
             - '@Sineflow\ElasticsearchBundle\Result\DocumentConverter'
 
+    Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry:
+        arguments:
+            - '@Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector'
+            - !tagged_iterator { tag: 'sfes.index_manager' }
+
     Sineflow\ElasticsearchBundle\Result\DocumentConverter:
         arguments:
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector'
@@ -49,12 +54,6 @@ services:
             - '%sfes.provider_self.class%'
         calls:
             - [ setContainer, [ '@Symfony\Component\DependencyInjection\ContainerInterface' ]]
-
-    Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry:
-        arguments:
-            - '@Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector'
-        calls:
-            - [setContainer, ['@service_container']]
 
     Sineflow\ElasticsearchBundle\Finder\Finder:
         arguments:
