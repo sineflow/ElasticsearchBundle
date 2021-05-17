@@ -10,27 +10,6 @@ use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 abstract class AbstractProvider implements ProviderInterface
 {
     /**
-     * @var string The document class the provider is for
-     */
-    private $documentClass;
-
-    /**
-     * @param string $documentClass The document class the provider is for
-     */
-    public function __construct(string $documentClass)
-    {
-        $this->documentClass = $documentClass;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDocumentClass() : string
-    {
-        return $this->documentClass;
-    }
-
-    /**
      * Returns a PHP Generator for iterating over the full dataset of source data that is to be inserted in ES
      * The returned data can be either a document entity or an array ready for direct sending to ES
      *

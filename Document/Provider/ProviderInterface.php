@@ -11,13 +11,6 @@ use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 interface ProviderInterface
 {
     /**
-     * Returns the document class the provider is for
-     *
-     * @return string
-     */
-    public function getDocumentClass() : string;
-
-    /**
      * Returns a PHP Generator for iterating over the full dataset of source data that is to be inserted in ES
      * The returned data can be either a document entity or an array ready for direct sending to ES
      *

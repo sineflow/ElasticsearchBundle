@@ -259,9 +259,13 @@ class IndexManager
      */
     public function getDataProvider(): ProviderInterface
     {
-        return $this->providerRegistry->getProviderInstance(
-            $this->getDocumentClass()
-        );
+        $dataProvider = $this->providerRegistry->getProviderForEntity($this->getDocumentClass());
+
+        if (!$dataProvider) {
+            $dataProvider = $this->providerRegistry->getSelfProviderForEntity($this->getDocumentClass());
+        }
+
+        return $dataProvider;
     }
 
     /**

@@ -4,9 +4,12 @@ namespace Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document
 
 use Sineflow\ElasticsearchBundle\Annotation as ES;
 use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
+use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Provider\CustomerProvider;
 
 /**
- * @ES\Document
+ * @ES\Document(
+ *     providerClass=CustomerProvider::class
+ * )
  */
 class Customer extends AbstractDocument
 {

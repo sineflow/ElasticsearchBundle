@@ -37,7 +37,7 @@ class DocumentMetadata
      */
     protected function configureOptions(OptionsResolver $optionsResolver)
     {
-        $optionsResolver->setRequired(['properties', 'fields', 'propertiesMetadata', 'repositoryClass', 'className']);
+        $optionsResolver->setRequired(['properties', 'fields', 'propertiesMetadata', 'repositoryClass', 'providerClass', 'className']);
     }
 
     /**
@@ -91,6 +91,14 @@ class DocumentMetadata
     public function getRepositoryClass(): ?string
     {
         return $this->metadata['repositoryClass'];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getProviderClass(): ?string
+    {
+        return $this->metadata['providerClass'];
     }
 
     /**

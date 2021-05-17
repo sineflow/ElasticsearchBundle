@@ -38,20 +38,17 @@ class ElasticsearchProvider extends AbstractProvider
     protected $chunkSize = 500;
 
     /**
-     * @param string                    $documentClass       The document class the provider is for
      * @param DocumentMetadataCollector $metadataCollector   The metadata collector
      * @param IndexManager              $sourceIndexManager  The index manager of the data source
      * @param string                    $sourceDocumentClass The document class the data is coming from
      */
     public function __construct(
-        string $documentClass,
         DocumentMetadataCollector $metadataCollector,
         IndexManager $sourceIndexManager,
         string $sourceDocumentClass
     ) {
-        parent::__construct($documentClass);
-        $this->sourceIndexManager = $sourceIndexManager;
         $this->metadataCollector = $metadataCollector;
+        $this->sourceIndexManager = $sourceIndexManager;
         $this->sourceDocumentClass = $sourceDocumentClass;
     }
 

@@ -85,6 +85,12 @@ services:
             - { name: sfes.provider, type: "AcmeFooBundle:Order" }
         public: true
 
+    app.es.data_provider.customer:
+        class: Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Provider\CustomerProvider
+        tags:
+            - { name: sfes.provider }
+        public: true
+
     sfes.index.blah: # some index manager service that is not actually an index manager
         class: Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\LanguageProvider
         public: true

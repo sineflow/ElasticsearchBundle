@@ -97,6 +97,7 @@ class DocumentParser
                 'fields' => array_filter($classAnnotation->dump()),
                 'propertiesMetadata' => $this->getPropertiesMetadata($documentReflection),
                 'repositoryClass' => $classAnnotation->repositoryClass,
+                'providerClass' => $classAnnotation->providerClass,
                 'className' => $documentReflection->getName(),
             ];
         }

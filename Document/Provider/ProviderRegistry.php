@@ -30,99 +30,69 @@ class ProviderRegistry implements ContainerAwareInterface
     private $selfProviderClass;
 
     /**
-     * @var array
+     * @var iterable<ProviderInterface>
      */
-    private $providers = [];
+    private $availableProviders;
 
     /**
      * ProviderRegistry constructor.
      *
+     * @param iterable                  $availableProviders
      * @param DocumentMetadataCollector $documentMetadataCollector
      * @param IndexManagerRegistry      $indexManagerRegistry
      * @param string                    $selfProviderClass
      */
     public function __construct(
+        iterable $availableProviders,
         DocumentMetadataCollector $documentMetadataCollector,
         IndexManagerRegistry $indexManagerRegistry,
         string $selfProviderClass
     ) {
+        $this->availableProviders = $availableProviders;
         $this->documentMetadataCollector = $documentMetadataCollector;
         $this->indexManagerRegistry = $indexManagerRegistry;
         $this->selfProviderClass = $selfProviderClass;
     }
 
-
-    /**
-     * Registers a provider service for the specified document class.
-     *
-     * @param string $documentClass The FQN or alias to the document class
-     * @param string $providerId    The provider service id
-     */
-    public function addProvider(string $documentClass, string $providerId) : void
+    public function getProviderForEntity(string $documentClass): ?ProviderInterface
     {
-        $this->providers[$this->documentMetadataCollector->getDocumentMetadata($documentClass)->getClassName()] = $providerId;
-    }
+        $documentMetadata = $this->documentMetadataCollector->getDocumentMetadata($documentClass);
+        $providerClass = $documentMetadata->getProviderClass();
 
-    /**
-     * Unsets registered provider for the specified document class.
-     *
-     * @param string $documentClass The FQN or alias to the document class
-     */
-    public function removeProvider(string $documentClass) : void
-    {
-        unset($this->providers[$this->documentMetadataCollector->getDocumentMetadata($documentClass)->getClassName()]);
-    }
-
-    /**
-     * Gets registered provider service id for the specified document class.
-     *
-     * @param string $documentClass The FQN or alias to the document class
-     *
-     * @return string|null
-     */
-    public function getProviderId(string $documentClass) : ?string
-    {
-        $fullClassName = $this->documentMetadataCollector->getDocumentMetadata($documentClass)->getClassName();
-
-        return isset($this->providers[$fullClassName]) ? $this->providers[$fullClassName] : null;
-    }
-
-    /**
-     * Gets the provider for a document class.
-     *
-     * @param string $documentClass FQN or alias (e.g App:Entity)
-     *
-     * @return ProviderInterface
-     *
-     * @throws \InvalidArgumentException if no provider was registered for the document class
-     */
-    public function getProviderInstance(string $documentClass) : ProviderInterface
-    {
-        $documentClass = $this->documentMetadataCollector->getDocumentMetadata($documentClass)->getClassName();
-
-        if (isset($this->providers[$documentClass])) {
-            $provider = $this->container->get($this->providers[$documentClass]);
-            if (!$provider instanceof ProviderInterface) {
-                throw new \InvalidArgumentException(sprintf('Registered provider [%s] must implement [%s].', $this->providers[$documentClass], ProviderInterface::class));
+        // If a provider was specified in the entity annotation
+        if ($providerClass) {
+            foreach ($this->availableProviders as $provider) {
+                if (get_class($provider) === $providerClass) {
+                    return $provider;
+                }
             }
-
-            return $provider;
+            throw new \InvalidArgumentException(sprintf('Provider %s was not found. Make sure you have tagged it as sfes.provider or enable autowiring', $providerClass));
         }
 
-        // Return default self-provider, if no specific one was registered
-        if (class_exists($this->selfProviderClass)) {
-            $indexManager = $this->indexManagerRegistry->get(
-                $this->documentMetadataCollector->getDocumentClassIndex($documentClass)
-            );
+        return null;
+    }
 
-            return new $this->selfProviderClass(
-                $documentClass,
-                $this->documentMetadataCollector,
-                $indexManager,
-                $documentClass
-            );
+    /**
+     * Returns the self-provider if available (the provider that allows the index to rebuild from itself)
+     *
+     * @param string $documentClass
+     *
+     * @return ProviderInterface|null
+     */
+    public function getSelfProviderForEntity(string $documentClass): ?ProviderInterface
+    {
+        if (!class_exists($this->selfProviderClass)) {
+            return null;
         }
 
-        throw new \InvalidArgumentException(sprintf('No data provider is registered for [%s].', $documentClass));
+        $indexManager = $this->indexManagerRegistry->get(
+            $this->documentMetadataCollector->getDocumentClassIndex($documentClass)
+        );
+
+        return new $this->selfProviderClass(
+            $this->documentMetadataCollector,
+            $indexManager,
+            $documentClass
+        );
     }
 }

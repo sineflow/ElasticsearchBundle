@@ -19,6 +19,11 @@ final class Document implements DumperInterface
     public $repositoryClass;
 
     /**
+     * @var string
+     */
+    public $providerClass;
+
+    /**
      * Settings directly passed to Elasticsearch client as-is
      *
      * @var array

@@ -95,6 +95,7 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
                     ],
             ],
         'repositoryClass'    => null,
+        'providerClass'      => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\FooBundle\\Document\\Provider\\CustomerProvider',
         'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\FooBundle\\Document\\Customer',
     ];
 
@@ -414,6 +415,7 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
                     ],
             ],
         'repositoryClass'    => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\Repository\\ProductRepository',
+        'providerClass'      => null,
         'className'          => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\Product',
     ];
 

@@ -64,7 +64,6 @@ class ElasticsearchProviderTest extends AbstractElasticsearchTestCase
     private function getProvider()
     {
         return new ElasticsearchProvider(
-            'AcmeBarBundle:Product',
             $this->getContainer()->get(DocumentMetadataCollector::class),
             $this->getIndexManager('bar'),
             'AcmeBarBundle:Product'

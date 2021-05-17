@@ -367,6 +367,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                     ],
                 ],
                 'repositoryClass' => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\Repository\\ProductRepository',
+                'providerClass' => null,
                 'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\fixture\\Acme\\BarBundle\\Document\\Product',
         ];
 

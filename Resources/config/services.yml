@@ -49,6 +49,7 @@ services:
 
     Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry:
         arguments:
+            -  !tagged_iterator { tag: 'sfes.provider' }
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector'
             - '@Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry'
             - '%sfes.provider_self.class%'

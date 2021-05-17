@@ -125,7 +125,7 @@ class DocumentMetadataCollector
      *
      * @return DocumentMetadata
      */
-    public function getDocumentMetadata(string $documentClass)
+    public function getDocumentMetadata(string $documentClass): DocumentMetadata
     {
         $documentClass = $this->documentLocator->resolveClassName($documentClass);
 
@@ -148,7 +148,7 @@ class DocumentMetadataCollector
      * @throws \ReflectionException
      * @throws \UnexpectedValueException
      */
-    public function getObjectPropertiesMetadata(string $objectClass)
+    public function getObjectPropertiesMetadata(string $objectClass): array
     {
         $objectMetadata = null;
 
@@ -185,7 +185,7 @@ class DocumentMetadataCollector
      *
      * @throws \InvalidArgumentException
      */
-    public function getDocumentMetadataForIndex(string $indexManagerName)
+    public function getDocumentMetadataForIndex(string $indexManagerName): DocumentMetadata
     {
         $documentClass = array_search($indexManagerName, $this->documentClassToIndexManagerNames);
         $indexMetadata = $this->metadata[$documentClass] ?? null;
@@ -204,7 +204,7 @@ class DocumentMetadataCollector
      *
      * @return array
      */
-    public function getIndexManagersForDocumentClasses(array $documentClasses = [])
+    public function getIndexManagersForDocumentClasses(array $documentClasses = []): array
     {
         if ($documentClasses) {
             $result = [];
@@ -230,7 +230,7 @@ class DocumentMetadataCollector
      *
      * @return string
      */
-    public function getDocumentClassIndex(string $documentClass)
+    public function getDocumentClassIndex(string $documentClass): string
     {
         $documentClass = $this->documentLocator->resolveClassName($documentClass);
 
@@ -248,13 +248,13 @@ class DocumentMetadataCollector
      *
      * @throws \ReflectionException
      */
-    private function fetchDocumentsMetadata()
+    private function fetchDocumentsMetadata(): array
     {
         $metadata = [];
         $indexManagerNames = [];
 
         foreach ($this->indexManagers as $indexManagerName => $indexSettings) {
-            $indexAnalyzers = isset($indexSettings['settings']['analysis']['analyzer']) ? $indexSettings['settings']['analysis']['analyzer'] : [];
+            $indexAnalyzers = $indexSettings['settings']['analysis']['analyzer'] ?? [];
 
             // Fetch DocumentMetadata object for the entity in that index
             $documentClass = $this->documentLocator->resolveClassName($indexSettings['class']);

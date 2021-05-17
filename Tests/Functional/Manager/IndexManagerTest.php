@@ -3,6 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Manager;
 
 use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Sineflow\ElasticsearchBundle\Document\Provider\ElasticsearchProvider;
 use Sineflow\ElasticsearchBundle\Document\Repository\Repository;
 use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
 use Sineflow\ElasticsearchBundle\Exception\Exception;
@@ -13,6 +14,7 @@ use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Repository\ProductRepository;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Customer;
+use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Provider\CustomerProvider;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Provider\OrderProvider;
 
 /**
@@ -47,6 +49,12 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
                     '_id' => 111,
                     'name' => 'Jane Doe',
                     'active' => true,
+                ],
+            ],
+            'backup' => [
+                [
+                    '_id' => 'abcde',
+                    'entry' => 'log entry',
                 ],
             ],
         ];
@@ -328,29 +336,36 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
 
     public function testReindexWithElasticsearchSelfProvider()
     {
-        $imWithAliases = $this->getIndexManager('customer');
-        $imWithAliases->getConnection()->setAutocommit(false);
+        $im = $this->getIndexManager('backup');
+        $im->getConnection()->setAutocommit(false);
 
-        $rawDoc = $imWithAliases->getRepository()->getById(111, Finder::RESULTS_RAW);
+        $rawDoc = $im->getRepository()->getById('abcde', Finder::RESULTS_RAW);
         $this->assertEquals(1, $rawDoc['_version']);
 
-        $imWithAliases->reindex(111);
+        $im->reindex('abcde');
 
-        $rawDoc = $imWithAliases->getRepository()->getById(111, Finder::RESULTS_RAW);
+        $rawDoc = $im->getRepository()->getById('abcde', Finder::RESULTS_RAW);
         $this->assertEquals(1, $rawDoc['_version']);
 
-        $imWithAliases->getConnection()->commit();
+        $im->getConnection()->commit();
 
-        $rawDoc = $imWithAliases->getRepository()->getById(111, Finder::RESULTS_RAW);
+        $rawDoc = $im->getRepository()->getById('abcde', Finder::RESULTS_RAW);
         $this->assertEquals(2, $rawDoc['_version']);
-        $this->assertEquals('Jane Doe', $rawDoc['_source']['name']);
+        $this->assertEquals('log entry', $rawDoc['_source']['entry']);
     }
 
     public function testGetDataProvider()
     {
-        $imWithAliases = $this->getIndexManager('order', false);
+        $imWithAliases = $this->getIndexManager('customer', false);
         $dataProvider = $imWithAliases->getDataProvider();
-        $this->assertInstanceOf(OrderProvider::class, $dataProvider);
+        $this->assertInstanceOf(CustomerProvider::class, $dataProvider);
+    }
+
+    public function testGetDataProviderWhenNoCustomProviderIsSet()
+    {
+        $imWithAliases = $this->getIndexManager('bar', false);
+        $dataProvider = $imWithAliases->getDataProvider();
+        $this->assertInstanceOf(ElasticsearchProvider::class, $dataProvider);
     }
 
     public function testGetRepository()

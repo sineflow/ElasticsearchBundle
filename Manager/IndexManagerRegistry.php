@@ -5,15 +5,12 @@ namespace Sineflow\ElasticsearchBundle\Manager;
 use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\Exception\InvalidIndexManagerException;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * Class to get defined index manager services
  */
 class IndexManagerRegistry
 {
-    use ContainerAwareTrait;
-
     /**
      * @var DocumentMetadataCollector
      */
