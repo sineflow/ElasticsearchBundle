@@ -71,6 +71,7 @@ services:
             - '@sfes.annotations.cached_reader'
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentLocator'
             - '%sfes.mlproperty.language_separator%'
+            - '%sfes.languages%'
 
     Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector:
         arguments:

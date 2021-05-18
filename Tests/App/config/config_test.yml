@@ -13,6 +13,9 @@ framework:
         utf8: true
 
 sineflow_elasticsearch:
+
+    languages: ['en', 'fr']
+
     entity_locations:
         AcmeBarBundle:
             directory: '%kernel.project_dir%/Tests/App/fixture/Acme/BarBundle/Document'
@@ -71,12 +74,6 @@ sineflow_elasticsearch:
             class: AcmeFooBundle:Log
 
 services:
-    app.es.language_provider:
-        class: Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\LanguageProvider
-        tags:
-            - { name: sfes.language_provider }
-        public: true
-
     app.es.data_provider.order:
         class: Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Provider\OrderProvider
         arguments:
@@ -92,7 +89,7 @@ services:
         public: true
 
     sfes.index.blah: # some index manager service that is not actually an index manager
-        class: Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\LanguageProvider
+        class: Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Repository\ProductRepository
         public: true
 
     # Since the profiler is not used by any service inside the bundle, it is removed from the container unless I explicitly make it public

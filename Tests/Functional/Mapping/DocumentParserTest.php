@@ -22,8 +22,8 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
         $reader = new AnnotationReader;
         $locator = $this->getContainer()->get(DocumentLocator::class);
         $separator = $this->getContainer()->getParameter('sfes.mlproperty.language_separator');
-        $this->documentParser = new DocumentParser($reader, $locator, $separator);
-        $this->documentParser->setLanguageProvider($this->getContainer()->get('app.es.language_provider'));
+        $languages = $this->getContainer()->getParameter('sfes.languages');
+        $this->documentParser = new DocumentParser($reader, $locator, $separator, $languages);
     }
 
     public function testParseNonDocument()

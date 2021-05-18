@@ -9,7 +9,9 @@ Assuming you have [Composer](https://getcomposer.org) installed globally, enter 
 $ composer require sineflow/elasticsearch-bundle "~7.1.0"
 ```
 
-> NOTE: Replace version accordingly. Latest release is [![Latest Stable Version](https://poser.pugx.org/sineflow/elasticsearch-bundle/v/stable)](https://packagist.org/packages/sineflow/elasticsearch-bundle)
+> Replace version accordingly. Latest release is [![Latest Stable Version](https://poser.pugx.org/sineflow/elasticsearch-bundle/v/stable)](https://packagist.org/packages/sineflow/elasticsearch-bundle)
+
+> Since the bundle's major version is kept in line with the Elasticsearch major version, it is likely that breaking changes can occur in minor versions.
 
 ### Step 2: Enable the Bundle
 

@@ -22,10 +22,13 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-            ->append($this->getEntityLocationsNode())
-            ->append($this->getConnectionsNode())
-            ->append($this->getIndicesNode())
-
+                ->arrayNode('languages')
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
+                ->append($this->getEntityLocationsNode())
+                ->append($this->getConnectionsNode())
+                ->append($this->getIndicesNode())
             ->end();
 
         return $treeBuilder;

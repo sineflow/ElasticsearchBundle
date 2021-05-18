@@ -9,7 +9,6 @@ use Sineflow\ElasticsearchBundle\Annotation\Document;
 use Sineflow\ElasticsearchBundle\Annotation\Id;
 use Sineflow\ElasticsearchBundle\Annotation\Property;
 use Sineflow\ElasticsearchBundle\Annotation\Score;
-use Sineflow\ElasticsearchBundle\LanguageProvider\LanguageProviderInterface;
 
 /**
  * Document parser used for reading document annotations.
@@ -42,34 +41,27 @@ class DocumentParser
     private $properties = [];
 
     /**
-     * @var LanguageProviderInterface
-     */
-    private $languageProvider;
-
-    /**
      * @var string
      */
     private $languageSeparator;
+
+    /**
+     * @var array
+     */
+    private $languages;
 
     /**
      * @param Reader          $reader            Used for reading annotations.
      * @param DocumentLocator $documentLocator   Used for resolving namespaces.
      * @param string          $languageSeparator String separating the language code from the ML property name
      */
-    public function __construct(Reader $reader, DocumentLocator $documentLocator, $languageSeparator)
+    public function __construct(Reader $reader, DocumentLocator $documentLocator, string $languageSeparator, array $languages = [])
     {
         $this->reader = $reader;
         $this->documentLocator = $documentLocator;
         $this->languageSeparator = $languageSeparator;
+        $this->languages = $languages;
         $this->registerAnnotations();
-    }
-
-    /**
-     * @param LanguageProviderInterface $languageProvider
-     */
-    public function setLanguageProvider(LanguageProviderInterface $languageProvider)
-    {
-        $this->languageProvider = $languageProvider;
     }
 
     /**
@@ -303,10 +295,10 @@ class DocumentParser
                 if (!in_array($propertyAnnotation->type, ['string', 'keyword', 'text'])) {
                     throw new \InvalidArgumentException(sprintf('"%s" property in %s is declared as multilanguage, so can only be of type "keyword", "text" or the deprecated "string"', $propertyAnnotation->name, $documentReflection->getName()));
                 }
-                if (!$this->languageProvider) {
-                    throw new \InvalidArgumentException('There must be a service tagged as "sfes.language_provider" in order to use multilanguage properties');
+                if (!$this->languages) {
+                    throw new \InvalidArgumentException('There must be at least one language specified in sineflow_elasticsearch.languages in order to use multilanguage properties');
                 }
-                foreach ($this->languageProvider->getLanguages() as $language) {
+                foreach ($this->languages as $language) {
                     $mapping[$propertyAnnotation->name.$this->languageSeparator.$language] = $this->getPropertyMapping($propertyAnnotation, $language, $indexAnalyzers);
                 }
                 // TODO: The application should decide whether it wants to use a default field at all and set its mapping on a global base
