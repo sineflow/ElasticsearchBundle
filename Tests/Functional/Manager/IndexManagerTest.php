@@ -269,7 +269,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         /** @var Product $doc */
         $doc = $repo->getById('doc1');
         $doc->title = 'NewName';
-        $repo->persist($doc);
+        $im->persist($doc);
 
         $doc = $repo->getById('doc1');
         $this->assertEquals('NewName', $doc->title);

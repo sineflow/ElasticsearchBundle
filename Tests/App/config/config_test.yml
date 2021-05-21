@@ -74,16 +74,14 @@ sineflow_elasticsearch:
             class: AcmeFooBundle:Log
 
 services:
-    app.es.data_provider.order:
-        class: Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Provider\OrderProvider
+    Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Provider\OrderProvider:
         arguments:
             - AcmeFooBundle:Order
         tags:
-            - { name: sfes.provider, type: "AcmeFooBundle:Order" }
+            - { name: sfes.provider }
         public: true
 
-    app.es.data_provider.customer:
-        class: Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Provider\CustomerProvider
+    Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Provider\CustomerProvider:
         tags:
             - { name: sfes.provider }
         public: true

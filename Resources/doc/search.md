@@ -1,9 +1,37 @@
 # Searching
 
+Retrieving data from your index should be done via a Repository.
+
+```php
+$repo = $im->getRepository();
+```
+
+If you want to define your own custom Repository methods, you need to specify the `repositoryClass` for your Document entity in an annotation as described in the `mapping` page.
+
+If you want to configure your repository as a service, so you can add additional dependencies and inject it in your services, make sure it is defined like this:
+```php
+use Sineflow\ElasticsearchBundle\Document\Repository;
+
+class ProductRepository extends Repository implements ServiceRepositoryInterface
+{
+    public function __construct(IndexManagerRegistry $indexManagerRegistry, Finder $finder)
+    {
+        parent::__construct($indexManagerRegistry->get('products'), $finder);
+    }
+}
+```
+
+If you don't have autowiring enabled, you will also need to manually tag it as `sfes.repository`:
+```php
+    App\ElasticSearch\Document\Repository\ProductRepository:
+        tags:
+            - { name: sfes.repository }
+```
+
 ## Get a document by id
 
 ```php
-$repo = $this->get('sfes.index.product')->getRepository();
+$repo = $productsIndexManager->getRepository();
 $product = $repo->getById(5); // 5 is the _id of the document in Elasticsearch
 ```
 > The result is returned as an instance of the Product class. An optional second parameter of getByID() allows you to specify different format of the result. See [results types](#resulttypes) below for more information.
@@ -11,7 +39,7 @@ $product = $repo->getById(5); // 5 is the _id of the document in Elasticsearch
 ## Find documents using a search query
 
 ```php
-$repo = $this->get('sfes.index.product')->getRepository();
+$repo = $productsIndexManager->getRepository();
 $searchBody = [
     'query' => [
         'match_all' => (object) []
@@ -39,7 +67,7 @@ $productsCount = $repo->count($searchBody);
 
 ## Searching in multiple types and indices
 
-It is convenient to search in a single index as shown above, but sometime you may wish to search in multiple indices. The finder service comes in play:
+It is convenient to search in a single index as shown above, but sometime you may wish to search in multiple indices. In this case, you can use directly the Finder service:
 
 ```php
 $searchBody = [
@@ -88,11 +116,11 @@ $paginatedResults = $paginator->paginate(
     $recordsPerPage
 );
 
-return $this->render('template.twig', array(
+return $this->render('template.twig', [
     'paginatedResults' => $paginatedResults,
     'aggregations' => $paginatedResults->getCustomParameter('aggregations'),
     'suggestions' => $paginatedResults->getCustomParameter('suggestions'),
-));
+]);
 ```
 > **IMPORTANT:** Getting aggregations and suggestions is not supported for **Finder::RESULTS_ARRAY** results and you'd get NULL returned
 

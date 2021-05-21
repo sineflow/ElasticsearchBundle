@@ -55,10 +55,10 @@ class ProviderRegistryTest extends AbstractElasticsearchTestCase
 
     public function testGetProviderForEntity()
     {
-        $this->assertInstanceOf(CustomerProvider::class, $this->providerRegistry->getProviderForEntity(Customer::class));
-        $this->assertInstanceOf(OrderProvider::class, $this->providerRegistry->getProviderForEntity(Order::class));
-        $this->assertNull($this->providerRegistry->getProviderForEntity(Log::class));
-        $this->assertNull($this->providerRegistry->getProviderForEntity(Product::class));
+        $this->assertInstanceOf(CustomerProvider::class, $this->providerRegistry->getCustomProviderForEntity(Customer::class));
+        $this->assertInstanceOf(OrderProvider::class, $this->providerRegistry->getCustomProviderForEntity(Order::class));
+        $this->assertNull($this->providerRegistry->getCustomProviderForEntity(Log::class));
+        $this->assertNull($this->providerRegistry->getCustomProviderForEntity(Product::class));
     }
 
     public function testGetSelfProviderForEntity()

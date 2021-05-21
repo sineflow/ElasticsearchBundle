@@ -5,6 +5,7 @@ namespace Sineflow\ElasticsearchBundle\Manager;
 use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\Exception\InvalidIndexManagerException;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * Class to get defined index manager services
@@ -17,26 +18,26 @@ class IndexManagerRegistry
     private $metadataCollector;
 
     /**
-     * @var iterable<IndexManager>
+     * @var ServiceLocator
      */
-    private $indexManagers;
+    private $serviceLocator;
 
     /**
      * Constructor
      *
      * @param DocumentMetadataCollector $metadataCollector
-     * @param iterable                  $indexManagers
+     * @param ServiceLocator            $serviceLocator
      */
-    public function __construct(DocumentMetadataCollector $metadataCollector, iterable $indexManagers)
+    public function __construct(DocumentMetadataCollector $metadataCollector, ServiceLocator $serviceLocator)
     {
         $this->metadataCollector = $metadataCollector;
-        $this->indexManagers = $indexManagers;
+        $this->serviceLocator = $serviceLocator;
     }
 
     /**
      * Returns the index manager service for a given index manager name
      *
-     * @param string $name
+     * @param string $name The index manager name from the 'sineflow_elasticsearch.indices' configuration
      *
      * @return IndexManager
      *
@@ -44,13 +45,17 @@ class IndexManagerRegistry
      */
     public function get(string $name): IndexManager
     {
-        foreach ($this->indexManagers as $indexManager) {
-            if ($indexManager->getManagerName() === $name) {
-                return $indexManager;
+        $serviceId = sprintf('sfes.index.%s', $name);
+        if ($this->serviceLocator->has($serviceId)) {
+            $indexManager = $this->serviceLocator->get($serviceId);
+            if (! $indexManager instanceof IndexManager) {
+                throw new \RuntimeException(sprintf('The service "%s" must be instance of "%s".', $serviceId, IndexManager::class));
             }
+
+            return $indexManager;
         }
 
-        throw new InvalidIndexManagerException(sprintf('No manager is defined for [%s] index', $name));
+        throw new InvalidIndexManagerException(sprintf('Index manager service "%s" is not found. Available ones are %s', $serviceId, implode(', ', array_keys($this->serviceLocator->getProvidedServices()))));
     }
 
     /**
@@ -70,10 +75,12 @@ class IndexManagerRegistry
     /**
      * Get all index manager instances defined
      *
-     * @return iterable<IndexManager>
+     * @return \Generator<IndexManager>
      */
     public function getAll(): iterable
     {
-        return $this->indexManagers;
+        foreach ($this->serviceLocator->getProvidedServices() as $serviceId => $serviceClass) {
+            yield $this->serviceLocator->get($serviceId);
+        }
     }
 }

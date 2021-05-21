@@ -4,17 +4,15 @@ Simply put, data providers are the sources of data for your Elasticsearch indice
 
 By default, each index is assigned a default *self* data provider (`ElasticsearchProvider`), which retrieves the data from the Elasticsearch index itself. This is useful when you want to rebuild the index (like if you changed the mapping and want to update it).
 
-In order to define your own custom data provider for an index, you have to create a service that implements `ProviderInterface` and tag it as `sfes.provider`, specifying the entity it is for in the `type` argument:
-
+In order to define your own custom data provider for an index, you have to create a service that implements `ProviderInterface` and specify it in the `providerClass` annotation of your document entity.
+If you don't use autowiring, you'll also need to tag the provider service as `sfes.provider`:
 ```
 services:
-    app.es.data_provider.product:
-        class: App\ElasticSearch\Document\Provider\ProductProvider
+    App\ElasticSearch\Document\Provider\ProductProvider:
         arguments:
-            - App:Product
             - @doctrine.orm.entity_manager
         tags:
-            - { name: sfes.provider, type: "App:Product" }
+            - { name: sfes.provider }
 ```
 
 If your data is coming from Doctrine, you may extend the `AbstractDoctrineProvider` class, which provides you with the basic framework and you only need to extend a couple of methods in it, to make it work for your case:

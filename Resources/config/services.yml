@@ -36,20 +36,26 @@ services:
             - '@Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry'
             - '@Sineflow\ElasticsearchBundle\Finder\Finder'
             - '@Sineflow\ElasticsearchBundle\Result\DocumentConverter'
+            - '@Sineflow\ElasticsearchBundle\Document\Repository\RepositoryFactory'
 
     Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry:
         arguments:
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector'
-            - !tagged_iterator { tag: 'sfes.index_manager' }
+            - !tagged_locator { tag: 'sfes.index_manager' }
 
     Sineflow\ElasticsearchBundle\Result\DocumentConverter:
         arguments:
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector'
             - '%sfes.mlproperty.language_separator%'
 
+    Sineflow\ElasticsearchBundle\Document\Repository\RepositoryFactory:
+        arguments:
+            - !tagged_locator { tag: 'sfes.repository' }
+            - '@Sineflow\ElasticsearchBundle\Finder\Finder'
+
     Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry:
         arguments:
-            -  !tagged_iterator { tag: 'sfes.provider' }
+            - !tagged_locator { tag: 'sfes.provider' }
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector'
             - '@Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry'
             - '%sfes.provider_self.class%'

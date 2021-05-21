@@ -29,13 +29,18 @@ class Product extends AbstractDocument
 > Make sure your document classes directly implement DocumentInterface or extend AbstractDocument.
 
 
-#### Document annotation
+### Document annotation
 
 The class representing a document must be annotated as `@ES\Document`. The following properties are supported inside that annotation:
 
 - `repositoryClass` Allows you to specify a specific repository class for this document. If not specified, the default repository class is used.
 ```
 repositoryClass="App\Document\Repository\ProductRepository"
+```
+
+- `providerClass` Allows you to specify a specific data provider that will be used as data source when rebuilding the index. If not specified, the default self-provider is used, i.e the index is rebuilt from itself.
+```
+repositoryClass="App\Document\Provider\ProductProvider"
 ```
 
 - `options` Allows to specify any type option supported by Elasticsearch, such as [\_all](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-all-field.html), [dynamic_templates](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-templates.html), [dynamic_date_formats](https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-field-mapping.html#date-detection), etc.

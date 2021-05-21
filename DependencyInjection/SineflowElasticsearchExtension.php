@@ -2,6 +2,8 @@
 
 namespace Sineflow\ElasticsearchBundle\DependencyInjection;
 
+use Sineflow\ElasticsearchBundle\Document\Provider\ProviderInterface;
+use Sineflow\ElasticsearchBundle\Document\Repository\ServiceRepositoryInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -12,7 +14,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  */
 class SineflowElasticsearchExtension extends Extension
 {
-
     /**
      * @param array            $config
      * @param ContainerBuilder $container
@@ -39,5 +40,13 @@ class SineflowElasticsearchExtension extends Extension
         $container->setParameter('sfes.connections', $config['connections']);
         $container->setParameter('sfes.indices', $config['indices']);
         $container->setParameter('sfes.languages', $config['languages']);
+
+        $container
+            ->registerForAutoconfiguration(ServiceRepositoryInterface::class)
+            ->addTag('sfes.repository');
+
+        $container
+            ->registerForAutoconfiguration(ProviderInterface::class)
+            ->addTag('sfes.provider');
     }
 }

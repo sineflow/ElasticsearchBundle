@@ -63,21 +63,13 @@ class RepositoryTest extends AbstractElasticsearchTestCase
         parent::setUp();
 
         $this->finder            = $this->getContainer()->get(Finder::class);
-        $this->metadataCollector = $this->getContainer()->get(DocumentMetadataCollector::class);
         $this->indexManager      = $this->getContainer()->get('sfes.index.bar');
 
         $this->indexManager->getConnection()->setAutocommit(true);
 
-        $this->repository = new Repository($this->indexManager, Product::class, $this->finder, $this->metadataCollector);
+        $this->repository = new Repository($this->indexManager, $this->finder);
 
         $this->getIndexManager('bar', !$this->hasCreatedIndexManager('bar'));
-    }
-
-    public function testConstructorWithEntityOfAnotherIndexManager()
-    {
-        $this->assertThrows(\InvalidArgumentException::class, function () {
-            $this->repository = new Repository($this->indexManager, Customer::class, $this->finder, $this->metadataCollector);
-        });
     }
 
     public function testGetIndexManager()
@@ -113,40 +105,5 @@ class RepositoryTest extends AbstractElasticsearchTestCase
         $rawDoc = $this->repository->getById('doc1', Finder::RESULTS_RAW);
         $this->assertEquals(2, $rawDoc['_version']);
         $this->assertEquals('aaa', $rawDoc['_source']['title']);
-    }
-
-    public function testDelete()
-    {
-        $this->repository->delete(3);
-
-        $doc = $this->repository->getById(3);
-        $this->assertNull($doc);
-    }
-
-    public function testUpdate()
-    {
-        $this->repository->update('doc1', ['title' => 'newTitle']);
-        $this->assertEquals('newTitle', $this->repository->getById('doc1')->title);
-    }
-
-    public function testPersist()
-    {
-        $product = new Product();
-        $product->id = 11;
-        $product->title = 'Acme title';
-        $this->indexManager->persist($product);
-
-        $this->assertEquals('Acme title', $this->repository->getById(11)->title);
-    }
-
-    public function testPersistRaw()
-    {
-        $product = [
-            '_id' => 22,
-            'title' => 'Acme title'
-        ];
-        $this->indexManager->persistRaw($product);
-
-        $this->assertEquals('Acme title', $this->repository->getById(22)->title);
     }
 }

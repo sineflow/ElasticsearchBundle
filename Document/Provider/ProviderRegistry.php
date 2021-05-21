@@ -6,6 +6,7 @@ use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * References persistence providers for each index.
@@ -35,38 +36,47 @@ class ProviderRegistry implements ContainerAwareInterface
     private $availableProviders;
 
     /**
+     * @var ServiceLocator
+     */
+    private $serviceLocator;
+
+    /**
      * ProviderRegistry constructor.
      *
-     * @param iterable                  $availableProviders
+     * @param ServiceLocator            $serviceLocator
      * @param DocumentMetadataCollector $documentMetadataCollector
      * @param IndexManagerRegistry      $indexManagerRegistry
      * @param string                    $selfProviderClass
      */
     public function __construct(
-        iterable $availableProviders,
+        ServiceLocator $serviceLocator,
         DocumentMetadataCollector $documentMetadataCollector,
         IndexManagerRegistry $indexManagerRegistry,
         string $selfProviderClass
     ) {
-        $this->availableProviders = $availableProviders;
+        $this->serviceLocator = $serviceLocator;
         $this->documentMetadataCollector = $documentMetadataCollector;
         $this->indexManagerRegistry = $indexManagerRegistry;
         $this->selfProviderClass = $selfProviderClass;
     }
 
-    public function getProviderForEntity(string $documentClass): ?ProviderInterface
+    public function getCustomProviderForEntity(string $documentClass): ?ProviderInterface
     {
         $documentMetadata = $this->documentMetadataCollector->getDocumentMetadata($documentClass);
-        $providerClass = $documentMetadata->getProviderClass();
+        $customProviderClass = $documentMetadata->getProviderClass();
 
-        // If a provider was specified in the entity annotation
-        if ($providerClass) {
-            foreach ($this->availableProviders as $provider) {
-                if (get_class($provider) === $providerClass) {
-                    return $provider;
+        // If there is a custom provider specified for the entity
+        if ($customProviderClass !== null) {
+            if ($this->serviceLocator->has($customProviderClass)) {
+                $provider = $this->serviceLocator->get($customProviderClass);
+                if (! $provider instanceof ProviderInterface) {
+                    throw new \RuntimeException(sprintf('The service "%s" must implement "%s".', $customProviderClass, ProviderInterface::class));
                 }
+
+                return $provider;
             }
-            throw new \InvalidArgumentException(sprintf('Provider %s was not found. Make sure you have tagged it as sfes.provider or enable autowiring', $providerClass));
+
+            throw new \InvalidArgumentException(sprintf('Provider service "%s" was not found. Make sure the service exists and is tagged with "sfes.provider".', $customProviderClass));
         }
 
         return null;

@@ -8,6 +8,7 @@ use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\Document\Provider\ProviderInterface;
 use Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry;
 use Sineflow\ElasticsearchBundle\Document\Repository\Repository;
+use Sineflow\ElasticsearchBundle\Document\Repository\RepositoryFactory;
 use Sineflow\ElasticsearchBundle\Event\Events;
 use Sineflow\ElasticsearchBundle\Event\PrePersistEvent;
 use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
@@ -16,6 +17,7 @@ use Sineflow\ElasticsearchBundle\Exception\IndexOrAliasNotFoundException;
 use Sineflow\ElasticsearchBundle\Exception\IndexRebuildingException;
 use Sineflow\ElasticsearchBundle\Exception\InvalidLiveIndexException;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
+use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadata;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Sineflow\ElasticsearchBundle\Result\DocumentConverter;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -56,6 +58,11 @@ class IndexManager
     protected $documentConverter;
 
     /**
+     * @var RepositoryFactory
+     */
+    protected $repositoryFactory;
+
+    /**
      * @var array
      */
     protected $indexMapping = null;
@@ -66,9 +73,9 @@ class IndexManager
     private $indexSettings;
 
     /**
-     * @var Repository[]
+     * @var Repository
      */
-    protected $repositories = [];
+    protected $repository;
 
     /**
      * @var bool Whether to use index aliases
@@ -106,7 +113,8 @@ class IndexManager
         DocumentMetadataCollector $metadataCollector,
         ProviderRegistry $providerRegistry,
         Finder $finder,
-        DocumentConverter $documentConverter
+        DocumentConverter $documentConverter,
+        RepositoryFactory $repositoryFactory
     ) {
         $this->managerName = $managerName;
         $this->connection = $connection;
@@ -114,6 +122,7 @@ class IndexManager
         $this->providerRegistry = $providerRegistry;
         $this->finder = $finder;
         $this->documentConverter = $documentConverter;
+        $this->repositoryFactory = $repositoryFactory;
         $this->useAliases = $indexSettings['use_aliases'];
         $this->indexSettings = $indexSettings;
 
@@ -147,7 +156,7 @@ class IndexManager
     public function getIndexMapping(): array
     {
         if (is_null($this->indexMapping)) {
-            $this->indexMapping = $this->buildIndexMapping($this->managerName);
+            $this->indexMapping = $this->buildIndexMapping();
         }
 
         return $this->indexMapping;
@@ -156,11 +165,9 @@ class IndexManager
     /**
      * Returns mapping array for index
      *
-     * @param string $indexManagerName
-     *
      * @return array
      */
-    private function buildIndexMapping(string $indexManagerName): array
+    private function buildIndexMapping(): array
     {
         $index = ['index' => $this->indexSettings['name']];
 
@@ -168,8 +175,7 @@ class IndexManager
             $index['body']['settings'] = $this->indexSettings['settings'];
         }
 
-        $metadata = $this->metadataCollector->getDocumentMetadataForIndex($indexManagerName);
-        $index['body']['mappings'] = $metadata->getClientMapping();
+        $index['body']['mappings'] = $this->getDocumentMetadata()->getClientMapping();
 
         return $index;
     }
@@ -235,21 +241,7 @@ class IndexManager
      */
     public function getRepository(): Repository
     {
-        $documentMetadata = $this->metadataCollector->getDocumentMetadataForIndex($this->managerName);
-
-        if (isset($this->repositories[$documentMetadata->getClassName()])) {
-            return $this->repositories[$documentMetadata->getClassName()];
-        }
-
-        $repositoryClass = $documentMetadata->getRepositoryClass() ?: Repository::class;
-        $repo = new $repositoryClass($this, $documentMetadata->getClassName(), $this->finder, $this->metadataCollector);
-
-        if (!($repo instanceof Repository)) {
-            throw new \InvalidArgumentException(sprintf('Repository [%s] must extend [%s]', $repositoryClass, Repository::class));
-        }
-        $this->repositories[$documentMetadata->getClassName()] = $repo;
-
-        return $repo;
+        return $this->repositoryFactory->getRepository($this);
     }
 
     /**
@@ -259,7 +251,7 @@ class IndexManager
      */
     public function getDataProvider(): ProviderInterface
     {
-        $dataProvider = $this->providerRegistry->getProviderForEntity($this->getDocumentClass());
+        $dataProvider = $this->providerRegistry->getCustomProviderForEntity($this->getDocumentClass());
 
         if (!$dataProvider) {
             $dataProvider = $this->providerRegistry->getSelfProviderForEntity($this->getDocumentClass());
@@ -768,12 +760,20 @@ class IndexManager
     }
 
     /**
+     * Get document metadata
+     */
+    public function getDocumentMetadata(): DocumentMetadata
+    {
+        return $this->metadataCollector->getDocumentMetadata($this->indexSettings['class']);
+    }
+
+    /**
      * Get FQN of document class managed by this index manager
      *
      * @return string
      */
     public function getDocumentClass(): string
     {
-        return $this->metadataCollector->getDocumentMetadata($this->indexSettings['class'])->getClassName();
+        return $this->getDocumentMetadata()->getClassName();
     }
 }

@@ -38,20 +38,27 @@ sineflow_elasticsearch:
 ## Index manager
 
 In order to work with an index, you will need the respective index manager service.
-Once you define managers in your `config.yml` file, you can use them in controllers and grab them from DI container via `sfes.index.<name>`. With the above example:
+Once you define a manager in your `config.yml` file, you will have a service id `sfes.index.<name>` available, which you can inject in your Controller.
+
+If you'd rather have your controller/service autowired, you have the following 2 options:
 
 ```php
-$im = $this->get('sfes.index.product');
-```
+use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
+use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 
-## Repositories
+class MyController
+{
+    public function myAction(IndexManagerRegistry $imRegistry)
+    {
+        $productsIndexManager = $imRegistry->get('products');
+    }
 
-When you need to work with documents in the index, you can do so through the Repository class of an entity.
-The default Repository is mostly a convenience class, as its methods are also available either through the IndexManager or the Finder services. However it may be useful to have type-specific methods in your own custom repositories.
-You can get a document's repository through the index manager that manages it:
-
-```php
-$repo = $im->getRepository();
+    public function myOtherAction(IndexManager $productsIndexManager)
+    {
+        // An alias is automatically registered for each index, so any IndexManager
+        // argument named like '<index>IndexManager' will be autowired to the respective manager.
+    }
+}
 ```
 
 ## Create a document
@@ -60,19 +67,9 @@ $repo = $im->getRepository();
 $product = new Product();
 $product->id = 5; // If not set, elasticsearch will set a random unique id.
 $product->title = 'Acme title';
-$repo->persist($product);
-$repo->getIndexManager()->getConnection()->commit();
-```
-
-Alternatively, you can directly persist the document through the index manager as well:
-```php
-$product = new Product();
-$product->id = 5; // If not set, elasticsearch will set a random unique id.
-$product->title = 'Acme title';
 $im->persist($product);
 $im->getConnection()->commit();
 ```
-
 
 If you want to bypass the entity objects for some reason, you can persist a raw array into the index like this:
 
@@ -81,7 +78,7 @@ $product = [
     '_id' => 5,
     'title' => 'Acme title'
 ];
-$repo->persistRaw($product);
+$im->persistRaw($product);
 $im->getConnection()->commit();
 ```
 
@@ -90,16 +87,17 @@ $im->getConnection()->commit();
 ## Update a document
 
 ```php
+$repo = $im->getRepository();
 $product = $repo->getById(5);
 $product->title = 'changed Acme title';
-$repo->persist($product);
+$im->persist($product);
 $im->getConnection()->commit();
 ```
 
 ## Delete a document
 
 ```php
-$repo->delete(5);
+$im->delete(5);
 $im->getConnection()->commit();
 ```
 
@@ -107,7 +105,7 @@ $im->getConnection()->commit();
 
 You can refresh the content of a document from its registered data provider.
 ```php
-$repo->reindex(5);
+$im->reindex(5);
 $im->getConnection()->commit();
 ```
 For more information about that, see [data providers](dataproviders.md).
