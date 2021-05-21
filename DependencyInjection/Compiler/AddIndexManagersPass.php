@@ -45,7 +45,12 @@ class AddIndexManagersPass implements CompilerPassInterface
             );
 
             // Allow auto-wiring of index managers based on the argument name
-            $container->registerAliasForArgument($indexManagerId, IndexManager::class, $indexManagerName . 'IndexManager');
+            // If sfes.index_manager_prototype has been overridden, register the overriding class as an alias as well
+            $indexManagerClass = $container->getDefinition('sfes.index_manager_prototype')->getClass();
+            $container->registerAliasForArgument($indexManagerId, $indexManagerClass, $indexManagerName . 'IndexManager');
+            if ($indexManagerClass !== IndexManager::class) {
+                $container->registerAliasForArgument($indexManagerId, IndexManager::class, $indexManagerName . 'IndexManager');
+            }
         }
     }
 }

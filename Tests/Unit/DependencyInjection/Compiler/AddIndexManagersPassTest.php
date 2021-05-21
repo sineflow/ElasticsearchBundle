@@ -5,6 +5,7 @@ namespace Sineflow\ElasticsearchBundle\Tests\Unit\DependencyInjection\Compiler;
 use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\AddIndexManagersPass;
 use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\MappingPass;
+use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
@@ -80,6 +81,18 @@ class AddIndexManagersPassTest extends TestCase
                 [$this->equalTo('sfes.index.test')]
             )
             ->willReturn(new Definition());
+
+        $imPrototypeDefinitionMock = $this->getMockBuilder(Definition::class)
+            ->getMock();
+        $imPrototypeDefinitionMock
+            ->method('getClass')
+            ->willReturn(IndexManager::class);
+
+        $containerMock
+            ->expects($this->exactly(1))
+            ->method('getDefinition')
+            ->with('sfes.index_manager_prototype')
+            ->willReturn($imPrototypeDefinitionMock);
 
         $compilerPass = new AddIndexManagersPass();
         $compilerPass->process($containerMock);
