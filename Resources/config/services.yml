@@ -59,8 +59,6 @@ services:
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector'
             - '@Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry'
             - '%sfes.provider_self.class%'
-        calls:
-            - [ setContainer, [ '@Symfony\Component\DependencyInjection\ContainerInterface' ]]
 
     Sineflow\ElasticsearchBundle\Finder\Finder:
         arguments:

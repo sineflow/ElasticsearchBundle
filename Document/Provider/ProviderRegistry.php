@@ -4,17 +4,13 @@ namespace Sineflow\ElasticsearchBundle\Document\Provider;
 
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * References persistence providers for each index.
  */
-class ProviderRegistry implements ContainerAwareInterface
+class ProviderRegistry
 {
-    use ContainerAwareTrait;
-
     /**
      * @var DocumentMetadataCollector
      */
@@ -29,11 +25,6 @@ class ProviderRegistry implements ContainerAwareInterface
      * @var string
      */
     private $selfProviderClass;
-
-    /**
-     * @var iterable<ProviderInterface>
-     */
-    private $availableProviders;
 
     /**
      * @var ServiceLocator
