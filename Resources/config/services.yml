@@ -82,8 +82,6 @@ services:
             - '%sfes.indices%'
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentLocator'
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentParser'
-
-#            - '@sfes.cache_adapter'
             - '@cache.sfes'
 
     Sineflow\ElasticsearchBundle\Profiler\Handler\CollectionHandler:
@@ -116,13 +114,6 @@ services:
         public: false
         tags:
             - { name: cache.pool } # I need this tag, so a collector is registered for this cache pool and details can be seen in the Symfony toolbar
-
-#    sfes.cache_adapter:
-#        class: 'Symfony\Component\Cache\Adapter\PhpArrayAdapter'
-#        factory: ['Symfony\Component\Cache\Adapter\PhpArrayAdapter', 'create']
-#        arguments:
-#            - '%kernel.cache_dir%/sfes.cache.php'
-#            - '@cache.sfes'
 
     sfes.metadata_cache_warmer:
         class: 'Sineflow\ElasticsearchBundle\CacheWarmer\MetadataCacheWarmer'
