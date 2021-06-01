@@ -69,7 +69,7 @@ class Finder
      */
     public function get(string $documentClass, string $id, int $resultType = self::RESULTS_OBJECT)
     {
-        $indexManagerName = current($this->documentMetadataCollector->getIndexManagersForDocumentClasses([$documentClass]));
+        $indexManagerName = $this->documentMetadataCollector->getDocumentClassIndex($documentClass);
 
         $search = [
             'index' => $this->indexManagerRegistry->get($indexManagerName)->getReadAlias(),
@@ -221,10 +221,9 @@ class Finder
      */
     public function getTargetIndices(array $documentClasses) : array
     {
-        $indexManagersForDocumentClasses = $this->documentMetadataCollector->getIndexManagersForDocumentClasses($documentClasses);
-
         $indices = [];
-        foreach ($indexManagersForDocumentClasses as $documentClass => $indexManagerName) {
+        foreach ($documentClasses as $documentClass) {
+            $indexManagerName = $this->documentMetadataCollector->getDocumentClassIndex($documentClass);
             $indices[] = $this->indexManagerRegistry->get($indexManagerName)->getReadAlias();
         }
 
@@ -275,11 +274,11 @@ class Finder
     private function getIndicesToDocumentClasses(array $documentClasses): IndicesToDocumentClasses
     {
         $indicesToDocumentClasses = new IndicesToDocumentClasses();
-        $documentClassToIndexManagerMap = $this->documentMetadataCollector->getIndexManagersForDocumentClasses($documentClasses);
 
         $getLiveIndices = (count($documentClasses) > 1);
 
-        foreach ($documentClassToIndexManagerMap as $documentClass => $indexManagerName) {
+        foreach ($documentClasses as $documentClass) {
+            $indexManagerName = $this->documentMetadataCollector->getDocumentClassIndex($documentClass);
             // Build mappings of indices to document class names, for the Converter
             if (!$getLiveIndices) {
                 $indicesToDocumentClasses->set(null, $documentClass);

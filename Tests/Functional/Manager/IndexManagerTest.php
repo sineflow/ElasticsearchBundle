@@ -10,6 +10,7 @@ use Sineflow\ElasticsearchBundle\Exception\Exception;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
+use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadata;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product;
 use Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Repository\ProductRepository;
@@ -389,5 +390,14 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
 
         $this->assertEquals('customer', $imWithAliases->getManagerName());
         $this->assertEquals('bar', $imWithoutAliases->getManagerName());
+    }
+
+    public function testGetDocumentMetadata()
+    {
+        /** @var IndexManager $imWithAliases */
+        $imWithAliases = $this->getIndexManager('customer', false);
+
+        $indexMetadata = $imWithAliases->getDocumentMetadata();
+        $this->assertInstanceOf(DocumentMetadata::class, $indexMetadata);
     }
 }

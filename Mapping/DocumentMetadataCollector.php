@@ -2,23 +2,24 @@
 
 namespace Sineflow\ElasticsearchBundle\Mapping;
 
-use Doctrine\Common\Cache\Cache;
-use Sineflow\ElasticsearchBundle\Exception\Exception;
+use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Class for getting document metadata.
  */
-class DocumentMetadataCollector
+class DocumentMetadataCollector implements WarmableInterface
 {
     /**
      * For caching the full metadata of all available document entities
      */
-    const DOCUMENTS_CACHE_KEY = 'sfes.documents_metadata';
+    const DOCUMENTS_CACHE_KEY_PREFIX = 'sfes.documents_metadata.';
 
     /**
      * For caching just the properties metadata of a document or object entity
      */
-    const OBJECTS_CACHE_KEY = 'sfes.object_properties_metadata.';
+    const OBJECTS_CACHE_KEY_PREFIX = 'sfes.object_properties_metadata.';
 
     /**
      * <document_class_FQN> => DocumentMetadata
@@ -57,64 +58,61 @@ class DocumentMetadataCollector
     private $parser;
 
     /**
-     * @var Cache
+     * @var CacheInterface
      */
     private $cache;
 
     /**
-     * @var int
-     */
-    private $documentsLastModifiedTime;
-
-    /**
-     * @var bool
-     */
-    private $isCacheEnabled;
-
-    /**
-     * @var bool
-     */
-    private $verifyCacheFreshness;
-
-    /**
      * @param array           $indexManagers   The list of index managers defined
-     * @param DocumentLocator $documentLocator For finding documents.
-     * @param DocumentParser  $parser          For reading document annotations.
-     * @param Cache|null      $cache           For caching documents metadata
-     * @param bool            $debug
-     *
-     * @throws \ReflectionException
+     * @param DocumentLocator $documentLocator
+     * @param DocumentParser  $parser          For reading entity annotations
+     * @param CacheInterface  $cache           For caching entity metadata
      */
-    public function __construct(array $indexManagers, DocumentLocator $documentLocator, DocumentParser $parser, ?Cache $cache, bool $debug = false)
+    public function __construct(array $indexManagers, DocumentLocator $documentLocator, DocumentParser $parser, CacheInterface $cache)
     {
         $this->indexManagers = $indexManagers;
         $this->documentLocator = $documentLocator;
         $this->parser = $parser;
         $this->cache = $cache;
-        $this->isCacheEnabled = $cache instanceof Cache;
-        $this->verifyCacheFreshness = $this->isCacheEnabled && $debug;
-
-        if ($this->verifyCacheFreshness) {
-            // Gets the time when the documents' folders were last modified
-            $documentDirs = $this->documentLocator->getAllDocumentDirs();
-            foreach ($documentDirs as $dir) {
-                $this->documentsLastModifiedTime = max($this->documentsLastModifiedTime, filemtime($dir));
-            }
-        }
-
-        if ($this->isCacheEnabled && $this->isCacheFresh(self::DOCUMENTS_CACHE_KEY)) {
-            $this->metadata = $this->cache->fetch(self::DOCUMENTS_CACHE_KEY);
-        }
-
-        // If we have no metadata, build it now
-        if (!$this->metadata) {
-            $this->metadata = $this->fetchDocumentsMetadata();
-        }
 
         // Build an internal array with map of document class to index manager name
         foreach ($this->indexManagers as $indexManagerName => $indexSettings) {
-            $this->documentClassToIndexManagerNames[$this->documentLocator->resolveClassName($indexSettings['class'])] = $indexManagerName;
+            $documentClass = $this->documentLocator->resolveClassName($indexSettings['class']);
+
+            if (isset($this->documentClassToIndexManagerNames[$documentClass])) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Index manager [%s] can not have class [%s], as that class is already specified for [%s]',
+                        $indexManagerName,
+                        $documentClass,
+                        $this->documentClassToIndexManagerNames[$documentClass]
+                    )
+                );
+            }
+
+            $this->documentClassToIndexManagerNames[$documentClass] = $indexManagerName;
         }
+    }
+
+    /**
+     * Warms up the cache.
+     *
+     * @param string $cacheDir
+     *
+     * @return string[]
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function warmUp($cacheDir)
+    {
+        // force cache generation
+        foreach ($this->documentClassToIndexManagerNames as $documentClass => $indexManagerName) {
+            $this->getDocumentMetadata($documentClass);
+        }
+
+        // TODO: call getObjectPropertiesMetadata for every ES document/object entity available, so the properties metadata cache is also warmed up
+
+        return [];
     }
 
     /**
@@ -124,14 +122,21 @@ class DocumentMetadataCollector
      * @param string $documentClass
      *
      * @return DocumentMetadata
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getDocumentMetadata(string $documentClass): DocumentMetadata
     {
         $documentClass = $this->documentLocator->resolveClassName($documentClass);
 
-        if (!isset($this->metadata[$documentClass])) {
-            throw new \InvalidArgumentException(sprintf('Metadata for [%s] is not available', $documentClass));
+        if (isset($this->metadata[$documentClass])) {
+            return $this->metadata[$documentClass];
         }
+
+        $cacheKey = self::DOCUMENTS_CACHE_KEY_PREFIX.strtr($documentClass, '\\', '.');
+        $this->metadata[$documentClass] = $this->cache->get($cacheKey, function (ItemInterface $item) use ($documentClass) {
+            return $this->fetchDocumentMetadata($documentClass);
+        }, 0);
 
         return $this->metadata[$documentClass];
     }
@@ -144,83 +149,22 @@ class DocumentMetadataCollector
      *
      * @return array
      *
-     * @throws Exception
-     * @throws \ReflectionException
-     * @throws \UnexpectedValueException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getObjectPropertiesMetadata(string $objectClass): array
     {
-        $objectMetadata = null;
-
         $objectClass = $this->documentLocator->resolveClassName($objectClass);
+
         if (isset($this->objectsMetadata[$objectClass])) {
             return $this->objectsMetadata[$objectClass];
         }
 
-        if ($this->isCacheEnabled && $this->isCacheFresh(self::OBJECTS_CACHE_KEY.$objectClass)) {
-            $objectMetadata = $this->cache->fetch(self::OBJECTS_CACHE_KEY.$objectClass);
-        }
+        $cacheKey = self::OBJECTS_CACHE_KEY_PREFIX.strtr($objectClass, '\\', '.');
+        $this->objectsMetadata[$objectClass] = $this->cache->get($cacheKey, function (ItemInterface $item) use ($objectClass) {
+            return $this->parser->getPropertiesMetadata(new \ReflectionClass($objectClass));
+        }, 0);
 
-        // Get the metadata the slow way
-        if (!$objectMetadata) {
-            $objectMetadata = $this->parser->getPropertiesMetadata(new \ReflectionClass($objectClass));
-        }
-
-        // Save the value for subsequent calls
-        $this->objectsMetadata[$objectClass] = $objectMetadata;
-        if ($this->isCacheEnabled) {
-            $this->cache->save(self::OBJECTS_CACHE_KEY.$objectClass, $objectMetadata);
-            $this->cache->save('[C]'.self::OBJECTS_CACHE_KEY.$objectClass, time());
-        }
-
-        return $objectMetadata;
-    }
-
-    /**
-     * Returns the metadata of the documents within the specified index
-     *
-     * @param string $indexManagerName
-     *
-     * @return DocumentMetadata
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function getDocumentMetadataForIndex(string $indexManagerName): DocumentMetadata
-    {
-        $documentClass = array_search($indexManagerName, $this->documentClassToIndexManagerNames);
-        $indexMetadata = $this->metadata[$documentClass] ?? null;
-
-        if (!$indexMetadata) {
-            throw new \InvalidArgumentException(sprintf('No metadata found for index [%s]', $indexManagerName));
-        }
-
-        return $indexMetadata;
-    }
-
-    /**
-     * Returns all document classes FQNs as keys and the corresponding index manager that manages them as values
-     *
-     * @param array $documentClasses If specified, will only return indices for those class names
-     *
-     * @return array
-     */
-    public function getIndexManagersForDocumentClasses(array $documentClasses = []): array
-    {
-        if ($documentClasses) {
-            $result = [];
-            foreach ($documentClasses as $documentClass) {
-                $documentClass = $this->documentLocator->resolveClassName($documentClass);
-                if (isset($this->documentClassToIndexManagerNames[$documentClass])) {
-                    $result[$documentClass] = $this->documentClassToIndexManagerNames[$documentClass];
-                } else {
-                    throw new \InvalidArgumentException(sprintf('Class [%s] is not managed by any index manager', $documentClass));
-                }
-            }
-        } else {
-            $result = $this->documentClassToIndexManagerNames;
-        }
-
-        return $result;
+        return $this->objectsMetadata[$objectClass];
     }
 
     /**
@@ -235,66 +179,28 @@ class DocumentMetadataCollector
         $documentClass = $this->documentLocator->resolveClassName($documentClass);
 
         if (!isset($this->documentClassToIndexManagerNames[$documentClass])) {
-            throw new \InvalidArgumentException(sprintf('Entity [%s] is not managed by any index manager', $documentClass));
+            throw new \InvalidArgumentException(sprintf('Entity [%s] is not managed by any index manager. You need an entry in the sineflow_elasticsearch.indices config key with this class.', $documentClass));
         }
 
         return $this->documentClassToIndexManagerNames[$documentClass];
     }
 
     /**
-     * Retrieves the metadata for all documents in all indices
+     * Retrieves the metadata for a document
      *
-     * @return array
+     * @param string $documentClass
+     *
+     * @return DocumentMetadata
      *
      * @throws \ReflectionException
      */
-    private function fetchDocumentsMetadata(): array
+    private function fetchDocumentMetadata(string $documentClass): DocumentMetadata
     {
-        $metadata = [];
-        $indexManagerNames = [];
+        $documentClass = $this->documentLocator->resolveClassName($documentClass);
+        $indexManagerName = $this->getDocumentClassIndex($documentClass);
+        $indexAnalyzers = $this->indexManagers[$indexManagerName]['settings']['analysis']['analyzer'] ?? [];
+        $documentMetadataArray = $this->parser->parse(new \ReflectionClass($documentClass), $indexAnalyzers);
 
-        foreach ($this->indexManagers as $indexManagerName => $indexSettings) {
-            $indexAnalyzers = $indexSettings['settings']['analysis']['analyzer'] ?? [];
-
-            // Fetch DocumentMetadata object for the entity in that index
-            $documentClass = $this->documentLocator->resolveClassName($indexSettings['class']);
-            if (isset($indexManagerNames[$documentClass])) {
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        'Index manager [%s] can not have class [%s], as that class is already specified for [%s]',
-                        $indexManagerName,
-                        $documentClass,
-                        $indexManagerNames[$documentClass]
-                    )
-                );
-            }
-            $indexManagerNames[$documentClass] = $indexManagerName;
-            $documentMetadataArray = $this->parser->parse(new \ReflectionClass($documentClass), $indexAnalyzers);
-
-            $metadata[$documentClass] = new DocumentMetadata($documentMetadataArray);
-        }
-
-        if ($this->isCacheEnabled) {
-            $this->cache->save(self::DOCUMENTS_CACHE_KEY, $metadata);
-            $this->cache->save('[C]'.self::DOCUMENTS_CACHE_KEY, time());
-        }
-
-        return $metadata;
-    }
-
-    /**
-     * Return whether cache for the given cache key is up-to-date
-     *
-     * @param string $cacheKey
-     *
-     * @return bool
-     */
-    private function isCacheFresh(string $cacheKey) : bool
-    {
-        if ($this->verifyCacheFreshness) {
-            return $this->cache->fetch('[C]'.$cacheKey) > $this->documentsLastModifiedTime;
-        }
-
-        return true;
+        return new DocumentMetadata($documentMetadataArray);
     }
 }

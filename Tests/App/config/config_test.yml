@@ -94,3 +94,7 @@ services:
     test.Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler:
         alias: 'Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler'
         public: true
+
+    app.null_cache_adapter:
+        class: 'Symfony\Component\Cache\Adapter\NullAdapter'
+        public: true

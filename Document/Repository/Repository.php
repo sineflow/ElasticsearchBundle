@@ -2,11 +2,8 @@
 
 namespace Sineflow\ElasticsearchBundle\Document\Repository;
 
-use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
-use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadata;
-use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 
 /**
  * Base entity repository class.

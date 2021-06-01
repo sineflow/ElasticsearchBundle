@@ -72,7 +72,7 @@ services:
 
     Sineflow\ElasticsearchBundle\Mapping\DocumentParser:
         arguments:
-            - '@sfes.annotations.cached_reader'
+            - '@annotation_reader'
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentLocator'
             - '%sfes.mlproperty.language_separator%'
             - '%sfes.languages%'
@@ -82,8 +82,9 @@ services:
             - '%sfes.indices%'
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentLocator'
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentParser'
-            - '@sfes.cache_engine'
-            - '%kernel.debug%'
+
+#            - '@sfes.cache_adapter'
+            - '@cache.sfes'
 
     Sineflow\ElasticsearchBundle\Profiler\Handler\CollectionHandler:
         arguments:
@@ -108,17 +109,27 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
-    sfes.cache_engine:
-        class: Doctrine\Common\Cache\FilesystemCache
-        arguments: ['%kernel.cache_dir%/sineflow', '.sineflow.data']
-        public: true
+    cache.sfes:
+        parent: 'cache.system'
+        autowire: false
+        autoconfigure: false
+        public: false
+        tags:
+            - { name: cache.pool } # I need this tag, so a collector is registered for this cache pool and details can be seen in the Symfony toolbar
 
-    sfes.annotations.cached_reader:
-        class: Doctrine\Common\Annotations\CachedReader
+#    sfes.cache_adapter:
+#        class: 'Symfony\Component\Cache\Adapter\PhpArrayAdapter'
+#        factory: ['Symfony\Component\Cache\Adapter\PhpArrayAdapter', 'create']
+#        arguments:
+#            - '%kernel.cache_dir%/sfes.cache.php'
+#            - '@cache.sfes'
+
+    sfes.metadata_cache_warmer:
+        class: 'Sineflow\ElasticsearchBundle\CacheWarmer\MetadataCacheWarmer'
         arguments:
-            - '@annotations.reader'
-            - '@sfes.cache_engine'
-            - '%kernel.debug%'
+            - '@Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector'
+        tags:
+            - { name: kernel.cache_warmer }
 
     sfes.logger.trace:
         class: Monolog\Logger

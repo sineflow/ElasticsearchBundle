@@ -2,13 +2,13 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Mapping;
 
-use Doctrine\Common\Cache\Cache;
 use Jchook\AssertThrows\AssertThrows;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadata;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentParser;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Class DocumentMetadataCollectorTest
@@ -38,9 +38,14 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
     private $docParser;
 
     /**
-     * @var Cache
+     * @var CacheInterface
      */
     private $cache;
+
+    /**
+     * @var CacheInterface
+     */
+    private $nullCache;
 
     /**
      * @var array Expected metadata for customer index
@@ -424,9 +429,10 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
         $this->indexManagers = $this->getContainer()->getParameter('sfes.indices');
         $this->docLocator    = $this->getContainer()->get(DocumentLocator::class);
         $this->docParser     = $this->getContainer()->get(DocumentParser::class);
-        $this->cache         = $this->getContainer()->get('sfes.cache_engine');
+        $this->cache         = $this->getContainer()->get('cache.system');
+        $this->nullCache     = $this->getContainer()->get('app.null_cache_adapter');
 
-        $this->metadataCollector = new DocumentMetadataCollector($this->indexManagers, $this->docLocator, $this->docParser, $this->cache, true);
+        $this->metadataCollector = new DocumentMetadataCollector($this->indexManagers, $this->docLocator, $this->docParser, $this->cache);
     }
 
     public function testGetDocumentMetadata()
@@ -449,10 +455,9 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
 
     public function testMetadataWithCacheVsNoCache()
     {
-        $metadataCollectorWithCacheEnabled = new DocumentMetadataCollector($this->indexManagers, $this->docLocator, $this->docParser, $this->cache, false);
-
-        $this->assertEquals($this->metadataCollector->getDocumentMetadata('AcmeFooBundle:Customer'), $metadataCollectorWithCacheEnabled->getDocumentMetadata('AcmeFooBundle:Customer'));
-        $this->assertEquals($this->metadataCollector->getObjectPropertiesMetadata('AcmeFooBundle:Customer'), $metadataCollectorWithCacheEnabled->getObjectPropertiesMetadata('AcmeFooBundle:Customer'));
+        $metadataCollectorWithCacheDisabled = new DocumentMetadataCollector($this->indexManagers, $this->docLocator, $this->docParser, $this->nullCache);
+        $this->assertEquals($this->metadataCollector->getDocumentMetadata('AcmeFooBundle:Customer'), $metadataCollectorWithCacheDisabled->getDocumentMetadata('AcmeFooBundle:Customer'));
+        $this->assertEquals($this->metadataCollector->getObjectPropertiesMetadata('AcmeFooBundle:Customer'), $metadataCollectorWithCacheDisabled->getObjectPropertiesMetadata('AcmeFooBundle:Customer'));
     }
 
     public function testGetObjectPropertiesMetadataWithValidClasses()
@@ -477,42 +482,6 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
         // Test non-existing class
         $this->assertThrows(\ReflectionException::class, function () {
             $this->metadataCollector->getObjectPropertiesMetadata('Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\NonExisting');
-        });
-    }
-
-    public function testGetDocumentMetadataForIndex()
-    {
-        $indexMetadata = $this->metadataCollector->getDocumentMetadataForIndex('customer');
-        $this->assertEquals(new DocumentMetadata($this->expectedCustomerMetadata), $indexMetadata);
-
-        $this->assertThrows(\InvalidArgumentException::class, function () {
-            $this->metadataCollector->getDocumentMetadataForIndex('non_existing_index');
-        });
-    }
-
-    public function testGetIndexManagersForDocumentClasses()
-    {
-        $docClassIndices = $this->metadataCollector->getIndexManagersForDocumentClasses();
-        $this->assertEquals([
-            'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Customer' => 'customer',
-            'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Order' => 'order',
-            'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product' => 'bar',
-            'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Log' => 'backup',
-        ], $docClassIndices);
-
-        $docClassIndices = $this->metadataCollector->getIndexManagersForDocumentClasses([
-            'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Customer',
-            'AcmeBarBundle:Product',
-        ]);
-        $this->assertEquals([
-            'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\Customer' => 'customer',
-            'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Product' => 'bar',
-        ], $docClassIndices);
-
-        $this->assertThrows(\InvalidArgumentException::class, function () {
-            $this->metadataCollector->getIndexManagersForDocumentClasses([
-                'Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\FooBundle\Document\NonExistingClass',
-            ]);
         });
     }
 

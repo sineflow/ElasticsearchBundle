@@ -761,6 +761,10 @@ class IndexManager
 
     /**
      * Get document metadata
+     *
+     * @return DocumentMetadata
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getDocumentMetadata(): DocumentMetadata
     {
@@ -771,6 +775,8 @@ class IndexManager
      * Get FQN of document class managed by this index manager
      *
      * @return string
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getDocumentClass(): string
     {
