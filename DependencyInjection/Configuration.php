@@ -26,6 +26,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('scalar')
                     ->end()
                 ->end()
+                ->scalarNode('metadata_cache_pool')->end()
                 ->append($this->getEntityLocationsNode())
                 ->append($this->getConnectionsNode())
                 ->append($this->getIndicesNode())

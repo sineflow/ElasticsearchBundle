@@ -4,6 +4,11 @@ Here is an example configuration, covering all available options:
 
 ```
 sineflow_elasticsearch:
+
+    languages: ['en', 'fr']
+
+    metadata_cache_pool: sfes.metadata_cache_pool
+
     entity_locations:
         # Specify locations of Elasticsearch entities
         # looks for entity classes in 'directory' directory and gives them an 'App' alias (so you can say things like App:Post):
@@ -62,6 +67,10 @@ sineflow_elasticsearch:
 
 And here is the breakdown:
 
+* `languages`: Specifies all languages that will be available for multilanguage properties
+
+* `metadata_cache_pool`: Optional cache pool to use for metadata caching. If not provided, the `cache.system` pool will be used by default
+
 * `entity_locations` *(required)*: Specifies all directories where the Elasticsearch entities are located
 
 * `connections` *(required)*: Here you define your Elasticsearch connections. In the above example we have only one connection, named **default**, which will be accessible from the service container like **$container->get('sfes.connection.default')** or just **$container->get('sfes.connection')** in case of the default connection.
@@ -77,3 +86,68 @@ It is important to note here the use of **'_'** in front of the index manager na
     * `use_aliases` *(default: true)*: Whether to setup read and write alias for working with the physical index. Very useful for being able to reindex with no downtime.
     * `settings`: Here you can specify any index settings supported by Elasticsearch. [See here for more info on that](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-update-settings.html)
     * `types`: This is where you specify the types, which will be managed by the index. This is done by listing the document entities that manage the respective types, in short notation.
+
+## Configuring custom cache pool:
+
+### Example 1 (cache metadata in Redis):
+
+```yaml
+services:
+    app.es.metadata_cache_provider:
+        class: 'Symfony\Component\Cache\Adapter\RedisAdapter'
+        factory: ['Symfony\Component\Cache\Adapter\AbstractAdapter', 'createConnection']
+        arguments:
+            - '%env(REDIS_DB1_DSN)%'
+
+framework:
+    cache:
+        pools:
+            sfes.metadata_cache_pool:
+                adapter: cache.adapter.redis
+                provider: app.es.metadata_cache_provider
+
+sineflow_elasticsearch:
+    metadata_cache_pool: sfes.metadata_cache_pool
+```
+
+### Example 2 (cache in Redis and change the cache namespace):
+
+```yaml
+services:
+    app.es.metadata_cache_provider:
+        class: 'Symfony\Component\Cache\Adapter\RedisAdapter'
+        factory: ['Symfony\Component\Cache\Adapter\AbstractAdapter', 'createConnection']
+        arguments:
+            - '%env(REDIS_DB1_DSN)%'
+
+    app.es.cache.adapter.redis:
+        parent: 'cache.adapter.redis'
+        tags:
+            - { name: 'cache.pool', namespace: '%deploy_env_prefix%es_cache' }
+
+framework:
+    cache:
+        pools:
+            sfes.metadata_cache_pool:
+                adapter: app.es.cache.adapter.redis
+                provider: app.es.metadata_cache_provider
+
+sineflow_elasticsearch:
+    metadata_cache_pool: sfes.metadata_cache_pool
+```
+
+
+### Example 3 (cache in Redis, using a Client provided by the snc_redis bundle):
+
+```yaml
+framework:
+    cache:
+        pools:
+            sfes.metadata_cache_pool:
+                adapter: cache.adapter.redis
+                provider: snc_redis.cache
+
+sineflow_elasticsearch:
+    metadata_cache_pool: sfes.metadata_cache_pool
+```
+

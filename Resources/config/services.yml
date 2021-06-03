@@ -82,7 +82,6 @@ services:
             - '%sfes.indices%'
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentLocator'
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentParser'
-            - '@cache.sfes'
 
     Sineflow\ElasticsearchBundle\Profiler\Handler\CollectionHandler:
         arguments:
@@ -106,14 +105,6 @@ services:
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector'
         tags:
             - { name: kernel.event_subscriber }
-
-    cache.sfes:
-        parent: 'cache.system'
-        autowire: false
-        autoconfigure: false
-        public: false
-        tags:
-            - { name: cache.pool } # I need this tag, so a collector is registered for this cache pool and details can be seen in the Symfony toolbar
 
     sfes.metadata_cache_warmer:
         class: 'Sineflow\ElasticsearchBundle\CacheWarmer\MetadataCacheWarmer'
