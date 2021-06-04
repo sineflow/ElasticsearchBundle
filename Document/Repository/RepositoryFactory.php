@@ -27,6 +27,12 @@ class RepositoryFactory
      */
     private $knownRepositories = [];
 
+    /**
+     * RepositoryFactory constructor.
+     *
+     * @param ServiceLocator $container
+     * @param Finder         $finder
+     */
     public function __construct(ServiceLocator $container, Finder $finder)
     {
         $this->container = $container;
@@ -44,11 +50,11 @@ class RepositoryFactory
         $customRepositoryClass = $documentMetadata->getRepositoryClass();
 
         // If there is a custom repository specified for the entity
-        if ($customRepositoryClass !== null) {
+        if (null !== $customRepositoryClass) {
             // Try to get from the service container, in case there is such service available
             if ($this->container->has($customRepositoryClass)) {
                 $repository = $this->container->get($customRepositoryClass);
-                if (! $repository instanceof Repository) {
+                if (!$repository instanceof Repository) {
                     throw new \RuntimeException(sprintf('The service "%s" must extend "%s".', $customRepositoryClass, Repository::class));
                 }
 
@@ -61,7 +67,7 @@ class RepositoryFactory
             }
 
             // If the repository class specified doesn't exist at all
-            if (! class_exists($customRepositoryClass)) {
+            if (!class_exists($customRepositoryClass)) {
                 throw new \RuntimeException(sprintf('The "%s" entity has a repositoryClass set to "%s", but this is not a valid class. Check your class naming. If this is meant to be a service id, make sure this service exists and is tagged with "sfes.repository".', $documentMetadata->getClassName(), $customRepositoryClass));
             }
 
@@ -69,7 +75,7 @@ class RepositoryFactory
         }
 
         // if we already have the repository instance for this IndexManager from before, return it straight away
-        $repositoryHash = $documentMetadata->getClassName() . spl_object_hash($indexManager);
+        $repositoryHash = $documentMetadata->getClassName().spl_object_hash($indexManager);
         if (isset($this->knownRepositories[$repositoryHash])) {
             return $this->knownRepositories[$repositoryHash];
         }
@@ -87,7 +93,7 @@ class RepositoryFactory
     private function createRepository(IndexManager $indexManager, DocumentMetadata $documentMetadata): Repository
     {
         $repositoryClass = $documentMetadata->getRepositoryClass() ?: Repository::class;
-        $repository = new $repositoryClass($indexManager, $this->finder);;
+        $repository = new $repositoryClass($indexManager, $this->finder);
 
         return $repository;
     }

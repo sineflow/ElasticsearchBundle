@@ -5,6 +5,14 @@ namespace Sineflow\ElasticsearchBundle\Tests;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+// Since symfony/framework-bundle 5.3, there is already a getContainer() method in KernelTestCase,
+// which makes AbstractContainerAwareTestCase obsolete
+if (method_exists(KernelTestCase::class, 'getContainer')) {
+    abstract class AbstractContainerAwareTestCase extends KernelTestCase {}
+
+    return;
+}
+
 /**
  * Base test which gives access to container
  */
