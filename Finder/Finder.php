@@ -176,7 +176,18 @@ class Finder
 
         $totalHits = $raw['hits']['total']['value'];
 
-        return (count($raw['hits']['hits']) > 0) ? $this->parseResult($raw, $resultsType, $documentClasses) : false;
+        // If no results were returned, clear the scroll
+        if (count($raw['hits']['hits']) === 0) {
+            $client->clearScroll([
+                'body' => [
+                    'scroll_id' => $scrollId,
+                ],
+            ]);
+
+            return false;
+        }
+
+        return $this->parseResult($raw, $resultsType, $documentClasses);
     }
 
     /**
