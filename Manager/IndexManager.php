@@ -276,15 +276,17 @@ class IndexManager
     /**
      * Return a name for a new index, which does not already exist
      *
+     * @param string|null $suffix
+     *
      * @return string
      */
-    private function getUniqueIndexName(): string
+    protected function getUniqueIndexName(?string $suffix): string
     {
-        $indexName = $baseName = $this->getBaseIndexName().'_'.date('YmdHis');
+        $indexName = $baseName = $this->getBaseIndexName().($suffix ?? '_'.date('YmdHis'));
 
         $i = 1;
         // Keep trying other names until there is no such existing index or alias
-        while ($this->getConnection()->existsIndexOrAlias(array('index' => $indexName))) {
+        while ($this->getConnection()->existsIndexOrAlias(['index' => $indexName])) {
             $indexName = $baseName.'_'.$i;
             $i++;
         }
@@ -654,12 +656,14 @@ class IndexManager
     /**
      * Created a new index with a unique name
      *
+     * @param string|null $suffix
+     *
      * @return string
      */
-    protected function createNewIndexWithUniqueName(): string
+    protected function createNewIndexWithUniqueName(?string $suffix = null): string
     {
         $settings = $this->getIndexMapping();
-        $newIndex = $this->getUniqueIndexName();
+        $newIndex = $this->getUniqueIndexName($suffix);
         $settings['index'] = $newIndex;
         $this->getConnection()->getClient()->indices()->create($settings);
 

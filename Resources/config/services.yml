@@ -2,7 +2,6 @@ imports:
     - { resource: services_commands.yml }
 
 parameters:
-    sfes.logging.path: "%kernel.logs_dir%/%kernel.environment%.sf_elasticsearch.log"
     sfes.profiler_backtrace_enabled: false
     sfes.mlproperty.language_separator: '-'
 
@@ -88,13 +87,6 @@ services:
             - '@request_stack'
             - '%sfes.profiler_backtrace_enabled%'
 
-    Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler:
-        calls:
-            - [setIndexManagers, ['%sfes.indices%']]
-            - [addLogger, ['@sfes.logger.trace']]
-        tags:
-            - {name: data_collector, template: '@SineflowElasticsearch/Profiler/profiler.html.twig', id: sfes.profiler}
-
     Sineflow\ElasticsearchBundle\Subscriber\KnpPaginateQuerySubscriber:
         arguments: ['@request_stack']
         tags:
@@ -113,18 +105,15 @@ services:
         tags:
             - { name: kernel.cache_warmer }
 
-    sfes.logger.trace:
+    Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler:
+        calls:
+            - [setIndexManagers, ['%sfes.indices%']]
+            - [addLogger, ['@sfes.logger.profiler']]
+        tags:
+            - {name: data_collector, template: '@SineflowElasticsearch/Profiler/profiler.html.twig', id: sfes.profiler}
+
+    sfes.logger.profiler:
         class: Monolog\Logger
-        arguments: ['sfes_trace']
+        arguments: ['sfes_profiler']
         calls:
             - [pushHandler, ['@Sineflow\ElasticsearchBundle\Profiler\Handler\CollectionHandler']]
-
-    sfes.logger.log_handler:
-        class: Monolog\Handler\RotatingFileHandler
-        arguments: ['%sfes.logging.path%', 0, notice]
-
-    sfes.logger.log:
-        class: Monolog\Logger
-        arguments: ['sfes_log']
-        calls:
-            - [pushHandler, ['@sfes.logger.log_handler']]

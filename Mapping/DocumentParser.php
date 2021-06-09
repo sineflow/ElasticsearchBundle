@@ -51,9 +51,10 @@ class DocumentParser
     private $languages;
 
     /**
-     * @param Reader          $reader            Used for reading annotations.
-     * @param DocumentLocator $documentLocator   Used for resolving namespaces.
+     * @param Reader          $reader            Used for reading annotations
+     * @param DocumentLocator $documentLocator   Used for resolving namespaces
      * @param string          $languageSeparator String separating the language code from the ML property name
+     * @param array           $languages         List of all supported languages
      */
     public function __construct(Reader $reader, DocumentLocator $documentLocator, string $languageSeparator, array $languages = [])
     {
@@ -324,7 +325,7 @@ class DocumentParser
      *
      * @throws \ReflectionException
      */
-    private function getPropertyMapping(Property $propertyAnnotation, $language = null, array $indexAnalyzers = [])
+    private function getPropertyMapping(Property $propertyAnnotation, string $language = null, array $indexAnalyzers = [])
     {
         $propertyMapping = $propertyAnnotation->dump([
             'language' => $language,

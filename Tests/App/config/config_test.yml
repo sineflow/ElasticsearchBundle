@@ -86,7 +86,8 @@ services:
             - { name: sfes.provider }
         public: true
 
-    sfes.index.blah: # some index manager service that is not actually an index manager
+    # Some service named as an index manager that is not actually an index manager
+    sfes.index.blah:
         class: Sineflow\ElasticsearchBundle\Tests\App\fixture\Acme\BarBundle\Document\Repository\ProductRepository
         public: true
 
@@ -98,3 +99,18 @@ services:
     app.null_cache_adapter:
         class: 'Symfony\Component\Cache\Adapter\NullAdapter'
         public: true
+
+    # Override Symfony's default logger, which outputs to stderr
+    logger:
+        class: Monolog\Logger
+        arguments: ['sfes']
+        calls:
+            - [pushHandler, ['@app.null_log_handler']]
+
+    app.null_log_handler:
+        class: Monolog\Handler\NullHandler
+
+    app.file_log_handler:
+        class: Monolog\Handler\RotatingFileHandler
+        arguments: ['%kernel.logs_dir%/%kernel.environment%.sf_elasticsearch.log']
+
