@@ -63,18 +63,23 @@ class ConnectionManager
     private $eventDispatcher;
 
     /**
-     * Construct.
-     *
-     * @param string $connectionName     The unique connection name
-     * @param array  $connectionSettings Settings array.
+     * @var bool
      */
-    public function __construct(string $connectionName, array $connectionSettings)
+    private $kernelDebug;
+
+    /**
+     * @param string $connectionName     The unique connection name
+     * @param array  $connectionSettings Settings array
+     * @param bool   $kernelDebug        The kernel.debug value
+     */
+    public function __construct(string $connectionName, array $connectionSettings, bool $kernelDebug)
     {
         $this->connectionName = $connectionName;
         $this->connectionSettings = $connectionSettings;
         $this->bulkQueries = [];
         $this->bulkParams = [];
         $this->autocommit = false;
+        $this->kernelDebug = $kernelDebug;
     }
 
     /**
@@ -125,7 +130,7 @@ class ConnectionManager
         if (!$this->client) {
             $clientBuilder = ClientBuilder::create();
             $clientBuilder->setHosts($this->connectionSettings['hosts']);
-            if ($this->tracer) {
+            if ($this->tracer && $this->kernelDebug) {
                 $clientBuilder->setTracer($this->tracer);
             }
             if ($this->logger) {

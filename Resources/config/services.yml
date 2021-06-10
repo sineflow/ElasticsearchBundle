@@ -23,6 +23,7 @@ services:
         arguments:
             - # connection name
             - # connection settings
+            - '%kernel.debug%'
 
     sfes.index_manager_prototype:
         abstract: true
