@@ -74,7 +74,7 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
         $imWithoutAliases->getRepository()->getById(3);
 
         $this->assertGreaterThan(0.0, $this->getCollector()->getTime(), 'Time should be greater than 0ms');
-        $this->assertLessThan(1000.0, $this->getCollector()->getTime(), 'Time should be less than 1s');
+        $this->assertLessThan(2000.0, $this->getCollector()->getTime(), 'Time should be less than 2s');
     }
 
     /**

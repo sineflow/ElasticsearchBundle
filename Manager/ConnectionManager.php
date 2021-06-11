@@ -317,13 +317,13 @@ class ConnectionManager
     }
 
     /**
-     * Send refresh call to index.
-     *
-     * Makes your documents available for search.
+     * Refresh all indices, making any newly indexed documents immediately available for search
      */
     public function refresh()
     {
-        $this->getClient()->indices()->refresh();
+        // Use an index wildcard to avoid deprecation warnings about accessing system indices
+        // Passing this 'index' argument should not be necessary in ES8
+        $this->getClient()->indices()->refresh(['index' => '*,-.*']);
     }
 
     /**
@@ -345,8 +345,9 @@ class ConnectionManager
     public function getAliases(): array
     {
         $aliases = [];
-        // Get all indices and their linked aliases and invert the results
-        $indices = $this->getClient()->indices()->getAlias();
+        // Get all indices and their linked aliases (exc. dot-prefixed indices) and invert the results
+        // Passing this 'index' argument should not be necessary in ES8
+        $indices = $this->getClient()->indices()->getAlias(['index' => '*,-.*']);
         foreach ($indices as $index => $data) {
             foreach ($data['aliases'] as $alias => $aliasData) {
                 $aliases[$alias][$index] = [];
@@ -378,8 +379,9 @@ class ConnectionManager
 
         $indicesAndAliasesToCheck = array_flip(explode(',', $params['index']));
 
-        // Get all available indices with their aliases
-        $allAliases = $this->getClient()->indices()->getAlias();
+        // Get all available indices (exc. dot-prefixed indices) with their aliases
+        // Passing this 'index' argument should not be necessary in ES8
+        $allAliases = $this->getClient()->indices()->getAlias(['index' => '*,-.*']);
         foreach ($allAliases as $index => $data) {
             if (isset($indicesAndAliasesToCheck[$index])) {
                 unset($indicesAndAliasesToCheck[$index]);
@@ -421,8 +423,9 @@ class ConnectionManager
 
         $aliasesToCheck = explode(',', $params['name']);
 
-        // Get all available indexes with their aliases
-        $allAliases = $this->getClient()->indices()->getAlias();
+        // Get all available indices (exc. dot-prefixed indices) with their aliases
+        // Passing this 'index' argument should not be necessary in ES8
+        $allAliases = $this->getClient()->indices()->getAlias(['index' => '*,-.*']);
         foreach ($allAliases as $index => $data) {
             foreach ($aliasesToCheck as $aliasToCheck) {
                 if (isset($data['aliases'][$aliasToCheck])) {
