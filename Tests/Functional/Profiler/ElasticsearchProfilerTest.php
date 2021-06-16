@@ -82,10 +82,6 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
      */
     public function testCorrectDataLogged()
     {
-        $this->markTestSkipped(
-            'Skipped until this is fixed: https://github.com/elastic/elasticsearch-php/issues/1113'
-        );
-
         $imWithoutAliases = $this->getIndexManager('bar');
         $imWithoutAliases->getConnection()->setAutocommit(true);
         $imWithoutAliases->getRepository()->getById(3);
