@@ -41,8 +41,9 @@ jobs:
             - ./vendor
 
       # Setup Elasticsearch
-      - run: wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}${ES_FILENAME_SUFFIX}.tar.gz
-      - run: tar -xzf elasticsearch-${ES_VERSION}${ES_FILENAME_SUFFIX}.tar.gz
+      - run: export ES_VERSION=7.11.1
+      - run: wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
+      - run: tar -xzf elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
       - run: ./elasticsearch-${ES_VERSION}/bin/elasticsearch -d
 
       # run tests
