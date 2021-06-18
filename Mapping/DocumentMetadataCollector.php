@@ -22,20 +22,6 @@ class DocumentMetadataCollector implements WarmableInterface
     const OBJECTS_CACHE_KEY_PREFIX = 'sfes.object_properties_metadata.';
 
     /**
-     * <document_class_FQN> => DocumentMetadata
-     *
-     * @var array
-     */
-    private $metadata = [];
-
-    /**
-     * <object_class_FQN> => [<properties_metadata>]
-     *
-     * @var array
-     */
-    private $objectsMetadata = [];
-
-    /**
      * @var array
      *
      * <document_class_FQN> => <index_manager_name>
@@ -129,16 +115,11 @@ class DocumentMetadataCollector implements WarmableInterface
     {
         $documentClass = $this->documentLocator->resolveClassName($documentClass);
 
-        if (isset($this->metadata[$documentClass])) {
-            return $this->metadata[$documentClass];
-        }
-
         $cacheKey = self::DOCUMENTS_CACHE_KEY_PREFIX.strtr($documentClass, '\\', '.');
-        $this->metadata[$documentClass] = $this->cache->get($cacheKey, function (ItemInterface $item) use ($documentClass) {
+
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($documentClass) {
             return $this->fetchDocumentMetadata($documentClass);
         }, 0);
-
-        return $this->metadata[$documentClass];
     }
 
     /**
@@ -155,16 +136,11 @@ class DocumentMetadataCollector implements WarmableInterface
     {
         $objectClass = $this->documentLocator->resolveClassName($objectClass);
 
-        if (isset($this->objectsMetadata[$objectClass])) {
-            return $this->objectsMetadata[$objectClass];
-        }
-
         $cacheKey = self::OBJECTS_CACHE_KEY_PREFIX.strtr($objectClass, '\\', '.');
-        $this->objectsMetadata[$objectClass] = $this->cache->get($cacheKey, function (ItemInterface $item) use ($objectClass) {
+
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($objectClass) {
             return $this->parser->getPropertiesMetadata(new \ReflectionClass($objectClass));
         }, 0);
-
-        return $this->objectsMetadata[$objectClass];
     }
 
     /**
