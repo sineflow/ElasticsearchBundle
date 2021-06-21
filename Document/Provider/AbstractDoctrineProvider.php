@@ -33,7 +33,7 @@ abstract class AbstractDoctrineProvider extends AbstractProvider
     protected $doctrineEntityName;
 
     /**
-     * @var bool How to hydrate doctrine results
+     * @var int How to hydrate doctrine results
      */
     protected $sourceDataHydration = AbstractQuery::HYDRATE_OBJECT;
 
