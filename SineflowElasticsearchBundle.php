@@ -4,6 +4,7 @@ namespace Sineflow\ElasticsearchBundle;
 
 use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\AddConnectionsPass;
 use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\AddIndexManagersPass;
+use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\SetCachePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -21,5 +22,6 @@ class SineflowElasticsearchBundle extends Bundle
 
         $container->addCompilerPass(new AddConnectionsPass());
         $container->addCompilerPass(new AddIndexManagersPass());
+        $container->addCompilerPass(new SetCachePass());
     }
 }
