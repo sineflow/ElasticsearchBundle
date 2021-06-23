@@ -20,52 +20,52 @@ class ConnectionManager
     /**
      * @var string The unique connection manager name (the key from the index configuration)
      */
-    private $connectionName;
+    protected $connectionName;
 
     /**
      * @var Client
      */
-    private $client;
+    protected $client;
 
     /**
      * @var array
      */
-    private $connectionSettings;
+    protected $connectionSettings;
 
     /**
      * @var BulkQueryItem[] Container for bulk queries.
      */
-    private $bulkQueries;
+    protected $bulkQueries;
 
     /**
      * @var array Holder for consistency, refresh and replication parameters.
      */
-    private $bulkParams;
+    protected $bulkParams;
 
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    protected $logger;
 
     /**
      * @var LoggerInterface
      */
-    private $tracer;
+    protected $tracer;
 
     /**
      * @var bool
      */
-    private $autocommit;
+    protected $autocommit;
 
     /**
      * @var EventDispatcherInterface
      */
-    private $eventDispatcher;
+    protected $eventDispatcher;
 
     /**
      * @var bool
      */
-    private $kernelDebug;
+    protected $kernelDebug;
 
     /**
      * @param string $connectionName     The unique connection name
