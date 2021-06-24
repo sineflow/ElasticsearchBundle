@@ -99,8 +99,7 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
-    sfes.metadata_cache_warmer:
-        class: 'Sineflow\ElasticsearchBundle\CacheWarmer\MetadataCacheWarmer'
+    Sineflow\ElasticsearchBundle\CacheWarmer\MetadataCacheWarmer:
         arguments:
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector'
         tags:

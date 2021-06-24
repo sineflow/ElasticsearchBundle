@@ -25,8 +25,8 @@ class SetCachePass implements CompilerPassInterface
         } else {
             if (!$container->getParameter('kernel.debug')) {
                 // Use a service extending cache.system when kernel.debug is false (typically in prod and stage)
-                $cachePoolDefinition = new ChildDefinition('cache.system');
-                $cachePoolDefinition->addTag('cache.pool');
+                $container->setDefinition('sfes.cache.metadata', (new ChildDefinition('cache.system'))->addTag('cache.pool'));
+                $cachePoolDefinition = new Reference('sfes.cache.metadata');
             } else {
                 // By default, don't use cache if kernel.debug is set (typically in dev and test)
                 $cachePoolDefinition = new Definition(NullAdapter::class);
