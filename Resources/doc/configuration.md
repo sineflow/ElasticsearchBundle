@@ -89,65 +89,25 @@ It is important to note here the use of **'_'** in front of the index manager na
 
 ## Configuring custom cache pool:
 
-### Example 1 (cache metadata in Redis):
+### Example (cache metadata in Redis):
 
 ```yaml
 services:
-    app.es.metadata_cache_provider:
-        class: 'Symfony\Component\Cache\Adapter\RedisAdapter'
-        factory: ['Symfony\Component\Cache\Adapter\AbstractAdapter', 'createConnection']
+    app.redis.client.cache:
+        class: Predis\Client
+        factory: ['Symfony\Component\Cache\Adapter\RedisAdapter', 'createConnection']
         arguments:
             - '%env(REDIS_DB1_DSN)%'
 
-framework:
-    cache:
-        pools:
-            sfes.metadata_cache_pool:
-                adapter: cache.adapter.redis
-                provider: app.es.metadata_cache_provider
-
-sineflow_elasticsearch:
-    metadata_cache_pool: sfes.metadata_cache_pool
-```
-
-### Example 2 (cache in Redis and change the cache namespace):
-
-```yaml
-services:
-    app.es.metadata_cache_provider:
-        class: 'Symfony\Component\Cache\Adapter\RedisAdapter'
-        factory: ['Symfony\Component\Cache\Adapter\AbstractAdapter', 'createConnection']
-        arguments:
-            - '%env(REDIS_DB1_DSN)%'
-
-    app.es.cache.adapter.redis:
+    app.cache.sfes:
         parent: 'cache.adapter.redis'
         tags:
-            - { name: 'cache.pool', namespace: '%deploy_env_prefix%es_cache' }
-
-framework:
-    cache:
-        pools:
-            sfes.metadata_cache_pool:
-                adapter: app.es.cache.adapter.redis
-                provider: app.es.metadata_cache_provider
+            - name: cache.pool
+              namespace: '%deploy_env_prefix%es_cache' # Optional, if you want to control the namespace, otherwise it is a unique hash string
+              clearer: cache.system_clearer            # Optional, if you want your cache to be cleared with the system cache (i.e. with cache:clear)
+              provider: app.redis.client.cache         # Use the Predis client declared above, created by Symfony's built-in redis adapter
+              #provider: snc_redis.cache               # Use a Predis client created by the snc_redis bundle
 
 sineflow_elasticsearch:
     metadata_cache_pool: sfes.metadata_cache_pool
 ```
-
-
-### Example 3 (cache in Redis, using a Client provided by the snc_redis bundle):
-
-```yaml
-framework:
-    cache:
-        pools:
-            sfes.metadata_cache_pool:
-                adapter: cache.adapter.redis
-                provider: snc_redis.cache
-
-sineflow_elasticsearch:
-    metadata_cache_pool: sfes.metadata_cache_pool
-```
-
