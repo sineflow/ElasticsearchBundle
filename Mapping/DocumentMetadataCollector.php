@@ -93,10 +93,15 @@ class DocumentMetadataCollector implements WarmableInterface
     {
         // force cache generation
         foreach ($this->documentClassToIndexManagerNames as $documentClass => $indexManagerName) {
-            $this->getDocumentMetadata($documentClass);
-        }
+            $documentMetadata = $this->getDocumentMetadata($documentClass);
 
-        // TODO: call getObjectPropertiesMetadata for every ES document/object entity available, so the properties metadata cache is also warmed up
+            $recursive = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($documentMetadata->getPropertiesMetadata()));
+            foreach ($recursive as $key => $value) {
+                if ('className' === $key) {
+                    $this->getObjectPropertiesMetadata($value);
+                }
+            }
+        }
 
         return [];
     }
