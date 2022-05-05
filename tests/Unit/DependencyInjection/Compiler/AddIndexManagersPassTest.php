@@ -45,28 +45,28 @@ class AddIndexManagersPassTest extends TestCase
 
         $containerMock->method('hasDefinition')->with($this->anything())
             ->willReturnCallback(
-                    static function ($parameter) {
-                        switch ($parameter) {
-                            case 'sfes.connection.test1':
-                                return true;
-                            default:
-                                return null;
-                        }
+                static function ($parameter) {
+                    switch ($parameter) {
+                        case 'sfes.connection.test1':
+                            return true;
+                        default:
+                            return null;
                     }
+                }
             );
 
         $containerMock->expects($this->exactly(1))->method('getParameter')->with($this->anything())
             ->willReturnCallback(
-                    static function ($parameter) use ($connections, $managers) {
-                        switch ($parameter) {
-                            case 'sfes.indices':
-                                return $managers;
-                            case 'sfes.connections':
-                                return $connections;
-                            default:
-                                return null;
-                        }
+                static function ($parameter) use ($connections, $managers) {
+                    switch ($parameter) {
+                        case 'sfes.indices':
+                            return $managers;
+                        case 'sfes.connections':
+                            return $connections;
+                        default:
+                            return null;
                     }
+                }
             );
 
         $containerMock
