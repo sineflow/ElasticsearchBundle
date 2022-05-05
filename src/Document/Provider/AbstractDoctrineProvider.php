@@ -47,9 +47,6 @@ abstract class AbstractDoctrineProvider extends AbstractProvider
         $this->em = $em;
     }
 
-    /**
-     * @param int $batchSize
-     */
     public function setBatchSize(int $batchSize)
     {
         $this->batchSize = $batchSize;
@@ -57,8 +54,6 @@ abstract class AbstractDoctrineProvider extends AbstractProvider
 
     /**
      * Gets the query that will return all records from the DB
-     *
-     * @return Query
      */
     abstract public function getQuery(): Query;
 
@@ -81,7 +76,7 @@ abstract class AbstractDoctrineProvider extends AbstractProvider
      */
     public function getDocuments()
     {
-        set_time_limit(3600);
+        \set_time_limit(3600);
 
         $query = $this->getQuery();
 
@@ -94,7 +89,7 @@ abstract class AbstractDoctrineProvider extends AbstractProvider
             $records = $query->getResult($this->sourceDataHydration);
 
             $this->em->clear();
-            gc_collect_cycles();
+            \gc_collect_cycles();
 
             // Convert each to an ES entity and return it
             foreach ($records as $record) {

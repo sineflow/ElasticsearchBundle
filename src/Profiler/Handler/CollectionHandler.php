@@ -27,8 +27,7 @@ class CollectionHandler extends AbstractProcessingHandler
     private $backtraceEnabled;
 
     /**
-     * @param RequestStack $requestStack
-     * @param bool         $backtraceEnabled
+     * @param bool $backtraceEnabled
      */
     public function __construct(RequestStack $requestStack, $backtraceEnabled = false)
     {
@@ -49,7 +48,7 @@ class CollectionHandler extends AbstractProcessingHandler
 
         $record['extra']['backtrace'] = null;
         if ($this->backtraceEnabled && !empty($record['context'])) {
-            $record['extra']['backtrace'] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            $record['extra']['backtrace'] = \debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS);
         }
 
         $this->records[] = $record;

@@ -43,9 +43,7 @@ class DocumentIterator implements \Countable, \Iterator
     /**
      * Constructor.
      *
-     * @param array                    $rawData
-     * @param DocumentConverter        $documentConverter
-     * @param IndicesToDocumentClasses $indicesToDocumentClasses
+     * @param array $rawData
      */
     public function __construct($rawData, DocumentConverter $documentConverter, IndicesToDocumentClasses $indicesToDocumentClasses)
     {
@@ -95,7 +93,7 @@ class DocumentIterator implements \Countable, \Iterator
      */
     public function count()
     {
-        return count($this->documents);
+        return \count($this->documents);
     }
 
     /**
@@ -111,7 +109,7 @@ class DocumentIterator implements \Countable, \Iterator
      */
     public function next()
     {
-        next($this->documents);
+        \next($this->documents);
     }
 
     /**
@@ -119,7 +117,7 @@ class DocumentIterator implements \Countable, \Iterator
      */
     public function key()
     {
-        return key($this->documents);
+        return \key($this->documents);
     }
 
     /**
@@ -127,7 +125,7 @@ class DocumentIterator implements \Countable, \Iterator
      */
     public function valid()
     {
-        return $this->key() !== null;
+        return null !== $this->key();
     }
 
     /**
@@ -135,7 +133,7 @@ class DocumentIterator implements \Countable, \Iterator
      */
     public function rewind()
     {
-        reset($this->documents);
+        \reset($this->documents);
     }
 
     /**

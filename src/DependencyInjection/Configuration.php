@@ -38,8 +38,6 @@ class Configuration implements ConfigurationInterface
     /**
      * Connections configuration node.
      *
-     * @return NodeDefinition
-     *
      * @throws InvalidConfigurationException
      */
     private function getEntityLocationsNode(): NodeDefinition
@@ -72,8 +70,6 @@ class Configuration implements ConfigurationInterface
 
     /**
      * Connections configuration node.
-     *
-     * @return NodeDefinition
      *
      * @throws InvalidConfigurationException
      */
@@ -118,8 +114,6 @@ class Configuration implements ConfigurationInterface
 
     /**
      * Managers configuration node.
-     *
-     * @return NodeDefinition
      */
     private function getIndicesNode(): NodeDefinition
     {
@@ -132,21 +126,21 @@ class Configuration implements ConfigurationInterface
             ->useAttributeAsKey('id')
             ->info('Defines Elasticsearch indices')
             ->beforeNormalization()
-                ->always(function ($v) {
+                ->always(static function ($v) {
                     $templates = [];
-                    if (!is_array($v)) {
+                    if (!\is_array($v)) {
                         return [];
                     }
                     foreach ($v as $indexManager => $values) {
-                        if ($indexManager[0] === '_') {
+                        if ('_' === $indexManager[0]) {
                             $templates[$indexManager] = $values;
                             unset($v[$indexManager]);
                         }
                         if (isset($values['extends'])) {
                             if (!isset($templates[$values['extends']])) {
-                                throw new \InvalidArgumentException(sprintf('Index manager "%s" extends "%s", but it is not defined', $indexManager, $values['extends']));
+                                throw new \InvalidArgumentException(\sprintf('Index manager "%s" extends "%s", but it is not defined', $indexManager, $values['extends']));
                             }
-                            $v[$indexManager] = array_merge($templates[$values['extends']], $v[$indexManager]);
+                            $v[$indexManager] = \array_merge($templates[$values['extends']], $v[$indexManager]);
                         }
                         unset($v[$indexManager]['extends']);
                     }

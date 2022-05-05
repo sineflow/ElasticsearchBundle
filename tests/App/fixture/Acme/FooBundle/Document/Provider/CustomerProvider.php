@@ -16,7 +16,6 @@ class CustomerProvider extends AbstractProvider
             'id' => 2,
             'name' => 'Jane',
         ],
-
     ];
 
     public function getDocuments()

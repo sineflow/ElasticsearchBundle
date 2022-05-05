@@ -29,9 +29,6 @@ class Repository
 
     /**
      * Constructor.
-     *
-     * @param IndexManager $indexManager
-     * @param Finder       $finder
      */
     public function __construct(IndexManager $indexManager, Finder $finder)
     {
@@ -40,9 +37,6 @@ class Repository
         $this->documentClass = $indexManager->getDocumentClass();
     }
 
-    /**
-     * @return IndexManager
-     */
     public function getIndexManager(): IndexManager
     {
         return $this->indexManager;
@@ -71,18 +65,13 @@ class Repository
      *
      * @return mixed
      */
-    public function find(array $searchBody, int $resultsType = Finder::RESULTS_OBJECT, array $additionalRequestParams = [], int &$totalHits = null)
+    public function find(array $searchBody, int $resultsType = Finder::RESULTS_OBJECT, array $additionalRequestParams = [], ?int &$totalHits = null)
     {
         return $this->finder->find([$this->documentClass], $searchBody, $resultsType, $additionalRequestParams, $totalHits);
     }
 
     /**
      * Returns the number of records matching the given query
-     *
-     * @param array $searchBody
-     * @param array $additionalRequestParams
-     *
-     * @return int
      */
     public function count(array $searchBody = [], array $additionalRequestParams = []): int
     {

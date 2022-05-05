@@ -42,11 +42,8 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
 
     /**
      * Populates elasticsearch with data.
-     *
-     * @param IndexManager $indexManager
-     * @param array        $data
      */
-    protected function populateElasticsearchWithData($indexManager, array $data)
+    protected function populateElasticsearchWithData(IndexManager $indexManager, array $data)
     {
         if (!empty($data)) {
             foreach ($data as $document) {
@@ -55,7 +52,7 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
             try {
                 $indexManager->getConnection()->commit();
             } catch (BulkRequestException $e) {
-                print_r($e->getBulkResponseItems());
+                \print_r($e->getBulkResponseItems());
                 throw $e;
             }
         }
@@ -89,10 +86,10 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
      */
     protected function getIndexManager($name, $createIndex = true)
     {
-        $serviceName = sprintf('sfes.index.%s', $name);
+        $serviceName = \sprintf('sfes.index.%s', $name);
 
         if (!$this->getContainer()->has($serviceName)) {
-            throw new \LogicException(sprintf('Index manager "%s" does not exist', $name));
+            throw new \LogicException(\sprintf('Index manager "%s" does not exist', $name));
         }
 
         /** @var IndexManager $indexManager */

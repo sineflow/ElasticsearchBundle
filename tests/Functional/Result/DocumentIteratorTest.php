@@ -23,11 +23,11 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
         return [
             'bar' => [
                 [
-                    '_id'                => '1',
-                    'title'              => 'Foo Product',
-                    'category'           => [
+                    '_id' => '1',
+                    'title' => 'Foo Product',
+                    'category' => [
                         'title' => 'Bar',
-                        'tags'  => [
+                        'tags' => [
                             ['tagname' => 'first tag'],
                             ['tagname' => 'second tag'],
                         ],
@@ -35,7 +35,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
                     'related_categories' => [
                         [
                             'title' => 'Acme',
-                            'tags'  => [
+                            'tags' => [
                                 ['tagname' => 'tutu'],
                             ],
                         ],
@@ -43,13 +43,13 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
                             'title' => 'Doodle',
                         ],
                     ],
-                    'ml_info-en'         => 'info in English',
-                    'ml_info-fr'         => 'info in French',
+                    'ml_info-en' => 'info in English',
+                    'ml_info-fr' => 'info in French',
                 ],
                 [
-                    '_id'                => '2',
-                    'title'              => 'Bar Product',
-                    'category'           => null,
+                    '_id' => '2',
+                    'title' => 'Bar Product',
+                    'category' => null,
                     'related_categories' => [
                         [
                             'title' => 'Acme',
@@ -60,8 +60,8 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
                     ],
                 ],
                 [
-                    '_id'                => '3',
-                    'title'              => '3rd Product',
+                    '_id' => '3',
+                    'title' => '3rd Product',
                     'related_categories' => [],
                 ],
                 [
@@ -81,7 +81,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
 
         /** @var DocumentIterator $iterator */
         $iterator = $repo->find(
-            ['query' => ['match_all' => (object)[]], 'size' => 3, 'sort' => ['_id' => ['order' => 'asc']]],
+            ['query' => ['match_all' => (object) []], 'size' => 3, 'sort' => ['_id' => ['order' => 'asc']]],
             Finder::RESULTS_OBJECT
         );
 
@@ -96,7 +96,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
         foreach ($iterator as $document) {
             $categories = $document->relatedCategories;
 
-            if ($iteration === 0) {
+            if (0 === $iteration) {
                 $this->assertInstanceOf(ObjCategory::class, $document->category);
             } else {
                 $this->assertNull($document->category);
@@ -109,7 +109,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
                 $this->assertInstanceOf(ObjCategory::class, $category);
             }
 
-            $iteration++;
+            ++$iteration;
         }
     }
 
@@ -137,7 +137,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
             $this->assertEquals($i, $iterator->key());
             $this->assertEquals($expected[$i], $iterator->current()->title);
             $iterator->next();
-            $i++;
+            ++$i;
         }
         $iterator->rewind();
         $this->assertEquals($expected[0], $iterator->current()->title);

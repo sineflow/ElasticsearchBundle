@@ -49,11 +49,9 @@ class ScrollAdapter
     private $initialResults;
 
     /**
-     * @param Finder $finder
-     * @param array  $documentClasses
-     * @param array  $rawResults      The raw results from the initial search call
+     * @param array  $rawResults  The raw results from the initial search call
      * @param int    $resultsType
-     * @param string $scrollTime      The value for the 'scroll' param in a scroll request
+     * @param string $scrollTime  The value for the 'scroll' param in a scroll request
      */
     public function __construct(Finder $finder, array $documentClasses, $rawResults, $resultsType, $scrollTime)
     {
@@ -63,7 +61,7 @@ class ScrollAdapter
         $this->scrollTime = $scrollTime;
         $this->initialResults = $rawResults;
         // Make sure we don't get an adapter returned again when we recursively execute the paginated find()
-        $this->resultsType = $resultsType & ~ Finder::BITMASK_RESULT_ADAPTERS;
+        $this->resultsType = $resultsType & ~Finder::BITMASK_RESULT_ADAPTERS;
     }
 
     /**
@@ -75,7 +73,7 @@ class ScrollAdapter
     {
         // If this is the first call to this method, return the cached initial results from the search request
         if (null !== $this->initialResults) {
-            if (count($this->initialResults['hits']['hits']) > 0) {
+            if (\count($this->initialResults['hits']['hits']) > 0) {
                 $results = $this->finder->parseResult($this->initialResults, $this->resultsType, $this->documentClasses);
             } else {
                 $results = false;
@@ -99,14 +97,12 @@ class ScrollAdapter
      * Returns the total hits by the query, which the scroll is for
      * or throws an exception, if no scrolls have been retrieved yet
      *
-     * @return int
-     *
      * @throws Exception
      */
     public function getTotalHits(): int
     {
-        if (is_null($this->totalHits)) {
-            throw new Exception(sprintf('You must call getNextScrollResults() at least once, before you can get the total hits'));
+        if (null === $this->totalHits) {
+            throw new Exception('You must call getNextScrollResults() at least once, before you can get the total hits');
         }
 
         return $this->totalHits;

@@ -26,10 +26,6 @@ class PrePersistEvent extends Event
      */
     private $bulkOperationIndex;
 
-    /**
-     * @param DocumentInterface $document
-     * @param ConnectionManager $connectionManager
-     */
     public function __construct(DocumentInterface $document, ConnectionManager $connectionManager)
     {
         $this->document = $document;

@@ -78,10 +78,8 @@ class PropertyTest extends TestCase
             [
                 'copy_to' => 'en_all',
                 'analyzer' => 'en_analyzer',
-                'fields' =>
-                    [
-                        'ngram' =>
-                            [
+                'fields' => [
+                        'ngram' => [
                                 'analyzer' => 'en_analyzer',
                             ],
                     ],

@@ -2,10 +2,10 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Mapping;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentParser;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
-use Doctrine\Common\Annotations\AnnotationReader;
 
 /**
  * Class DocumentParserTest
@@ -17,9 +17,9 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
      */
     private $documentParser;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
-        $reader = new AnnotationReader;
+        $reader = new AnnotationReader();
         $locator = $this->getContainer()->get(DocumentLocator::class);
         $separator = $this->getContainer()->getParameter('sfes.mlproperty.language_separator');
         $languages = $this->getContainer()->getParameter('sfes.languages');
@@ -28,7 +28,6 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
 
     public function testParseNonDocument()
     {
-
         $reflection = new \ReflectionClass('Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\ObjCategory');
         $res = $this->documentParser->parse($reflection, []);
 
@@ -39,12 +38,10 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
     {
         $reflection = new \ReflectionClass('Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product');
         $indexAnalyzers = [
-            'default_analyzer' =>
-                [
+            'default_analyzer' => [
                     'type' => 'standard',
                 ],
-            'en_analyzer' =>
-                [
+            'en_analyzer' => [
                     'type' => 'standard',
                 ],
         ];
@@ -52,141 +49,104 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
         $res = $this->documentParser->parse($reflection, $indexAnalyzers);
 
         $expected = [
-            'properties' =>
-                [
-                    'title' =>
-                    [
-                        'fields' =>
-                            [
-                                'raw' =>
-                                    [
+            'properties' => [
+                    'title' => [
+                        'fields' => [
+                                'raw' => [
                                         'type' => 'keyword',
                                     ],
-                                    'title' =>
-                                    [
+                                    'title' => [
                                         'type' => 'text',
                                     ],
                             ],
                             'type' => 'text',
                     ],
-                    'description' =>
-                    [
+                    'description' => [
                         'type' => 'text',
                     ],
-                    'category' =>
-                    [
-                        'properties' =>
-                            [
-                                'id' =>
-                                    [
+                    'category' => [
+                        'properties' => [
+                                'id' => [
                                         'type' => 'integer',
                                     ],
-                                    'title' =>
-                                    [
+                                    'title' => [
                                         'type' => 'keyword',
                                     ],
-                                    'tags' =>
-                                    [
-                                        'properties' =>
-                                            [
-                                                'tagname' =>
-                                                    [
+                                    'tags' => [
+                                        'properties' => [
+                                                'tagname' => [
                                                         'type' => 'text',
                                                     ],
                                             ],
                                     ],
                             ],
                     ],
-                    'related_categories' =>
-                    [
-                        'properties' =>
-                            [
-                                'id' =>
-                                    [
+                    'related_categories' => [
+                        'properties' => [
+                                'id' => [
                                         'type' => 'integer',
                                     ],
-                                    'title' =>
-                                    [
+                                    'title' => [
                                         'type' => 'keyword',
                                     ],
-                                    'tags' =>
-                                    [
-                                        'properties' =>
-                                            [
-                                                'tagname' =>
-                                                    [
+                                    'tags' => [
+                                        'properties' => [
+                                                'tagname' => [
                                                         'type' => 'text',
                                                     ],
                                             ],
                                     ],
                             ],
                     ],
-                    'price' =>
-                    [
+                    'price' => [
                         'type' => 'float',
                     ],
-                    'location' =>
-                    [
+                    'location' => [
                         'type' => 'geo_point',
                     ],
-                    'limited' =>
-                    [
+                    'limited' => [
                         'type' => 'boolean',
                     ],
-                    'released' =>
-                    [
+                    'released' => [
                         'type' => 'date',
                     ],
-                    'ml_info-en' =>
-                    [
+                    'ml_info-en' => [
                         'analyzer' => 'en_analyzer',
-                        'fields'   =>
-                            [
-                                'ngram' =>
-                                    [
-                                        'type'     => 'text',
+                        'fields' => [
+                                'ngram' => [
+                                        'type' => 'text',
                                         'analyzer' => 'en_analyzer',
                                     ],
                             ],
                         'type' => 'text',
                     ],
-                    'ml_info-fr' =>
-                    [
+                    'ml_info-fr' => [
                         'analyzer' => 'default_analyzer',
-                        'fields'   =>
-                            [
-                                'ngram' =>
-                                    [
-                                        'type'     => 'text',
+                        'fields' => [
+                                'ngram' => [
+                                        'type' => 'text',
                                         'analyzer' => 'default_analyzer',
                                     ],
                             ],
                         'type' => 'text',
                     ],
-                    'ml_info-default' =>
-                    [
+                    'ml_info-default' => [
                         'type' => 'keyword',
                         'ignore_above' => 256,
                     ],
-                    'ml_more_info-en' =>
-                    [
+                    'ml_more_info-en' => [
                         'type' => 'text',
                     ],
-                    'ml_more_info-fr' =>
-                    [
+                    'ml_more_info-fr' => [
                         'type' => 'text',
                     ],
-                    'ml_more_info-default' =>
-                    [
+                    'ml_more_info-default' => [
                         'type' => 'text',
                         'index' => false,
                     ],
-                    'pieces_count' =>
-                    [
-                        'fields' =>
-                            [
-                                'count' =>
-                                    [
+                    'pieces_count' => [
+                        'fields' => [
+                                'count' => [
                                         'type' => 'token_count',
                                         'analyzer' => 'whitespace',
                                     ],
@@ -194,58 +154,47 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                             'type' => 'text',
                     ],
                 ],
-                'fields' =>
-                [
+                'fields' => [
                     'dynamic' => 'strict',
                 ],
-                'propertiesMetadata' =>
-                [
-                    'title' =>
-                    [
+                'propertiesMetadata' => [
+                    'title' => [
                         'propertyName' => 'title',
                         'type' => 'text',
                         'multilanguage' => null,
                         'propertyAccess' => 1,
                     ],
-                    'description' =>
-                    [
+                    'description' => [
                         'propertyName' => 'description',
                         'type' => 'text',
                         'multilanguage' => null,
                         'propertyAccess' => 1,
                     ],
-                    'category' =>
-                    [
+                    'category' => [
                         'propertyName' => 'category',
                         'type' => 'object',
                         'multilanguage' => null,
                         'multiple' => null,
-                        'propertiesMetadata' =>
-                            [
-                                'id' =>
-                                    [
+                        'propertiesMetadata' => [
+                                'id' => [
                                         'propertyName' => 'id',
                                         'type' => 'integer',
                                         'multilanguage' => null,
                                         'propertyAccess' => 1,
                                     ],
-                                    'title' =>
-                                    [
+                                    'title' => [
                                         'propertyName' => 'title',
                                         'type' => 'keyword',
                                         'multilanguage' => null,
                                         'propertyAccess' => 1,
                                     ],
-                                    'tags' =>
-                                    [
+                                    'tags' => [
                                         'propertyName' => 'tags',
                                         'type' => 'object',
                                         'multilanguage' => null,
                                         'multiple' => true,
-                                        'propertiesMetadata' =>
-                                            [
-                                                'tagname' =>
-                                                    [
+                                        'propertiesMetadata' => [
+                                                'tagname' => [
                                                         'propertyName' => 'tagName',
                                                         'type' => 'text',
                                                         'multilanguage' => null,
@@ -259,38 +208,31 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                             'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\Fixture\\Acme\\BarBundle\\Document\\ObjCategory',
                             'propertyAccess' => 1,
                     ],
-                    'related_categories' =>
-                    [
+                    'related_categories' => [
                         'propertyName' => 'relatedCategories',
                         'type' => 'object',
                         'multilanguage' => null,
                         'multiple' => true,
-                        'propertiesMetadata' =>
-                            [
-                                'id' =>
-                                    [
+                        'propertiesMetadata' => [
+                                'id' => [
                                         'propertyName' => 'id',
                                         'type' => 'integer',
                                         'multilanguage' => null,
                                         'propertyAccess' => 1,
                                     ],
-                                    'title' =>
-                                    [
+                                    'title' => [
                                         'propertyName' => 'title',
                                         'type' => 'keyword',
                                         'multilanguage' => null,
                                         'propertyAccess' => 1,
                                     ],
-                                    'tags' =>
-                                    [
+                                    'tags' => [
                                         'propertyName' => 'tags',
                                         'type' => 'object',
                                         'multilanguage' => null,
                                         'multiple' => true,
-                                        'propertiesMetadata' =>
-                                            [
-                                                'tagname' =>
-                                                    [
+                                        'propertiesMetadata' => [
+                                                'tagname' => [
                                                         'propertyName' => 'tagName',
                                                         'type' => 'text',
                                                         'multilanguage' => null,
@@ -304,63 +246,54 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                             'className' => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\Fixture\\Acme\\BarBundle\\Document\\ObjCategory',
                             'propertyAccess' => 1,
                     ],
-                    'price' =>
-                    [
+                    'price' => [
                         'propertyName' => 'price',
                         'type' => 'float',
                         'multilanguage' => null,
                         'propertyAccess' => 1,
                     ],
-                    'location' =>
-                    [
+                    'location' => [
                         'propertyName' => 'location',
                         'type' => 'geo_point',
                         'multilanguage' => null,
                         'propertyAccess' => 1,
                     ],
-                    'limited' =>
-                    [
+                    'limited' => [
                         'propertyName' => 'limited',
                         'type' => 'boolean',
                         'multilanguage' => null,
                         'propertyAccess' => 1,
                     ],
-                    'released' =>
-                    [
+                    'released' => [
                         'propertyName' => 'released',
                         'type' => 'date',
                         'multilanguage' => null,
                         'propertyAccess' => 1,
                     ],
-                    'ml_info' =>
-                        [
+                    'ml_info' => [
                             'propertyName' => 'mlInfo',
                             'type' => 'text',
                             'multilanguage' => true,
                             'propertyAccess' => 1,
                         ],
-                    'ml_more_info' =>
-                        [
+                    'ml_more_info' => [
                             'propertyName' => 'mlMoreInfo',
                             'type' => 'text',
                             'multilanguage' => true,
                             'propertyAccess' => 1,
                         ],
-                    'pieces_count' =>
-                    [
+                    'pieces_count' => [
                         'propertyName' => 'tokenPiecesCount',
                         'type' => 'text',
                         'multilanguage' => null,
                         'propertyAccess' => 1,
                     ],
-                    '_id' =>
-                    [
+                    '_id' => [
                         'propertyName' => 'id',
                         'type' => 'keyword',
                         'propertyAccess' => 1,
                     ],
-                    '_score' =>
-                    [
+                    '_score' => [
                         'propertyName' => 'score',
                         'type' => 'float',
                         'propertyAccess' => 1,

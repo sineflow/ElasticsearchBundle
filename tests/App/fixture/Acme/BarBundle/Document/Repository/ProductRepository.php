@@ -9,5 +9,4 @@ use Sineflow\ElasticsearchBundle\Document\Repository\Repository;
  */
 class ProductRepository extends Repository
 {
-
 }

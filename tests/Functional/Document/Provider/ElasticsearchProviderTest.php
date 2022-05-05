@@ -55,7 +55,7 @@ class ElasticsearchProviderTest extends AbstractElasticsearchTestCase
 
         // Since we're retrieving source docs ordered by _doc, they don't necessarily come in the order inserted
         // so we order them in order to compare
-        sort($ids);
+        \sort($ids);
 
         // Make sure all and exact documents were returned
         $this->assertEquals([1, 2, 3], $ids);

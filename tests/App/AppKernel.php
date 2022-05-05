@@ -28,7 +28,7 @@ class AppKernel extends Kernel
             new SineflowElasticsearchBundle(),
         ];
 
-        if (in_array($this->getEnvironment(), ['test'], true)) {
+        if (\in_array($this->getEnvironment(), ['test'], true)) {
             $bundles[] = new AcmeBarBundle();
             $bundles[] = new AcmeFooBundle();
         }
@@ -38,8 +38,6 @@ class AppKernel extends Kernel
 
     /**
      * Register container configuration.
-     *
-     * @param LoaderInterface $loader
      *
      * @throws \Exception
      */

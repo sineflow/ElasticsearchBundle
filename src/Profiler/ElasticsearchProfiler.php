@@ -35,8 +35,6 @@ class ElasticsearchProfiler extends DataCollector
 
     /**
      * Adds logger to look for collector handler.
-     *
-     * @param Logger $logger
      */
     public function addLogger(Logger $logger)
     {
@@ -46,7 +44,7 @@ class ElasticsearchProfiler extends DataCollector
     /**
      * {@inheritDoc}
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
     {
         $this->data['indexManagers'] = $this->cloneVar($this->indexManagers);
 
@@ -75,18 +73,14 @@ class ElasticsearchProfiler extends DataCollector
 
     /**
      * Returns total time queries took.
-     *
-     * @return float
      */
     public function getTime(): float
     {
-        return round($this->data['time'] * 1000, 2);
+        return \round($this->data['time'] * 1000, 2);
     }
 
     /**
      * Returns number of queries executed.
-     *
-     * @return int
      */
     public function getQueryCount(): int
     {
@@ -101,29 +95,21 @@ class ElasticsearchProfiler extends DataCollector
      *      'method'  - HTTP method.
      *      'uri'     - Uri request was sent.
      *      'time'    - Time client took to respond.
-     *
-     * @return array
      */
     public function getQueries(): array
     {
         return $this->data['queries'];
     }
 
-    /**
-     * @return array
-     */
     public function getIndexManagers(): array
     {
         return $this->data['indexManagers']->getValue();
     }
 
-    /**
-     * @param array $indexManagers
-     */
     public function setIndexManagers(array $indexManagers)
     {
         foreach ($indexManagers as $name => $manager) {
-            $this->indexManagers[$name] = sprintf('sfes.index.%s', $name);
+            $this->indexManagers[$name] = \sprintf('sfes.index.%s', $name);
         }
     }
 
@@ -137,12 +123,10 @@ class ElasticsearchProfiler extends DataCollector
 
     /**
      * Handles passed records.
-     *
-     * @param array $records
      */
     private function handleRecords(array $records)
     {
-        $this->data['queryCount'] += count($records) / 2;
+        $this->data['queryCount'] += \count($records) / 2;
         $queryBody = '';
         $rawRequest = '';
         foreach ($records as $record) {
@@ -152,22 +136,16 @@ class ElasticsearchProfiler extends DataCollector
                 $route = !empty($record['extra']['route']) ? $record['extra']['route'] : self::UNDEFINED_ROUTE;
                 $this->addQuery($route, $record, $queryBody, $rawRequest);
             } else {
-                $position = strpos($record['message'], ' -d');
-                $queryBody = $position !== false ? substr($record['message'], $position + 3) : '';
+                $position = \strpos($record['message'], ' -d');
+                $queryBody = false !== $position ? \substr($record['message'], $position + 3) : '';
                 $rawRequest = $record['message'];
             }
         }
     }
 
-    /**
-     * @param string $route
-     * @param array  $record
-     * @param string $queryBody
-     * @param string $rawRequest
-     */
     private function addQuery(string $route, array $record, string $queryBody, string $rawRequest)
     {
-        $parsedUrl = array_merge(
+        $parsedUrl = \array_merge(
             [
                 'scheme' => '',
                 'host' => '',
@@ -175,24 +153,24 @@ class ElasticsearchProfiler extends DataCollector
                 'path' => '',
                 'query' => '',
             ],
-            parse_url($record['context']['uri'])
+            \parse_url($record['context']['uri'])
         );
         $senseRequest = $record['context']['method'].' '.$parsedUrl['path'];
         if ($parsedUrl['query']) {
             $senseRequest .= '?'.$parsedUrl['query'];
         }
         if ($queryBody) {
-            $senseRequest .= "\n".trim($queryBody, " '");
+            $senseRequest .= "\n".\trim($queryBody, " '");
         }
 
-        $this->data['queries'][$route][] = array_merge(
+        $this->data['queries'][$route][] = \array_merge(
             [
                 'time' => $record['context']['duration'] * 1000,
                 'curlRequest' => $rawRequest,
                 'senseRequest' => $senseRequest,
                 'backtrace' => $record['extra']['backtrace'],
             ],
-            array_diff_key(parse_url($record['context']['uri']), array_flip(['query']))
+            \array_diff_key(\parse_url($record['context']['uri']), \array_flip(['query']))
         );
     }
 }

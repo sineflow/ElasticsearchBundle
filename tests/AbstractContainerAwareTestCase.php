@@ -1,4 +1,5 @@
 <?php
+
 // phpcs:ignoreFile
 
 namespace Sineflow\ElasticsearchBundle\Tests;
@@ -8,8 +9,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 // Since symfony/framework-bundle 5.3, there is already a getContainer() method in KernelTestCase,
 // which makes AbstractContainerAwareTestCase obsolete
-if (method_exists(KernelTestCase::class, 'getContainer')) {
-    abstract class AbstractContainerAwareTestCase extends KernelTestCase {}
+if (\method_exists(KernelTestCase::class, 'getContainer')) {
+    abstract class AbstractContainerAwareTestCase extends KernelTestCase
+    {
+    }
 
     return;
 }
@@ -36,8 +39,6 @@ abstract class AbstractContainerAwareTestCase extends KernelTestCase
      * Returns service container.
      *
      * @param array $kernelOptions Options used passed to kernel if it needs to be initialized.
-     *
-     * @return ContainerInterface
      */
     protected function getContainer(array $kernelOptions = []): ContainerInterface
     {

@@ -86,23 +86,22 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
         $imWithoutAliases->getConnection()->setAutocommit(true);
         $imWithoutAliases->getRepository()->getById(3);
 
-
         $queries = $this->getCollector()->getQueries();
 
-        $lastQuery = end($queries[ElasticsearchProfiler::UNDEFINED_ROUTE]);
+        $lastQuery = \end($queries[ElasticsearchProfiler::UNDEFINED_ROUTE]);
         $this->checkQueryParameters($lastQuery);
 
-        $esHostAndPort = explode(':', $imWithoutAliases->getConnection()->getConnectionSettings()['hosts'][0]);
+        $esHostAndPort = \explode(':', $imWithoutAliases->getConnection()->getConnectionSettings()['hosts'][0]);
 
         $this->assertArraySubset(
             [
-                "curlRequest" => "curl -XPOST 'http://".implode(':', $esHostAndPort)."/sineflow-esb-test-bar/_search?pretty=true' -d '{\"query\":{\"ids\":{\"values\":[\"3\"]}},\"version\":true}'",
-                "senseRequest" => "POST /sineflow-esb-test-bar/_search\n{\"query\":{\"ids\":{\"values\":[\"3\"]}},\"version\":true}",
-                "backtrace" => null,
-                "scheme" => "http",
-                "host" => $esHostAndPort[0],
-                "port" => (int) $esHostAndPort[1],
-                "path" => "/sineflow-esb-test-bar/_search",
+                'curlRequest' => "curl -XPOST 'http://".\implode(':', $esHostAndPort)."/sineflow-esb-test-bar/_search?pretty=true' -d '{\"query\":{\"ids\":{\"values\":[\"3\"]}},\"version\":true}'",
+                'senseRequest' => "POST /sineflow-esb-test-bar/_search\n{\"query\":{\"ids\":{\"values\":[\"3\"]}},\"version\":true}",
+                'backtrace' => null,
+                'scheme' => 'http',
+                'host' => $esHostAndPort[0],
+                'port' => (int) $esHostAndPort[1],
+                'path' => '/sineflow-esb-test-bar/_search',
             ],
             $lastQuery,
             'Logged data did not match expected data.'
@@ -140,9 +139,6 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
         $this->assertNotEmpty($query['path'], 'Path should not be empty.');
     }
 
-    /**
-     * @return ElasticsearchProfiler
-     */
     private function getCollector(): ElasticsearchProfiler
     {
         $collector = $this->getContainer()->get('test.'.ElasticsearchProfiler::class);

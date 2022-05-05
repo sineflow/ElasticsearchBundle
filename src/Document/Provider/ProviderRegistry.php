@@ -33,11 +33,6 @@ class ProviderRegistry
 
     /**
      * ProviderRegistry constructor.
-     *
-     * @param ServiceLocator            $serviceLocator
-     * @param DocumentMetadataCollector $documentMetadataCollector
-     * @param IndexManagerRegistry      $indexManagerRegistry
-     * @param string                    $selfProviderClass
      */
     public function __construct(
         ServiceLocator $serviceLocator,
@@ -57,17 +52,17 @@ class ProviderRegistry
         $customProviderClass = $documentMetadata->getProviderClass();
 
         // If there is a custom provider specified for the entity
-        if ($customProviderClass !== null) {
+        if (null !== $customProviderClass) {
             if ($this->serviceLocator->has($customProviderClass)) {
                 $provider = $this->serviceLocator->get($customProviderClass);
-                if (! $provider instanceof ProviderInterface) {
-                    throw new \RuntimeException(sprintf('The service "%s" must implement "%s".', $customProviderClass, ProviderInterface::class));
+                if (!$provider instanceof ProviderInterface) {
+                    throw new \RuntimeException(\sprintf('The service "%s" must implement "%s".', $customProviderClass, ProviderInterface::class));
                 }
 
                 return $provider;
             }
 
-            throw new \InvalidArgumentException(sprintf('Provider service "%s" was not found. Make sure the service exists and is tagged with "sfes.provider".', $customProviderClass));
+            throw new \InvalidArgumentException(\sprintf('Provider service "%s" was not found. Make sure the service exists and is tagged with "sfes.provider".', $customProviderClass));
         }
 
         return null;
@@ -75,14 +70,10 @@ class ProviderRegistry
 
     /**
      * Returns the self-provider if available (the provider that allows the index to rebuild from itself)
-     *
-     * @param string $documentClass
-     *
-     * @return ProviderInterface|null
      */
     public function getSelfProviderForEntity(string $documentClass): ?ProviderInterface
     {
-        if (!class_exists($this->selfProviderClass)) {
+        if (!\class_exists($this->selfProviderClass)) {
             return null;
         }
 

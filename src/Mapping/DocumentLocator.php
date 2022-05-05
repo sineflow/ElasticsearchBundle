@@ -22,12 +22,10 @@ class DocumentLocator
 
     /**
      * Returns list of existing directories within all application bundles that are possible locations for ES documents
-     *
-     * @return array
      */
     public function getAllDocumentDirs(): array
     {
-        return array_column($this->entityLocations, 'directory');
+        return \array_column($this->entityLocations, 'directory');
     }
 
     /**
@@ -42,13 +40,13 @@ class DocumentLocator
      */
     public function resolveClassName(string $fullClassName): string
     {
-        if (strpos($fullClassName, ':') !== false) {
+        if (\str_contains($fullClassName, ':')) {
             // Resolve short syntax into an FQN
-            [$locationAlias, $className] = explode(':', $fullClassName);
-            if (!array_key_exists($locationAlias, $this->entityLocations)) {
-                throw new \UnexpectedValueException(sprintf('Location "%s" does not exist.', $locationAlias));
+            [$locationAlias, $className] = \explode(':', $fullClassName);
+            if (!\array_key_exists($locationAlias, $this->entityLocations)) {
+                throw new \UnexpectedValueException(\sprintf('Location "%s" does not exist.', $locationAlias));
             }
-            $fullClassName = rtrim($this->entityLocations[$locationAlias]['namespace'], '\\') . '\\' . $className;
+            $fullClassName = \rtrim($this->entityLocations[$locationAlias]['namespace'], '\\').'\\'.$className;
         }
 
         return $fullClassName;

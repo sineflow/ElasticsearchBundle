@@ -20,7 +20,7 @@ abstract class AbstractCommandTestCase extends AbstractContainerAwareTestCase
      */
     protected function getIndexManager($name)
     {
-        return $this->getContainer()->get(sprintf('sfes.index.%s', $name));
+        return $this->getContainer()->get(\sprintf('sfes.index.%s', $name));
     }
 
     /**

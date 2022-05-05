@@ -33,8 +33,8 @@ class ElasticsearchBundleTest extends TestCase
         /** @var PassConfig $passConfig */
         $passConfig = $container->getCompiler()->getPassConfig();
         foreach ($passConfig->getPasses() as $pass) {
-            $classPath = explode('\\', get_class($pass));
-            $loadedPasses[] = end($classPath);
+            $classPath = \explode('\\', \get_class($pass));
+            $loadedPasses[] = \end($classPath);
         }
 
         $finder = new Finder();
@@ -42,13 +42,13 @@ class ElasticsearchBundleTest extends TestCase
 
         /** @var $file SplFileInfo */
         foreach ($finder as $file) {
-            $passName = str_replace('.php', '', $file->getFilename());
+            $passName = \str_replace('.php', '', $file->getFilename());
             // Check whether pass is not blacklisted and not added by bundle.
-            if (!in_array($passName, $this->passesBlacklist)) {
+            if (!\in_array($passName, $this->passesBlacklist)) {
                 $this->assertContains(
                     $passName,
                     $loadedPasses,
-                    sprintf(
+                    \sprintf(
                         "Compiler pass '%s' is not added to container or not blacklisted in test.",
                         $passName
                     )

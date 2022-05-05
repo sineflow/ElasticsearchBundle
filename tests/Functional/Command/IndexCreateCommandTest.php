@@ -4,8 +4,6 @@ namespace Sineflow\ElasticsearchBundle\Tests\Functional\Command;
 
 use Sineflow\ElasticsearchBundle\Command\IndexCreateCommand;
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
 
 class IndexCreateCommandTest extends AbstractCommandTestCase
 {
@@ -32,12 +30,12 @@ class IndexCreateCommandTest extends AbstractCommandTestCase
             $commandTester->execute($arguments, $options)
         );
 
-        $expectedOutput = sprintf(
+        $expectedOutput =
             'Created index for "customer"'
-        );
+        ;
 
         // Test if the command output matches the expected output or not
-        $this->assertStringMatchesFormat($expectedOutput . '%a', $commandTester->getDisplay());
+        $this->assertStringMatchesFormat($expectedOutput.'%a', $commandTester->getDisplay());
 
         $manager->dropIndex();
     }
@@ -66,12 +64,12 @@ class IndexCreateCommandTest extends AbstractCommandTestCase
             $commandTester->execute($arguments, $options)
         );
 
-        $expectedOutput = sprintf(
+        $expectedOutput =
             'Index creation failed'
-        );
+        ;
 
         // Test if the command output matches the expected output or not
-        $this->assertStringMatchesFormat($expectedOutput . '%a', $commandTester->getDisplay());
+        $this->assertStringMatchesFormat($expectedOutput.'%a', $commandTester->getDisplay());
 
         $manager->dropIndex();
     }

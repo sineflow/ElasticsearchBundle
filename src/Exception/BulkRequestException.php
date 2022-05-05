@@ -13,7 +13,6 @@ class BulkRequestException extends Exception
 
     /**
      * @param string $bulkResponseItems
-     * @param array  $bulkRequest
      */
     public function setBulkResponseItems($bulkResponseItems, array $bulkRequest)
     {

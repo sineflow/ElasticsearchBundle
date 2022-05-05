@@ -26,9 +26,6 @@ class DocumentConverter
 
     /**
      * Constructor.
-     *
-     * @param DocumentMetadataCollector $metadataCollector
-     * @param string                    $languageSeparator
      */
     public function __construct(DocumentMetadataCollector $metadataCollector, string $languageSeparator)
     {
@@ -36,11 +33,9 @@ class DocumentConverter
         $this->languageSeparator = $languageSeparator;
     }
 
-
     /**
      * Converts raw array (as returned by the Elasticsearch client) to document.
      *
-     * @param array  $rawData
      * @param string $documentClass Document class FQN or in short notation (e.g. App:Product)
      *
      * @return DocumentInterface
@@ -56,12 +51,12 @@ class DocumentConverter
                 break;
 
             case isset($rawData['fields']):
-                $data = array_map('current', $rawData['fields']);
-                /** Check for returned fields as well (@see https://www.elastic.co/guide/en/elasticsearch/reference/7.11/search-fields.html#docvalue-fields) */
+                $data = \array_map('current', $rawData['fields']);
+                /* Check for returned fields as well (@see https://www.elastic.co/guide/en/elasticsearch/reference/7.11/search-fields.html#docvalue-fields) */
                 // TODO: when partial fields of nested objects are selected, partial objects should be constructed
                 foreach ($data as $key => $field) {
-                    if (is_array($field)) {
-                        $data = array_merge($data, $field);
+                    if (\is_array($field)) {
+                        $data = \array_merge($data, $field);
                         unset($data[$key]);
                     }
                 }
@@ -88,11 +83,8 @@ class DocumentConverter
     /**
      * Assigns all properties to object.
      *
-     * @param array           $array              Flat array with fields and their value
-     * @param ObjectInterface $object             A document or a (nested) object
-     * @param array           $propertiesMetadata
-     *
-     * @return ObjectInterface
+     * @param array           $array  Flat array with fields and their value
+     * @param ObjectInterface $object A document or a (nested) object
      */
     public function assignArrayToObject(array $array, ObjectInterface $object, array $propertiesMetadata): ObjectInterface
     {
@@ -102,30 +94,30 @@ class DocumentConverter
                 continue;
             }
 
-            if (in_array($propertyMetadata['type'], ['string', 'keyword', 'text']) && !empty($propertyMetadata['multilanguage'])) {
+            if (\in_array($propertyMetadata['type'], ['string', 'keyword', 'text']) && !empty($propertyMetadata['multilanguage'])) {
                 $objectValue = null;
                 foreach ($array as $fieldName => $value) {
-                    $prefixLength = strlen($esField.$this->languageSeparator);
-                    if (substr($fieldName, 0, $prefixLength) === $esField.$this->languageSeparator) {
+                    $prefixLength = \strlen($esField.$this->languageSeparator);
+                    if (\substr($fieldName, 0, $prefixLength) === $esField.$this->languageSeparator) {
                         if (!$objectValue) {
                             $objectValue = new MLProperty();
                         }
-                        $language = substr($fieldName, $prefixLength);
+                        $language = \substr($fieldName, $prefixLength);
                         $objectValue->setValue($value, $language);
                     }
                 }
-            } elseif (in_array($propertyMetadata['type'], ['object', 'nested'])) {
+            } elseif (\in_array($propertyMetadata['type'], ['object', 'nested'])) {
                 // ES doesn't mind having either single or multiple objects with the same mapping, but in this bundle we must specifically declare either.
                 // So we must make sure everything works for a 'multiple' definition where we actually have a single object and vice versa.
-                if ($propertyMetadata['multiple'] && is_string(key($array[$esField]))) {
+                if ($propertyMetadata['multiple'] && \is_string(\key($array[$esField]))) {
                     // field is declared multiple, but actual data is single object
                     $data = [$array[$esField]];
-                } elseif (!$propertyMetadata['multiple'] && key($array[$esField]) === 0) {
+                } elseif (!$propertyMetadata['multiple'] && 0 === \key($array[$esField])) {
                     // field is declared as single object, but actual data is an array of objects
-                    if (count($array[$esField]) > 1) {
-                        throw new DocumentConversionException(sprintf('Multiple objects found for a single object field `%s`', $propertyMetadata['propertyName']));
+                    if (\count($array[$esField]) > 1) {
+                        throw new DocumentConversionException(\sprintf('Multiple objects found for a single object field `%s`', $propertyMetadata['propertyName']));
                     }
-                    $data = current($array[$esField]);
+                    $data = \current($array[$esField]);
                 } else {
                     $data = $array[$esField];
                 }
@@ -143,7 +135,7 @@ class DocumentConverter
                 $objectValue = $array[$esField];
             }
 
-            if ($propertyMetadata['propertyAccess'] === DocumentMetadata::PROPERTY_ACCESS_PRIVATE) {
+            if (DocumentMetadata::PROPERTY_ACCESS_PRIVATE === $propertyMetadata['propertyAccess']) {
                 $object->{$propertyMetadata['methods']['setter']}($objectValue);
             } else {
                 $object->{$propertyMetadata['propertyName']} = $objectValue;
@@ -159,20 +151,18 @@ class DocumentConverter
      * @param ObjectInterface $object             A document or a (nested) object
      * @param array           $propertiesMetadata
      *
-     * @return array
-     *
      * @throws \ReflectionException
      */
     public function convertToArray(ObjectInterface $object, $propertiesMetadata = []): array
     {
         if (empty($propertiesMetadata)) {
-            $propertiesMetadata = $this->metadataCollector->getObjectPropertiesMetadata(get_class($object));
+            $propertiesMetadata = $this->metadataCollector->getObjectPropertiesMetadata(\get_class($object));
         }
 
         $array = [];
 
         foreach ($propertiesMetadata as $name => $propertyMetadata) {
-            if ($propertyMetadata['propertyAccess'] === DocumentMetadata::PROPERTY_ACCESS_PRIVATE) {
+            if (DocumentMetadata::PROPERTY_ACCESS_PRIVATE === $propertyMetadata['propertyAccess']) {
                 $value = $object->{$propertyMetadata['methods']['getter']}();
             } else {
                 $value = $object->{$propertyMetadata['propertyName']};
@@ -180,12 +170,12 @@ class DocumentConverter
 
             if (isset($value)) {
                 // If this is a (nested) object or a list of such
-                if (array_key_exists('propertiesMetadata', $propertyMetadata)) {
+                if (\array_key_exists('propertiesMetadata', $propertyMetadata)) {
                     $new = [];
                     if ($propertyMetadata['multiple']) {
                         // Verify value is traversable
-                        if (!(is_array($value) || (is_object($value) && $value instanceof \Traversable))) {
-                            throw new \InvalidArgumentException(sprintf('Value of "%s" is not traversable, although field is set to "multiple"', $propertyMetadata['propertyName']));
+                        if (!(\is_array($value) || (\is_object($value) && $value instanceof \Traversable))) {
+                            throw new \InvalidArgumentException(\sprintf('Value of "%s" is not traversable, although field is set to "multiple"', $propertyMetadata['propertyName']));
                         }
 
                         foreach ($value as $item) {
@@ -213,17 +203,12 @@ class DocumentConverter
     /**
      * Check if object is the correct class
      *
-     * @param ObjectInterface $object
-     * @param string          $expectedClass
-     *
      * @throws \InvalidArgumentException
      */
     private function checkObjectType(ObjectInterface $object, string $expectedClass)
     {
-        if (get_class($object) !== $expectedClass) {
-            throw new \InvalidArgumentException(
-                sprintf('Expected object of "%s", got "%s"', $expectedClass, get_class($object))
-            );
+        if (\get_class($object) !== $expectedClass) {
+            throw new \InvalidArgumentException(\sprintf('Expected object of "%s", got "%s"', $expectedClass, \get_class($object)));
         }
     }
 }

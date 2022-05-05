@@ -30,7 +30,7 @@ class Customer extends AbstractDocument
     private $active;
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isActive()
     {
@@ -38,7 +38,7 @@ class Customer extends AbstractDocument
     }
 
     /**
-     * @param boolean $active
+     * @param bool $active
      */
     public function setActive($active)
     {

@@ -3,8 +3,8 @@
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Finder;
 
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
-use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Finder\Adapter\KnpPaginatorAdapter;
+use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Result\DocumentIterator;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product;
@@ -150,16 +150,15 @@ class FinderTest extends AbstractElasticsearchTestCase
         $searchBody = [
             'query' => [
                 'match' => [
-                    'title' => 'bbb'
-                ]
-            ]
+                    'title' => 'bbb',
+                ],
+            ],
         ];
 
         $res = $finder->find(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer'], $searchBody, Finder::RESULTS_OBJECT, [], $totalHits);
         $this->assertInstanceOf(DocumentIterator::class, $res);
-        $this->assertEquals(2, count($res));
+        $this->assertCount(2, $res);
         $this->assertEquals(2, $totalHits);
-
 
         $res = $finder->find(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer'], $searchBody, Finder::RESULTS_ARRAY);
         $this->assertArraySubset([
@@ -170,9 +169,8 @@ class FinderTest extends AbstractElasticsearchTestCase
                 'name' => 'Jane Doe',
                 'title' => 'aaa bbb',
                 'active' => true,
-            ]
+            ],
         ], $res);
-
 
         $res = $finder->find(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer'], $searchBody, Finder::RESULTS_RAW);
         $this->assertArrayHasKey('_shards', $res);
@@ -189,9 +187,9 @@ class FinderTest extends AbstractElasticsearchTestCase
         $searchBody = [
             'query' => [
                 'match' => [
-                    'title' => 'bbb'
-                ]
-            ]
+                    'title' => 'bbb',
+                ],
+            ],
         ];
 
         $res = $finder->find(['AcmeBarBundle:Product'], $searchBody, Finder::RESULTS_OBJECT | Finder::ADAPTER_KNP);
@@ -211,9 +209,9 @@ class FinderTest extends AbstractElasticsearchTestCase
         $searchBody = [
             'query' => [
                 'match' => [
-                    'title' => 'bbb'
-                ]
-            ]
+                    'title' => 'bbb',
+                ],
+            ],
         ];
 
         $this->assertEquals(1, $finder->count(['AcmeFooBundle:Customer'], $searchBody));

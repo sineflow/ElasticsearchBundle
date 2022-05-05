@@ -16,7 +16,6 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Produ
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Repository\ProductRepository;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Customer;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Provider\CustomerProvider;
-use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Provider\OrderProvider;
 
 /**
  * Class IndexManagerTest
@@ -77,8 +76,8 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases = $this->getIndexManager('customer', false);
         $imWithAliases->createIndex();
 
-        $this->assertTrue($imWithAliases->getConnection()->existsAlias(array('name' => 'sineflow-esb-test-customer')), 'Read alias does not exist');
-        $this->assertTrue($imWithAliases->getConnection()->existsAlias(array('name' => 'sineflow-esb-test-customer_write')), 'Write alias does not exist');
+        $this->assertTrue($imWithAliases->getConnection()->existsAlias(['name' => 'sineflow-esb-test-customer']), 'Read alias does not exist');
+        $this->assertTrue($imWithAliases->getConnection()->existsAlias(['name' => 'sineflow-esb-test-customer_write']), 'Write alias does not exist');
 
         $indicesPointedByAliases = $imWithAliases->getConnection()->getClient()->indices()->getAlias(['name' => 'sineflow-esb-test-customer,sineflow-esb-test-customer_write']);
         $this->assertCount(1, $indicesPointedByAliases, 'Read and Write aliases must point to one and the same index');
@@ -91,7 +90,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
 
         $index = $imWithoutAliases->getConnection()->getClient()->indices()->getAlias(['index' => 'sineflow-esb-test-bar']);
         $this->assertCount(1, $index, 'Index was not created');
-        $this->assertCount(0, current($index)['aliases'], 'Index should not have any aliases pointing to it');
+        $this->assertCount(0, \current($index)['aliases'], 'Index should not have any aliases pointing to it');
     }
 
     public function testDropIndexWithAliases()
@@ -161,7 +160,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
 
         $imWithAliases->rebuildIndex();
 
-        $this->assertTrue($imWithAliases->getConnection()->getClient()->indices()->exists(array('index' => $liveIndex)));
+        $this->assertTrue($imWithAliases->getConnection()->getClient()->indices()->exists(['index' => $liveIndex]));
         $imWithAliases->getConnection()->getClient()->indices()->delete(['index' => $liveIndex]);
 
         $newLiveIndex = $imWithAliases->getLiveIndex();
@@ -175,7 +174,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
 
         $imWithAliases->rebuildIndex(true);
 
-        $this->assertFalse($imWithAliases->getConnection()->getClient()->indices()->exists(array('index' => $liveIndex)));
+        $this->assertFalse($imWithAliases->getConnection()->getClient()->indices()->exists(['index' => $liveIndex]));
 
         $newLiveIndex = $imWithAliases->getLiveIndex();
         $this->assertNotEquals($liveIndex, $newLiveIndex);
@@ -204,7 +203,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithoutAliases->persist($product);
         $imWithoutAliases->getConnection()->commit();
         $doc = $imWithoutAliases->getRepository()->getById(555);
-        $this->assertEquals(null, $doc->title, 'Null property value was not persisted');
+        $this->assertNull($doc->title, 'Null property value was not persisted');
     }
 
     public function testPersistForManagerWithAliasesWithoutAutocommit()
@@ -213,10 +212,10 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases->getConnection()->setAutocommit(false);
 
         // Simulate state during rebuilding when write alias points to more than 1 index
-        $settings = array (
+        $settings = [
             'index' => 'sineflow-esb-test-temp',
             'body' => ['mappings' => ['properties' => ['name' => ['type' => 'keyword']]]],
-        );
+        ];
         $imWithAliases->getConnection()->getClient()->indices()->create($settings);
         $setAliasParams = [
             'body' => ['actions' => [['add' => ['index' => 'sineflow-esb-test-temp', 'alias' => $imWithAliases->getWriteAlias()]]]],
@@ -282,7 +281,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases->getConnection()->setAutocommit(true);
 
         $imWithAliases->update(111, [
-            'name' => 'Alicia'
+            'name' => 'Alicia',
         ]);
 
         $doc = $imWithAliases->getRepository()->getById(111);
@@ -296,7 +295,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
 
         $this->expectException(BulkRequestException::class);
         $imWithAliases->update('non-existing-id', [
-            'name' => 'Alicia'
+            'name' => 'Alicia',
         ]);
     }
 
@@ -306,10 +305,10 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases->getConnection()->setAutocommit(true);
 
         // Simulate state during rebuilding when write alias points to more than 1 index
-        $settings = array (
+        $settings = [
             'index' => 'sineflow-esb-test-temp',
             'body' => ['mappings' => ['properties' => ['name' => ['type' => 'keyword']]]],
-        );
+        ];
         $imWithAliases->getConnection()->getClient()->indices()->create($settings);
         $setAliasParams = [
             'body' => ['actions' => [['add' => ['index' => 'sineflow-esb-test-temp', 'alias' => $imWithAliases->getWriteAlias()]]]],

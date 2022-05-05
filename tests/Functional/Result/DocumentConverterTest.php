@@ -190,35 +190,31 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
 
         $arr = $converter->convertToArray($product);
 
-        $this->assertGreaterThanOrEqual(6, count($arr));
+        $this->assertGreaterThanOrEqual(6, \count($arr));
         $this->assertArraySubset($arr, $this->fullDocArray);
     }
 
     public function testConvertToDocumentWithSource()
     {
-        $rawFromEs = array (
+        $rawFromEs = [
             '_index' => 'sineflow-esb-test-bar',
             '_id' => 'doc1',
             '_version' => 1,
             'found' => true,
-            '_source' =>
-                [
+            '_source' => [
                     'title' => 'Foo Product',
-                    'category' =>
-                        [
+                    'category' => [
                             'title' => 'Bar',
                         ],
-                        'related_categories' =>
-                        [
-                        0 =>
-                            [
+                        'related_categories' => [
+                        0 => [
                                 'title' => 'Acme',
                             ],
                         ],
                         'ml_info-en' => 'info in English',
                         'ml_info-fr' => 'info in French',
                 ],
-        );
+        ];
 
         $converter = $this->getContainer()->get('Sineflow\ElasticsearchBundle\Result\DocumentConverter');
 
@@ -240,23 +236,18 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
             '_index' => 'sineflow-esb-test-bar',
             '_id' => 'doc1',
             '_score' => 1,
-            'fields' =>
-                [
-                    'title' =>
-                        [
+            'fields' => [
+                    'title' => [
                             0 => 'Foo Product',
                         ],
-                        'related_categories.title' =>
-                        [
+                        'related_categories.title' => [
                             0 => 'Acme',
                             1 => 'Bar',
                         ],
-                        'category.title' =>
-                        [
+                        'category.title' => [
                             0 => 'Bar',
                         ],
-                        'ml_info-en' =>
-                        [
+                        'ml_info-en' => [
                             0 => 'info in English',
                         ],
                 ],

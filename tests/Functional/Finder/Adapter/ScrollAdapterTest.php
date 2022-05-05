@@ -70,15 +70,14 @@ class ScrollAdapterTest extends AbstractElasticsearchTestCase
         while (false !== ($matches = $scrollAdapter->getNextScrollResults())) {
             foreach ($matches as $doc) {
                 $this->assertInstanceOf(Product::class, $doc);
-                $i++;
+                ++$i;
             }
-            $scrolls++;
+            ++$scrolls;
         }
 
         $this->assertEquals(6, $i, 'Total matching documents iterated');
         $this->assertEquals(6, $scrollAdapter->getTotalHits(), 'Total hits returned by scroll');
         $this->assertEquals(3, $scrolls, 'Total number of scrolls');
-
 
         // Test array results
         /** @var ScrollAdapter $scrollAdapter */
@@ -94,10 +93,10 @@ class ScrollAdapterTest extends AbstractElasticsearchTestCase
                 $this->assertIsArray($doc);
                 $this->assertArrayHasKey('title', $doc, 'Document array returned');
                 $this->assertNotEquals($prevId, $id, 'Document returned is the same as the previous one');
-                $i++;
+                ++$i;
                 $prevId = $id;
             }
-            $scrolls++;
+            ++$scrolls;
         }
         $this->assertEquals(6, $i, 'Total matching documents iterated');
         $this->assertEquals(6, $scrollAdapter->getTotalHits(), 'Total hits returned by scroll');
@@ -122,10 +121,10 @@ class ScrollAdapterTest extends AbstractElasticsearchTestCase
                 $this->assertArrayHasKey('_id', $doc, 'Document array returned');
                 $this->assertEquals($doc['_id'], $doc['sort'][0], 'The correct sort order is not applied');
                 $this->assertNotEquals($prevId, $doc['_id'], 'Document returned is the same as the previous one');
-                $i++;
+                ++$i;
                 $prevId = $doc['_id'];
             }
-            $scrolls++;
+            ++$scrolls;
         }
         $this->assertEquals(6, $i, 'Total matching documents iterated');
         $this->assertEquals(6, $scrollAdapter->getTotalHits(), 'Total hits returned by scroll');

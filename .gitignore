@@ -7,3 +7,4 @@
 /var/
 .phpunit.result.cache
 .idea
+/.php-cs-fixer.cache

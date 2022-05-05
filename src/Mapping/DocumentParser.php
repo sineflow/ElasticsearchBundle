@@ -68,9 +68,6 @@ class DocumentParser
     /**
      * Parses document by used annotations and returns mapping for elasticsearch with some extra metadata.
      *
-     * @param \ReflectionClass $documentReflection
-     * @param array            $indexAnalyzers
-     *
      * @return array
      *
      * @throws \ReflectionException
@@ -87,7 +84,7 @@ class DocumentParser
 
             $metadata = [
                 'properties' => $properties,
-                'fields' => array_filter($classAnnotation->dump()),
+                'fields' => \array_filter($classAnnotation->dump()),
                 'propertiesMetadata' => $this->getPropertiesMetadata($documentReflection),
                 'repositoryClass' => $classAnnotation->repositoryClass,
                 'providerClass' => $classAnnotation->providerClass,
@@ -101,8 +98,6 @@ class DocumentParser
     /**
      * Finds properties' metadata for every property used in document or inner/nested object
      *
-     * @param \ReflectionClass $documentReflection
-     *
      * @return array
      *
      * @throws \ReflectionException
@@ -110,7 +105,7 @@ class DocumentParser
     public function getPropertiesMetadata(\ReflectionClass $documentReflection)
     {
         $className = $documentReflection->getName();
-        if (array_key_exists($className, $this->propertiesMetadata)) {
+        if (\array_key_exists($className, $this->propertiesMetadata)) {
             return $this->propertiesMetadata[$className];
         }
 
@@ -127,7 +122,7 @@ class DocumentParser
                 continue;
             }
 
-            switch (get_class($propertyAnnotation)) {
+            switch (\get_class($propertyAnnotation)) {
                 case Property::class:
                     $propertyMetadata[$propertyAnnotation->name] = [
                         'propertyName' => $propertyName,
@@ -136,14 +131,12 @@ class DocumentParser
                     ];
 
                     // If property is a (nested) object
-                    if (in_array($propertyAnnotation->type, ['object', 'nested'])) {
+                    if (\in_array($propertyAnnotation->type, ['object', 'nested'])) {
                         if (!$propertyAnnotation->objectName) {
-                            throw new \InvalidArgumentException(
-                                sprintf('Property "%s" in %s is missing "objectName" setting', $propertyName, $className)
-                            );
+                            throw new \InvalidArgumentException(\sprintf('Property "%s" in %s is missing "objectName" setting', $propertyName, $className));
                         }
                         $child = new \ReflectionClass($this->documentLocator->resolveClassName($propertyAnnotation->objectName));
-                        $propertyMetadata[$propertyAnnotation->name] = array_merge(
+                        $propertyMetadata[$propertyAnnotation->name] = \array_merge(
                             $propertyMetadata[$propertyAnnotation->name],
                             [
                                 'multiple' => $propertyAnnotation->multiple,
@@ -177,11 +170,11 @@ class DocumentParser
                 $propertyAccess = DocumentMetadata::PROPERTY_ACCESS_PUBLIC;
             } else {
                 $propertyAccess = DocumentMetadata::PROPERTY_ACCESS_PRIVATE;
-                $camelCaseName = ucfirst(Caser::camel($propertyName));
+                $camelCaseName = \ucfirst(Caser::camel($propertyName));
                 $setterMethod = 'set'.$camelCaseName;
                 $getterMethod = 'get'.$camelCaseName;
                 // Allow issers as getters for boolean properties
-                if ($propertyAnnotation->type === 'boolean' && !$documentReflection->hasMethod($getterMethod)) {
+                if ('boolean' === $propertyAnnotation->type && !$documentReflection->hasMethod($getterMethod)) {
                     $getterMethod = 'is'.$camelCaseName;
                 }
                 if ($documentReflection->hasMethod($getterMethod) && $documentReflection->hasMethod($setterMethod)) {
@@ -190,7 +183,7 @@ class DocumentParser
                         'setter' => $setterMethod,
                     ];
                 } else {
-                    $message = sprintf('Property "%s" either needs to be public or %s() and %s() methods must be defined', $propertyName, $getterMethod, $setterMethod);
+                    $message = \sprintf('Property "%s" either needs to be public or %s() and %s() methods must be defined', $propertyName, $getterMethod, $setterMethod);
                     throw new \LogicException($message);
                 }
             }
@@ -239,29 +232,27 @@ class DocumentParser
     /**
      * Returns all defined properties including private from parents.
      *
-     * @param \ReflectionClass $documentReflection
-     *
      * @return array
      */
     private function getDocumentPropertiesReflection(\ReflectionClass $documentReflection)
     {
-        if (in_array($documentReflection->getName(), $this->properties)) {
+        if (\in_array($documentReflection->getName(), $this->properties)) {
             return $this->properties[$documentReflection->getName()];
         }
 
         $properties = [];
 
         foreach ($documentReflection->getProperties() as $property) {
-            if (!in_array($property->getName(), $properties)) {
+            if (!\in_array($property->getName(), $properties)) {
                 $properties[$property->getName()] = $property;
             }
         }
 
         $parentReflection = $documentReflection->getParentClass();
         if (false !== $parentReflection) {
-            $properties = array_merge(
+            $properties = \array_merge(
                 $properties,
-                array_diff_key($this->getDocumentPropertiesReflection($parentReflection), $properties)
+                \array_diff_key($this->getDocumentPropertiesReflection($parentReflection), $properties)
             );
         }
 
@@ -274,7 +265,6 @@ class DocumentParser
      * Returns properties of reflection class.
      *
      * @param \ReflectionClass $documentReflection Class to read properties from.
-     * @param array            $indexAnalyzers
      *
      * @return array
      *
@@ -293,8 +283,8 @@ class DocumentParser
 
             // If it is a multi-language property
             if (true === $propertyAnnotation->multilanguage) {
-                if (!in_array($propertyAnnotation->type, ['string', 'keyword', 'text'])) {
-                    throw new \InvalidArgumentException(sprintf('"%s" property in %s is declared as multilanguage, so can only be of type "keyword", "text" or the deprecated "string"', $propertyAnnotation->name, $documentReflection->getName()));
+                if (!\in_array($propertyAnnotation->type, ['string', 'keyword', 'text'])) {
+                    throw new \InvalidArgumentException(\sprintf('"%s" property in %s is declared as multilanguage, so can only be of type "keyword", "text" or the deprecated "string"', $propertyAnnotation->name, $documentReflection->getName()));
                 }
                 if (!$this->languages) {
                     throw new \InvalidArgumentException('There must be at least one language specified in sineflow_elasticsearch.languages in order to use multilanguage properties');
@@ -317,15 +307,11 @@ class DocumentParser
     }
 
     /**
-     * @param Property    $propertyAnnotation
-     * @param string|null $language
-     * @param array       $indexAnalyzers
-     *
      * @return array
      *
      * @throws \ReflectionException
      */
-    private function getPropertyMapping(Property $propertyAnnotation, string $language = null, array $indexAnalyzers = [])
+    private function getPropertyMapping(Property $propertyAnnotation, ?string $language = null, array $indexAnalyzers = [])
     {
         $propertyMapping = $propertyAnnotation->dump([
             'language' => $language,
@@ -333,8 +319,8 @@ class DocumentParser
         ]);
 
         // Inner/nested object
-        if (in_array($propertyAnnotation->type, ['object', 'nested']) && !empty($propertyAnnotation->objectName)) {
-            $propertyMapping = array_replace_recursive($propertyMapping, $this->getObjectMapping($propertyAnnotation->objectName, $indexAnalyzers));
+        if (\in_array($propertyAnnotation->type, ['object', 'nested']) && !empty($propertyAnnotation->objectName)) {
+            $propertyMapping = \array_replace_recursive($propertyMapping, $this->getObjectMapping($propertyAnnotation->objectName, $indexAnalyzers));
         }
 
         return $propertyMapping;
@@ -346,7 +332,6 @@ class DocumentParser
      * Loads from cache if it's already loaded.
      *
      * @param string $objectName
-     * @param array  $indexAnalyzers
      *
      * @return array
      *
@@ -356,7 +341,7 @@ class DocumentParser
     {
         $className = $this->documentLocator->resolveClassName($objectName);
 
-        if (array_key_exists($className, $this->objects)) {
+        if (\array_key_exists($className, $this->objects)) {
             return $this->objects[$className];
         }
 
@@ -368,8 +353,7 @@ class DocumentParser
     /**
      * Returns relation mapping by its reflection.
      *
-     * @param \ReflectionClass $documentReflection
-     * @param array            $indexAnalyzers
+     * @param array $indexAnalyzers
      *
      * @return array|null
      *

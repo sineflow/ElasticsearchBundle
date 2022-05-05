@@ -40,11 +40,7 @@ class KnpPaginatorAdapter
     private $totalHits;
 
     /**
-     * @param Finder $finder
-     * @param array  $documentClasses
-     * @param array  $searchBody
-     * @param int    $resultsType
-     * @param array  $additionalRequestParams
+     * @param int $resultsType
      */
     public function __construct(Finder $finder, array $documentClasses, array $searchBody, $resultsType, array $additionalRequestParams = [])
     {
@@ -52,7 +48,7 @@ class KnpPaginatorAdapter
         $this->documentClasses = $documentClasses;
         $this->searchBody = $searchBody;
         // Make sure we don't get an adapter returned again when we recursively execute the paginated find()
-        $this->resultsType = $resultsType & ~ Finder::BITMASK_RESULT_ADAPTERS;
+        $this->resultsType = $resultsType & ~Finder::BITMASK_RESULT_ADAPTERS;
         $this->additionalRequestParams = $additionalRequestParams;
     }
 
@@ -71,6 +67,7 @@ class KnpPaginatorAdapter
      * @param int    $count
      * @param string $sortField
      * @param string $sortDir
+     *
      * @return mixed
      */
     public function getResults($offset, $count, $sortField = null, $sortDir = 'asc')
@@ -84,11 +81,11 @@ class KnpPaginatorAdapter
                 $searchBody['sort'] = [];
             }
             // If sorting is set in the request in advance and the main sort field is the same as the one set for KNP, remove it
-            if (isset($searchBody['sort'][0]) && key($searchBody['sort'][0]) === $sortField) {
-                array_shift($searchBody['sort']);
+            if (isset($searchBody['sort'][0]) && \key($searchBody['sort'][0]) === $sortField) {
+                \array_shift($searchBody['sort']);
             }
             // Keep any preliminary set order as a secondary order to the query
-            array_unshift($searchBody['sort'], [$sortField => ['order' => $sortDir]]);
+            \array_unshift($searchBody['sort'], [$sortField => ['order' => $sortDir]]);
         }
 
         return $this->finder->find($this->documentClasses, $searchBody, $this->resultsType, $this->additionalRequestParams, $this->totalHits);

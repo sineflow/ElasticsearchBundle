@@ -20,10 +20,6 @@ class PostCommitEvent extends Event
      */
     private $connectionName;
 
-    /**
-     * @param array             $bulkResponse
-     * @param ConnectionManager $connectionManager
-     */
     public function __construct(array $bulkResponse, ConnectionManager $connectionManager)
     {
         $this->bulkResponse = $bulkResponse;

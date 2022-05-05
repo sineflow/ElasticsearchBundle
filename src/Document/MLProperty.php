@@ -16,9 +16,6 @@ class MLProperty
      */
     private $values = [];
 
-    /**
-     * @param array $values
-     */
     public function __construct(array $values = [])
     {
         foreach ($values as $language => $value) {
@@ -43,7 +40,7 @@ class MLProperty
      * @param string $language
      * @param bool   $fallbackToDefault If set and value for the requested language is missing, return default language value
      *
-     * @return null|string
+     * @return string|null
      */
     public function getValue($language, $fallbackToDefault = true)
     {
@@ -51,9 +48,9 @@ class MLProperty
             return $this->values[$language];
         } elseif ($fallbackToDefault && isset($this->values[Property::DEFAULT_LANG_SUFFIX])) {
             return $this->values[Property::DEFAULT_LANG_SUFFIX];
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

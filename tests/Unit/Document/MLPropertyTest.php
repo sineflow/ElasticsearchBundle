@@ -18,8 +18,7 @@ class MLPropertyTest extends TestCase
         $mlProperty = new MLProperty();
         $mlProperty->setValue('test en', 'en');
 
-        $this->assertEquals(
-            null,
+        $this->assertNull(
             $mlProperty->getValue('bg'),
             'MLProperty does not return null if required and default language is missing.'
         );
@@ -59,7 +58,7 @@ class MLPropertyTest extends TestCase
             [
                 'default' => 'test default',
                 'en' => 'test en',
-                'bg' => 'test bg'
+                'bg' => 'test bg',
             ],
             $mlProperty->getValues(),
             'MLProperty does not return all values correctly.'
@@ -74,14 +73,14 @@ class MLPropertyTest extends TestCase
         $mlProperty = new MLProperty([
             'default' => 'test default',
             'en' => 'test en',
-            'bg' => 'test bg'
+            'bg' => 'test bg',
         ]);
 
         $this->assertEquals(
             [
                 'default' => 'test default',
                 'en' => 'test en',
-                'bg' => 'test bg'
+                'bg' => 'test bg',
             ],
             $mlProperty->getValues(),
             'MLProperty construct does not set all values correctly.'

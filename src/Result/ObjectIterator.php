@@ -26,10 +26,6 @@ class ObjectIterator implements \Countable, \Iterator
 
     /**
      * Constructor.
-     *
-     * @param DocumentConverter $documentConverter
-     * @param array             $rawData
-     * @param array             $propertyMetadata
      */
     public function __construct(DocumentConverter $documentConverter, array $rawData, array $propertyMetadata)
     {
@@ -43,7 +39,7 @@ class ObjectIterator implements \Countable, \Iterator
      */
     public function count()
     {
-        return count($this->objects);
+        return \count($this->objects);
     }
 
     /**
@@ -59,7 +55,7 @@ class ObjectIterator implements \Countable, \Iterator
      */
     public function next()
     {
-        next($this->objects);
+        \next($this->objects);
     }
 
     /**
@@ -67,7 +63,7 @@ class ObjectIterator implements \Countable, \Iterator
      */
     public function key()
     {
-        return key($this->objects);
+        return \key($this->objects);
     }
 
     /**
@@ -75,7 +71,7 @@ class ObjectIterator implements \Countable, \Iterator
      */
     public function valid()
     {
-        return $this->key() !== null;
+        return null !== $this->key();
     }
 
     /**
@@ -83,7 +79,7 @@ class ObjectIterator implements \Countable, \Iterator
      */
     public function rewind()
     {
-        reset($this->objects);
+        \reset($this->objects);
     }
 
     /**

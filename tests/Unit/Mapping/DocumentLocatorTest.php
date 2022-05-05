@@ -31,6 +31,7 @@ class DocumentLocatorTest extends TestCase
 
     /**
      * Data provider
+     *
      * @return array
      */
     public function getTestResolveClassNameDataProvider()
@@ -55,6 +56,7 @@ class DocumentLocatorTest extends TestCase
 
     /**
      * Data provider
+     *
      * @return array
      */
     public function getShortClassNameDataProvider()
@@ -79,6 +81,7 @@ class DocumentLocatorTest extends TestCase
 
     /**
      * Data provider
+     *
      * @return array
      */
     public function getShortClassNameExceptionsDataProvider()
@@ -103,7 +106,7 @@ class DocumentLocatorTest extends TestCase
      */
     public function testGetAllDocumentDirs()
     {
-        $this->assertEquals(2, count($this->locator->getAllDocumentDirs()));
+        $this->assertCount(2, $this->locator->getAllDocumentDirs());
     }
 
     /**

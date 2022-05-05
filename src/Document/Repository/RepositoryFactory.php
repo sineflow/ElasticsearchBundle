@@ -29,9 +29,6 @@ class RepositoryFactory
 
     /**
      * RepositoryFactory constructor.
-     *
-     * @param ServiceLocator $container
-     * @param Finder         $finder
      */
     public function __construct(ServiceLocator $container, Finder $finder)
     {
@@ -39,11 +36,6 @@ class RepositoryFactory
         $this->finder = $finder;
     }
 
-    /**
-     * @param IndexManager $indexManager
-     *
-     * @return Repository
-     */
     public function getRepository(IndexManager $indexManager): Repository
     {
         $documentMetadata = $indexManager->getDocumentMetadata();
@@ -55,27 +47,27 @@ class RepositoryFactory
             if ($this->container->has($customRepositoryClass)) {
                 $repository = $this->container->get($customRepositoryClass);
                 if (!$repository instanceof Repository) {
-                    throw new \RuntimeException(sprintf('The service "%s" must extend "%s".', $customRepositoryClass, Repository::class));
+                    throw new \RuntimeException(\sprintf('The service "%s" must extend "%s".', $customRepositoryClass, Repository::class));
                 }
 
                 return $repository;
             }
 
             // If not in the container but the class implements the interface for a repository service
-            if (is_a($customRepositoryClass, ServiceRepositoryInterface::class, true)) {
-                throw new \RuntimeException(sprintf('The "%s" repository implements "%s", but its service could not be found. Make sure the service exists and is tagged with "sfes.repository".', $customRepositoryClass, ServiceRepositoryInterface::class));
+            if (\is_a($customRepositoryClass, ServiceRepositoryInterface::class, true)) {
+                throw new \RuntimeException(\sprintf('The "%s" repository implements "%s", but its service could not be found. Make sure the service exists and is tagged with "sfes.repository".', $customRepositoryClass, ServiceRepositoryInterface::class));
             }
 
             // If the repository class specified doesn't exist at all
-            if (!class_exists($customRepositoryClass)) {
-                throw new \RuntimeException(sprintf('The "%s" entity has a repositoryClass set to "%s", but this is not a valid class. Check your class naming. If this is meant to be a service id, make sure this service exists and is tagged with "sfes.repository".', $documentMetadata->getClassName(), $customRepositoryClass));
+            if (!\class_exists($customRepositoryClass)) {
+                throw new \RuntimeException(\sprintf('The "%s" entity has a repositoryClass set to "%s", but this is not a valid class. Check your class naming. If this is meant to be a service id, make sure this service exists and is tagged with "sfes.repository".', $documentMetadata->getClassName(), $customRepositoryClass));
             }
 
             // the specified repository class is apparently not a service...
         }
 
         // if we already have the repository instance for this IndexManager from before, return it straight away
-        $repositoryHash = $documentMetadata->getClassName().spl_object_hash($indexManager);
+        $repositoryHash = $documentMetadata->getClassName().\spl_object_hash($indexManager);
         if (isset($this->knownRepositories[$repositoryHash])) {
             return $this->knownRepositories[$repositoryHash];
         }
@@ -84,12 +76,6 @@ class RepositoryFactory
         return $this->knownRepositories[$repositoryHash] = $this->createRepository($indexManager, $documentMetadata);
     }
 
-    /**
-     * @param IndexManager     $indexManager
-     * @param DocumentMetadata $documentMetadata
-     *
-     * @return Repository
-     */
     private function createRepository(IndexManager $indexManager, DocumentMetadata $documentMetadata): Repository
     {
         $repositoryClass = $documentMetadata->getRepositoryClass() ?: Repository::class;

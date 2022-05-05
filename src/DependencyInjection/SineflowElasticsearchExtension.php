@@ -15,9 +15,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 class SineflowElasticsearchExtension extends Extension
 {
     /**
-     * @param array            $config
-     * @param ContainerBuilder $container
-     *
      * @return Configuration
      */
     public function getConfiguration(array $config, ContainerBuilder $container)

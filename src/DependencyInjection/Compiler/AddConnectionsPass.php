@@ -22,7 +22,7 @@ class AddConnectionsPass implements CompilerPassInterface
 
         // Go through each defined connection and register a manager service for each
         foreach ($connections as $connectionName => $connectionSettings) {
-            $connectionName = strtolower($connectionName);
+            $connectionName = \strtolower($connectionName);
 
             $connectionDefinition = new ChildDefinition('sfes.connection_manager_prototype');
 
@@ -39,7 +39,7 @@ class AddConnectionsPass implements CompilerPassInterface
                 $connectionDefinition->addMethodCall('setTracer', [new Reference('sfes.logger.profiler')]);
             }
 
-            $connectionManagerId = sprintf('sfes.connection.%s', $connectionName);
+            $connectionManagerId = \sprintf('sfes.connection.%s', $connectionName);
             $container->setDefinition(
                 $connectionManagerId,
                 $connectionDefinition
@@ -50,7 +50,7 @@ class AddConnectionsPass implements CompilerPassInterface
             }
 
             // Allow auto-wiring of connection managers based on the argument name
-            $container->registerAliasForArgument($connectionManagerId, ConnectionManager::class, $connectionName . 'ConnectionManager');
+            $container->registerAliasForArgument($connectionManagerId, ConnectionManager::class, $connectionName.'ConnectionManager');
         }
     }
 }

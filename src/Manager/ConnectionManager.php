@@ -82,49 +82,31 @@ class ConnectionManager
         $this->kernelDebug = $kernelDebug;
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
 
-    /**
-     * @return LoggerInterface|null
-     */
     public function getLogger(): ?LoggerInterface
     {
         return $this->logger;
     }
 
-    /**
-     * @param LoggerInterface $tracer
-     */
     public function setTracer(LoggerInterface $tracer)
     {
         $this->tracer = $tracer;
     }
 
-    /**
-     * @return LoggerInterface|null
-     */
     public function getTracer(): ?LoggerInterface
     {
         return $this->tracer;
     }
 
-    /**
-     * @return string
-     */
     public function getConnectionName(): string
     {
         return $this->connectionName;
     }
 
-    /**
-     * @return Client
-     */
     public function getClient(): Client
     {
         if (!$this->client) {
@@ -142,25 +124,16 @@ class ConnectionManager
         return $this->client;
     }
 
-    /**
-     * @return array
-     */
     public function getConnectionSettings(): array
     {
         return $this->connectionSettings;
     }
 
-    /**
-     * @return bool
-     */
     public function isAutocommit(): bool
     {
         return $this->autocommit;
     }
 
-    /**
-     * @param bool $autocommit
-     */
     public function setAutocommit(bool $autocommit)
     {
         // If the autocommit mode is being turned on, commit any pending bulk items
@@ -171,17 +144,11 @@ class ConnectionManager
         $this->autocommit = $autocommit;
     }
 
-    /**
-     * @return EventDispatcherInterface
-     */
     public function getEventDispatcher(): EventDispatcherInterface
     {
         return $this->eventDispatcher;
     }
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
@@ -202,12 +169,10 @@ class ConnectionManager
 
     /**
      * Returns the number of bulk operations currently queued
-     *
-     * @return int
      */
     public function getBulkOperationsCount(): int
     {
-        return count($this->bulkQueries);
+        return \count($this->bulkQueries);
     }
 
     /**
@@ -250,7 +215,7 @@ class ConnectionManager
 
         if ($response['errors']) {
             $errorCount = $this->logBulkRequestErrors($response['items']);
-            $e = new BulkRequestException(sprintf('Bulk request failed with %s error(s)', $errorCount));
+            $e = new BulkRequestException(\sprintf('Bulk request failed with %s error(s)', $errorCount));
             $e->setBulkResponseItems($response['items'], $bulkRequest);
             throw $e;
         }
@@ -262,8 +227,6 @@ class ConnectionManager
 
     /**
      * Get the current bulk request queued for commit
-     *
-     * @return array
      */
     private function getBulkRequest(): array
     {
@@ -276,7 +239,7 @@ class ConnectionManager
             } else {
                 // Check whether the target index is actually an alias pointing to more than one index
                 // in which case, two separate bulk query operation will be set for each physical index
-                $indices = array_keys($this->getClient()->indices()->getAlias(['index' => $bulkQueryItem->getIndex()]));
+                $indices = \array_keys($this->getClient()->indices()->getAlias(['index' => $bulkQueryItem->getIndex()]));
                 $cachedAliasIndices[$bulkQueryItem->getIndex()] = $indices;
             }
             foreach ($indices as $index) {
@@ -286,7 +249,7 @@ class ConnectionManager
             }
         }
 
-        $bulkRequest = array_merge($bulkRequest, $this->bulkParams);
+        $bulkRequest = \array_merge($bulkRequest, $this->bulkParams);
 
         return $bulkRequest;
     }
@@ -303,13 +266,13 @@ class ConnectionManager
         $errorsCount = 0;
         foreach ($responseItems as $responseItem) {
             // Get the first element of the response item (its key could be one of index/create/delete/update)
-            $action = key($responseItem);
-            $actionResult = reset($responseItem);
+            $action = \key($responseItem);
+            $actionResult = \reset($responseItem);
 
             // If there was an error on that item
             if (!empty($actionResult['error']) && $this->logger) {
-                $errorsCount++;
-                $this->logger->error(sprintf('Bulk %s item failed', $action), $actionResult);
+                ++$errorsCount;
+                $this->logger->error(\sprintf('Bulk %s item failed', $action), $actionResult);
             }
         }
 
@@ -362,12 +325,12 @@ class ConnectionManager
      *
      * NOTE: This is a workaround function to the native indices()->exists() function of the ES client
      * because the latter generates warnings in the log file when index/alias does not exist
+     *
      * @see https://github.com/elasticsearch/elasticsearch-php/issues/163
      *
      * $params['index'] = (list) A comma-separated list of indices/aliases to check (Required)
-     * @param array $params Associative array of parameters
      *
-     * @return bool
+     * @param array $params Associative array of parameters
      *
      * @throws InvalidArgumentException
      */
@@ -377,7 +340,7 @@ class ConnectionManager
             throw new InvalidArgumentException('Required parameter "index" missing');
         }
 
-        $indicesAndAliasesToCheck = array_flip(explode(',', $params['index']));
+        $indicesAndAliasesToCheck = \array_flip(\explode(',', $params['index']));
 
         // Get all available indices (exc. dot-prefixed indices) with their aliases
         // Passing this 'index' argument should not be necessary in ES8
@@ -399,19 +362,17 @@ class ConnectionManager
         return false;
     }
 
-
     /**
      * Check whether any of the specified index aliases exists in the ES server
      *
      * NOTE: This is a workaround function to the native indices()->existsAlias() function of the ES client
      * because the latter generates warnings in the log file when alias does not exists
      * When this is fixed, we should revert back to using the ES client's function, not this one
+     *
      * @see https://github.com/elasticsearch/elasticsearch-php/issues/163
      *
      * @param array $params
-     * $params['name']               = (list) A comma-separated list of alias names to return (Required)
-     *
-     * @return bool
+     *                      $params['name']               = (list) A comma-separated list of alias names to return (Required)
      *
      * @throws InvalidArgumentException
      */
@@ -421,7 +382,7 @@ class ConnectionManager
             throw new InvalidArgumentException('Required parameter "name" missing');
         }
 
-        $aliasesToCheck = explode(',', $params['name']);
+        $aliasesToCheck = \explode(',', $params['name']);
 
         // Get all available indices (exc. dot-prefixed indices) with their aliases
         // Passing this 'index' argument should not be necessary in ES8

@@ -4,7 +4,6 @@ namespace Sineflow\ElasticsearchBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\AddIndexManagersPass;
-use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\MappingPass;
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -45,9 +44,8 @@ class AddIndexManagersPassTest extends TestCase
             ->getMock();
 
         $containerMock->method('hasDefinition')->with($this->anything())
-            ->will(
-                $this->returnCallback(
-                    function ($parameter) use ($connections, $managers) {
+            ->willReturnCallback(
+                    static function ($parameter) {
                         switch ($parameter) {
                             case 'sfes.connection.test1':
                                 return true;
@@ -55,13 +53,11 @@ class AddIndexManagersPassTest extends TestCase
                                 return null;
                         }
                     }
-                )
             );
 
         $containerMock->expects($this->exactly(1))->method('getParameter')->with($this->anything())
-            ->will(
-                $this->returnCallback(
-                    function ($parameter) use ($connections, $managers) {
+            ->willReturnCallback(
+                    static function ($parameter) use ($connections, $managers) {
                         switch ($parameter) {
                             case 'sfes.indices':
                                 return $managers;
@@ -71,7 +67,6 @@ class AddIndexManagersPassTest extends TestCase
                                 return null;
                         }
                     }
-                )
             );
 
         $containerMock

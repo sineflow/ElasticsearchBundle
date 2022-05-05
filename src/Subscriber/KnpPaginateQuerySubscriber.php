@@ -3,8 +3,8 @@
 namespace Sineflow\ElasticsearchBundle\Subscriber;
 
 use Knp\Component\Pager\Event\ItemsEvent;
-use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Finder\Adapter\KnpPaginatorAdapter;
+use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Result\DocumentIterator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,9 +20,6 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
      */
     private $requestStack;
 
-    /**
-     * @param RequestStack $requestStack
-     */
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
@@ -33,27 +30,24 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            'knp_pager.items' => array('items', 1),
-        );
+        return [
+            'knp_pager.items' => ['items', 1],
+        ];
     }
 
-    /**
-     * @param ItemsEvent $event
-     */
     public function items(ItemsEvent $event)
     {
         if ($event->target instanceof KnpPaginatorAdapter) {
             // Add sort to query
-            list($sortField, $sortDirection) = $this->getSorting($event);
+            [$sortField, $sortDirection] = $this->getSorting($event);
             $results = $event->target->getResults($event->getOffset(), $event->getLimit(), $sortField, $sortDirection);
             $event->count = $event->target->getTotalHits();
 
             $resultsType = $event->target->getResultsType();
             switch ($resultsType) {
                 case Finder::RESULTS_OBJECT:
-                    /** @var DocumentIterator $results */
-                    $event->items = iterator_to_array($results);
+                    /* @var DocumentIterator $results */
+                    $event->items = \iterator_to_array($results);
                     $event->setCustomPaginationParameter('aggregations', $results->getAggregations());
                     $event->setCustomPaginationParameter('suggestions', $results->getSuggestions());
                     break;
@@ -64,12 +58,12 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
 
                 case Finder::RESULTS_RAW:
                     $event->items = $results['hits']['hits'];
-                    $event->setCustomPaginationParameter('aggregations', isset($results['aggregations']) ? $results['aggregations'] : []);
-                    $event->setCustomPaginationParameter('suggestions', isset($results['suggestions']) ? $results['suggestions'] : []);
+                    $event->setCustomPaginationParameter('aggregations', $results['aggregations'] ?? []);
+                    $event->setCustomPaginationParameter('suggestions', $results['suggestions'] ?? []);
                     break;
 
                 default:
-                    throw new \InvalidArgumentException(sprintf('Unsupported results type "%s" for KNP paginator', $resultsType));
+                    throw new \InvalidArgumentException(\sprintf('Unsupported results type "%s" for KNP paginator', $resultsType));
             }
 
             $event->stopPropagation();
@@ -78,8 +72,6 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
 
     /**
      * Get and validate the KNP sorting params
-     *
-     * @param ItemsEvent $event
      *
      * @return array
      */
@@ -92,14 +84,12 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
         if ($request instanceof Request) {
             $sortField = $request->get($event->options['sortFieldParameterName']);
             $sortDirection = $request->get($event->options['sortDirectionParameterName'], 'desc');
-            $sortDirection = strtolower($sortDirection) === 'desc' ? 'desc' : 'asc';
+            $sortDirection = 'desc' === \strtolower($sortDirection) ? 'desc' : 'asc';
 
             if ($sortField) {
                 // check if the requested sort field is in the sort whitelist
-                if (isset($event->options['sortFieldWhitelist']) && !in_array($sortField, $event->options['sortFieldWhitelist'])) {
-                    throw new \UnexpectedValueException(
-                        sprintf('Cannot sort by [%s] as it is not in the whitelist', $sortField)
-                    );
+                if (isset($event->options['sortFieldWhitelist']) && !\in_array($sortField, $event->options['sortFieldWhitelist'])) {
+                    throw new \UnexpectedValueException(\sprintf('Cannot sort by [%s] as it is not in the whitelist', $sortField));
                 }
             }
         }

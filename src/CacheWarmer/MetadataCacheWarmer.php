@@ -16,9 +16,6 @@ class MetadataCacheWarmer implements CacheWarmerInterface
      */
     private $metadataCollector;
 
-    /**
-     * @param DocumentMetadataCollector $metadataCollector
-     */
     public function __construct(DocumentMetadataCollector $metadataCollector)
     {
         $this->metadataCollector = $metadataCollector;
@@ -45,6 +42,6 @@ class MetadataCacheWarmer implements CacheWarmerInterface
             return (array) $this->metadataCollector->warmUp($cacheDir);
         }
 
-        throw new \LogicException(sprintf('The metadata collector "%s" cannot be warmed up because it does not implement "%s".', get_debug_type($this->metadataCollector), WarmableInterface::class));
+        throw new \LogicException(\sprintf('The metadata collector "%s" cannot be warmed up because it does not implement "%s".', \get_debug_type($this->metadataCollector), WarmableInterface::class));
     }
 }

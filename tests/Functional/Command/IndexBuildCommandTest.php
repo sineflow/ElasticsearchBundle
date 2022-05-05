@@ -31,9 +31,9 @@ class IndexBuildCommandTest extends AbstractCommandTestCase
             $commandTester->execute($arguments, $options)
         );
 
-        $expectedOutput = sprintf(
+        $expectedOutput =
             'Built index for "customer"'
-        );
+        ;
 
         // Test if the command output matches the expected output or not
         $this->assertStringMatchesFormat($expectedOutput.'%a', $commandTester->getDisplay());

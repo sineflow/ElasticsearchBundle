@@ -22,7 +22,7 @@ class BulkQueryItemTest extends TestCase
                     [
                         'index' => [
                             '_index' => 'myindex',
-                            '_id'    => 3,
+                            '_id' => 3,
                         ],
                     ],
                     [
@@ -49,7 +49,7 @@ class BulkQueryItemTest extends TestCase
                     [
                         'update' => [
                             '_index' => 'forcedindex',
-                            '_id'    => 3,
+                            '_id' => 3,
                         ],
                     ],
                     [],
@@ -62,12 +62,11 @@ class BulkQueryItemTest extends TestCase
                     [
                         'delete' => [
                             '_index' => 'myindex',
-                            '_id'    => 3,
+                            '_id' => 3,
                         ],
                     ],
                 ],
             ],
-
         ];
     }
 

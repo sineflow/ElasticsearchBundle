@@ -49,10 +49,9 @@ class DocumentMetadataCollector implements WarmableInterface
     private $cache;
 
     /**
-     * @param array           $indexManagers   The list of index managers defined
-     * @param DocumentLocator $documentLocator
-     * @param DocumentParser  $parser          For reading entity annotations
-     * @param CacheInterface  $cache           For caching entity metadata
+     * @param array          $indexManagers The list of index managers defined
+     * @param DocumentParser $parser        For reading entity annotations
+     * @param CacheInterface $cache         For caching entity metadata
      */
     public function __construct(array $indexManagers, DocumentLocator $documentLocator, DocumentParser $parser, CacheInterface $cache)
     {
@@ -66,14 +65,7 @@ class DocumentMetadataCollector implements WarmableInterface
             $documentClass = $this->documentLocator->resolveClassName($indexSettings['class']);
 
             if (isset($this->documentClassToIndexManagerNames[$documentClass])) {
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        'Index manager [%s] can not have class [%s], as that class is already specified for [%s]',
-                        $indexManagerName,
-                        $documentClass,
-                        $this->documentClassToIndexManagerNames[$documentClass]
-                    )
-                );
+                throw new \InvalidArgumentException(\sprintf('Index manager [%s] can not have class [%s], as that class is already specified for [%s]', $indexManagerName, $documentClass, $this->documentClassToIndexManagerNames[$documentClass]));
             }
 
             $this->documentClassToIndexManagerNames[$documentClass] = $indexManagerName;
@@ -110,17 +102,13 @@ class DocumentMetadataCollector implements WarmableInterface
      * Returns metadata for the specified document class name.
      * Class can also be specified in short notation (e.g App:Product)
      *
-     * @param string $documentClass
-     *
-     * @return DocumentMetadata
-     *
      * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getDocumentMetadata(string $documentClass): DocumentMetadata
     {
         $documentClass = $this->documentLocator->resolveClassName($documentClass);
 
-        $cacheKey = self::DOCUMENTS_CACHE_KEY_PREFIX.strtr($documentClass, '\\', '.');
+        $cacheKey = self::DOCUMENTS_CACHE_KEY_PREFIX.\strtr($documentClass, '\\', '.');
 
         return $this->cache->get($cacheKey, function (ItemInterface $item) use ($documentClass) {
             return $this->fetchDocumentMetadata($documentClass);
@@ -131,17 +119,13 @@ class DocumentMetadataCollector implements WarmableInterface
      * Returns metadata for the specified object class name
      * Class can also be specified in short notation (e.g App:ObjCategory)
      *
-     * @param string $objectClass
-     *
-     * @return array
-     *
      * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getObjectPropertiesMetadata(string $objectClass): array
     {
         $objectClass = $this->documentLocator->resolveClassName($objectClass);
 
-        $cacheKey = self::OBJECTS_CACHE_KEY_PREFIX.strtr($objectClass, '\\', '.');
+        $cacheKey = self::OBJECTS_CACHE_KEY_PREFIX.\strtr($objectClass, '\\', '.');
 
         return $this->cache->get($cacheKey, function (ItemInterface $item) use ($objectClass) {
             return $this->parser->getPropertiesMetadata(new \ReflectionClass($objectClass));
@@ -152,15 +136,13 @@ class DocumentMetadataCollector implements WarmableInterface
      * Returns the index manager name that manages the given entity document class
      *
      * @param string $documentClass Either as a fully qualified class name or a short notation
-     *
-     * @return string
      */
     public function getDocumentClassIndex(string $documentClass): string
     {
         $documentClass = $this->documentLocator->resolveClassName($documentClass);
 
         if (!isset($this->documentClassToIndexManagerNames[$documentClass])) {
-            throw new \InvalidArgumentException(sprintf('Entity [%s] is not managed by any index manager. You need an entry in the sineflow_elasticsearch.indices config key with this class.', $documentClass));
+            throw new \InvalidArgumentException(\sprintf('Entity [%s] is not managed by any index manager. You need an entry in the sineflow_elasticsearch.indices config key with this class.', $documentClass));
         }
 
         return $this->documentClassToIndexManagerNames[$documentClass];
@@ -168,10 +150,6 @@ class DocumentMetadataCollector implements WarmableInterface
 
     /**
      * Retrieves the metadata for a document
-     *
-     * @param string $documentClass
-     *
-     * @return DocumentMetadata
      *
      * @throws \ReflectionException
      */

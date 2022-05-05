@@ -4,8 +4,8 @@ namespace Sineflow\ElasticsearchBundle\Tests\Functional\Finder\Adapter;
 
 use Knp\Bundle\PaginatorBundle\Pagination\SlidingPagination;
 use Sineflow\ElasticsearchBundle\Document\Repository\Repository;
-use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Finder\Adapter\KnpPaginatorAdapter;
+use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,15 +27,15 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
                         'title' => 'Bar',
                         'tags' => [
                             ['tagname' => 'first tag'],
-                            ['tagname' => 'second tag']
-                        ]
+                            ['tagname' => 'second tag'],
+                        ],
                     ],
                     'related_categories' => [
                         [
                             'title' => 'Acme',
                             'tags' => [
-                                ['tagname' => 'tutu']
-                            ]
+                                ['tagname' => 'tutu'],
+                            ],
                         ],
                         [
                             'title' => 'Doodle',
@@ -66,7 +66,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
                 ],
                 [
                     '_id' => '54321',
-                ]
+                ],
             ],
         ];
     }

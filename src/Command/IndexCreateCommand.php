@@ -20,9 +20,6 @@ class IndexCreateCommand extends Command
      */
     private $indexManagerRegistry;
 
-    /**
-     * @param IndexManagerRegistry $indexManagerRegistry
-     */
     public function __construct(IndexManagerRegistry $indexManagerRegistry)
     {
         $this->indexManagerRegistry = $indexManagerRegistry;
@@ -56,14 +53,14 @@ class IndexCreateCommand extends Command
         try {
             $indexManager->createIndex();
             $output->writeln(
-                sprintf(
+                \sprintf(
                     '<info>Created index for "</info><comment>%s</comment><info>"</info>',
                     $indexManagerName
                 )
             );
         } catch (\Exception $e) {
             $output->writeln(
-                sprintf(
+                \sprintf(
                     '<error>Index creation failed:</error> <comment>%s</comment>',
                     $e->getMessage()
                 )

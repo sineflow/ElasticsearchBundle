@@ -10,13 +10,12 @@ class OrderProvider extends AbstractProvider
     private $fixedDocuments = [
         1 => [
             'id' => 1,
-            'order_time' => 1452250000
+            'order_time' => 1452250000,
         ],
         2 => [
             'id' => 2,
-            'order_time' => 1452251632
+            'order_time' => 1452251632,
         ],
-
     ];
 
     public function getDocuments()

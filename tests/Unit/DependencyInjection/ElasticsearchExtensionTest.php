@@ -39,7 +39,7 @@ class ElasticsearchExtensionTest extends TestCase
                 'connections' => [
                     'test1' => [
                         'hosts' => [
-                            'user:pass@eshost:1111'
+                            'user:pass@eshost:1111',
                         ],
                         'profiling' => false,
                         'logging' => false,
@@ -57,20 +57,20 @@ class ElasticsearchExtensionTest extends TestCase
                             'analysis' => [
                                 'filter' => [
                                     'test_filter' => [
-                                        'type' => 'ngram'
-                                    ]
+                                        'type' => 'ngram',
+                                    ],
                                 ],
                                 'tokenizer' => [
                                     'test_tokenizer' => [
-                                        'type' => 'ngram'
-                                    ]
+                                        'type' => 'ngram',
+                                    ],
                                 ],
                                 'analyzer' => [
                                     'test_analyzer' => [
-                                        'type' => 'custom'
-                                    ]
-                                ]
-                            ]
+                                        'type' => 'custom',
+                                    ],
+                                ],
+                            ],
                         ],
                         'class' => 'testBundle:Foo',
                     ],
@@ -105,20 +105,20 @@ class ElasticsearchExtensionTest extends TestCase
                     'analysis' => [
                         'filter' => [
                             'test_filter' => [
-                                'type' => 'ngram'
-                            ]
+                                'type' => 'ngram',
+                            ],
                         ],
                         'tokenizer' => [
                             'test_tokenizer' => [
-                                'type' => 'ngram'
-                            ]
+                                'type' => 'ngram',
+                            ],
                         ],
                         'analyzer' => [
                             'test_analyzer' => [
-                                'type' => 'custom'
-                            ]
-                        ]
-                    ]
+                                'type' => 'custom',
+                            ],
+                        ],
+                    ],
                 ],
                 'class' => 'testBundle:Foo',
             ],
@@ -147,7 +147,7 @@ class ElasticsearchExtensionTest extends TestCase
     public function testLoad($parameters, $expectedEntityLocations, $expectedConnections, $expectedManagers)
     {
         $container = new ContainerBuilder();
-        class_exists('testClass') ? : eval('class testClass {}');
+        \class_exists('testClass') ?: eval('class testClass {}');
         $container->setParameter('kernel.cache_dir', '');
         $container->setParameter('kernel.logs_dir', '');
         $container->setParameter('kernel.debug', true);
@@ -192,7 +192,7 @@ class ElasticsearchExtensionTest extends TestCase
         foreach ($expectedServiceDefinitions as $expectedServiceDefinition) {
             $this->assertTrue(
                 $container->hasDefinition($expectedServiceDefinition),
-                sprintf('Container should have [%s] definition set.', $expectedServiceDefinition)
+                \sprintf('Container should have [%s] definition set.', $expectedServiceDefinition)
             );
         }
     }

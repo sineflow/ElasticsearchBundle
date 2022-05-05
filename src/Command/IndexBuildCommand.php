@@ -5,8 +5,8 @@ namespace Sineflow\ElasticsearchBundle\Command;
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -21,9 +21,6 @@ class IndexBuildCommand extends Command
      */
     private $indexManagerRegistry;
 
-    /**
-     * @param IndexManagerRegistry $indexManagerRegistry
-     */
     public function __construct(IndexManagerRegistry $indexManagerRegistry)
     {
         $this->indexManagerRegistry = $indexManagerRegistry;
@@ -73,14 +70,14 @@ class IndexBuildCommand extends Command
         try {
             $indexManager->rebuildIndex($deleteOldIndex, $cancelCurrent);
             $output->writeln(
-                sprintf(
+                \sprintf(
                     '<info>Built index for "</info><comment>%s</comment><info>"</info>',
                     $indexManagerName
                 )
             );
         } catch (\Exception $e) {
             $output->writeln(
-                sprintf(
+                \sprintf(
                     '<error>Index building failed:</error> <comment>%s</comment>',
                     $e->getMessage()
                 )

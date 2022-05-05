@@ -85,8 +85,6 @@ class ElasticsearchProvider extends AbstractProvider
      * Build and return a document from the data source, ready for insertion into ES
      *
      * @param int|string $id
-     *
-     * @return array
      */
     public function getDocument($id): array
     {

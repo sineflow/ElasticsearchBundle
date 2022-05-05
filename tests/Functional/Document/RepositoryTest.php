@@ -8,8 +8,6 @@ use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
-use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product;
-use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Customer;
 
 class RepositoryTest extends AbstractElasticsearchTestCase
 {
@@ -62,8 +60,8 @@ class RepositoryTest extends AbstractElasticsearchTestCase
     {
         parent::setUp();
 
-        $this->finder            = $this->getContainer()->get(Finder::class);
-        $this->indexManager      = $this->getContainer()->get('sfes.index.bar');
+        $this->finder = $this->getContainer()->get(Finder::class);
+        $this->indexManager = $this->getContainer()->get('sfes.index.bar');
 
         $this->indexManager->getConnection()->setAutocommit(true);
 

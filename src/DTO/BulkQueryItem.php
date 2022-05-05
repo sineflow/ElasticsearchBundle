@@ -37,8 +37,8 @@ class BulkQueryItem
      */
     public function __construct(string $operation, string $index, array $query, array $metaParams = [])
     {
-        if (!in_array($operation, ['index', 'create', 'update', 'delete'])) {
-            throw new InvalidArgumentException(sprintf('Invalid bulk operation "%s" specified', $operation));
+        if (!\in_array($operation, ['index', 'create', 'update', 'delete'])) {
+            throw new InvalidArgumentException(\sprintf('Invalid bulk operation "%s" specified', $operation));
         }
 
         $this->operation = $operation;
@@ -57,17 +57,11 @@ class BulkQueryItem
         $this->metaParams = $metaParams;
     }
 
-    /**
-     * @return string
-     */
     public function getIndex(): string
     {
         return $this->index;
     }
 
-    /**
-     * @return array
-     */
     public function getQuery(): array
     {
         return $this->query;
@@ -77,15 +71,13 @@ class BulkQueryItem
      * Return array of lines for bulk request
      *
      * @param string|null $forceIndex If set, that will be the index used for the output bulk request
-     *
-     * @return array
      */
     public function getLines($forceIndex = null): array
     {
         $result = [];
 
         $result[] = [
-            $this->operation => array_merge(
+            $this->operation => \array_merge(
                 $this->metaParams,
                 [
                     '_index' => $forceIndex ?: $this->index,

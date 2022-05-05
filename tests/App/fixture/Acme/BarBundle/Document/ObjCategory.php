@@ -34,5 +34,4 @@ class ObjCategory implements ObjectInterface
      * @ES\Property(type="object", name="tags", multiple=true, objectName="AcmeBarBundle:ObjTag")
      */
     public $tags;
-
 }

@@ -19,8 +19,6 @@ class DocumentMetadata
 
     /**
      * Resolves metadata.
-     *
-     * @param array $metadata
      */
     public function __construct(array $metadata)
     {
@@ -32,8 +30,6 @@ class DocumentMetadata
 
     /**
      * Configures options resolver.
-     *
-     * @param OptionsResolver $optionsResolver
      */
     protected function configureOptions(OptionsResolver $optionsResolver)
     {
@@ -42,68 +38,48 @@ class DocumentMetadata
 
     /**
      * Retrieves index mapping for the Elasticsearch client
-     *
-     * @return array
      */
     public function getClientMapping(): array
     {
-        $mapping = array_filter(
-            array_merge(
+        $mapping = \array_filter(
+            \array_merge(
                 ['properties' => $this->getProperties()],
                 $this->getFields()
             ),
-            function ($value) {
+            static function ($value) {
                 // Remove all empty non-boolean values from the mapping array
-                return (bool) $value || is_bool($value);
+                return (bool) $value || \is_bool($value);
             }
         );
 
         return $mapping;
     }
 
-    /**
-     * @return array
-     */
     public function getProperties(): array
     {
         return $this->metadata['properties'];
     }
 
-    /**
-     * @return array
-     */
     public function getPropertiesMetadata(): array
     {
         return $this->metadata['propertiesMetadata'];
     }
 
-    /**
-     * @return array
-     */
     public function getFields(): array
     {
         return $this->metadata['fields'];
     }
 
-    /**
-     * @return string|null
-     */
     public function getRepositoryClass(): ?string
     {
         return $this->metadata['repositoryClass'];
     }
 
-    /**
-     * @return string|null
-     */
     public function getProviderClass(): ?string
     {
         return $this->metadata['providerClass'];
     }
 
-    /**
-     * @return string
-     */
     public function getClassName(): string
     {
         return $this->metadata['className'];

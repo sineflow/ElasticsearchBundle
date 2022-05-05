@@ -3,11 +3,11 @@
 namespace Sineflow\ElasticsearchBundle\Finder;
 
 use Sineflow\ElasticsearchBundle\DTO\IndicesToDocumentClasses;
+use Sineflow\ElasticsearchBundle\Finder\Adapter\KnpPaginatorAdapter;
 use Sineflow\ElasticsearchBundle\Finder\Adapter\ScrollAdapter;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
-use Sineflow\ElasticsearchBundle\Finder\Adapter\KnpPaginatorAdapter;
 use Sineflow\ElasticsearchBundle\Result\DocumentConverter;
 use Sineflow\ElasticsearchBundle\Result\DocumentIterator;
 
@@ -44,9 +44,6 @@ class Finder
 
     /**
      * Finder constructor.
-     * @param DocumentMetadataCollector $documentMetadataCollector
-     * @param IndexManagerRegistry      $indexManagerRegistry
-     * @param DocumentConverter         $documentConverter
      */
     public function __construct(
         DocumentMetadataCollector $documentMetadataCollector,
@@ -62,8 +59,6 @@ class Finder
      * Returns a document by identifier
      *
      * @param string $documentClass FQN or short notation (i.e App:Product)
-     * @param string $id
-     * @param int    $resultType
      *
      * @return mixed
      */
@@ -121,7 +116,7 @@ class Finder
         // Add any additional params specified, overwriting the current ones
         // This allows for overriding the target index if necessary
         if (!empty($additionalRequestParams)) {
-            $params = array_replace_recursive($params, $additionalRequestParams);
+            $params = \array_replace_recursive($params, $additionalRequestParams);
         }
 
         // Set the body here, as we don't want to allow overriding it with the $additionalRequestParams
@@ -130,7 +125,7 @@ class Finder
         // Execute a scroll request
         if (($resultsType & self::BITMASK_RESULT_ADAPTERS) === self::ADAPTER_SCROLL) {
             // Set default scroll and size, unless custom ones were provided through $additionalRequestParams
-            $params = array_replace_recursive([
+            $params = \array_replace_recursive([
                 'scroll' => self::SCROLL_TIME,
                 'body' => ['sort' => ['_doc']],
             ], $params);
@@ -177,7 +172,7 @@ class Finder
         $totalHits = $raw['hits']['total']['value'];
 
         // If no results were returned, clear the scroll
-        if (count($raw['hits']['hits']) === 0) {
+        if (0 === \count($raw['hits']['hits'])) {
             $client->clearScroll([
                 'body' => [
                     'scroll_id' => $scrollId,
@@ -192,12 +187,6 @@ class Finder
 
     /**
      * Returns the number of records matching the given query
-     *
-     * @param array $documentClasses
-     * @param array $searchBody
-     * @param array $additionalRequestParams
-     *
-     * @return int
      */
     public function count(array $documentClasses, array $searchBody = [], array $additionalRequestParams = []): int
     {
@@ -214,7 +203,7 @@ class Finder
         }
 
         if (!empty($additionalRequestParams)) {
-            $params = array_merge($additionalRequestParams, $params);
+            $params = \array_merge($additionalRequestParams, $params);
         }
 
         $raw = $client->count($params);
@@ -225,10 +214,6 @@ class Finder
     /**
      * Returns an array with the Elasticsearch indices to be queried,
      * based on the given document classes in short notation (App:Product) or FQN
-     *
-     * @param array $documentClasses
-     *
-     * @return array
      */
     public function getTargetIndices(array $documentClasses): array
     {
@@ -250,7 +235,7 @@ class Finder
      *
      * @return array|DocumentIterator
      */
-    public function parseResult(array $raw, int $resultsType, array $documentClasses = null)
+    public function parseResult(array $raw, int $resultsType, ?array $documentClasses = null)
     {
         switch ($resultsType & self::BITMASK_RESULT_TYPES) {
             case self::RESULTS_OBJECT:
@@ -279,14 +264,12 @@ class Finder
      * Returns a mapping of live indices to the document classes that represent them
      *
      * @param string[] $documentClasses
-     *
-     * @return IndicesToDocumentClasses
      */
     private function getIndicesToDocumentClasses(array $documentClasses): IndicesToDocumentClasses
     {
         $indicesToDocumentClasses = new IndicesToDocumentClasses();
 
-        $getLiveIndices = (count($documentClasses) > 1);
+        $getLiveIndices = (\count($documentClasses) > 1);
 
         foreach ($documentClasses as $documentClass) {
             $indexManagerName = $this->documentMetadataCollector->getDocumentClassIndex($documentClass);
@@ -306,14 +289,10 @@ class Finder
 
     /**
      * Normalizes response array.
-     *
-     * @param array $data
-     *
-     * @return array
      */
     private function convertToNormalizedArray(array $data): array
     {
-        if (array_key_exists('_source', $data)) {
+        if (\array_key_exists('_source', $data)) {
             return $data['_source'];
         }
 
@@ -325,7 +304,7 @@ class Finder
             }
         } elseif (isset($data['hits']['hits'][0]['fields'])) {
             foreach ($data['hits']['hits'] as $item) {
-                $output[$item['_id']] = array_map('current', $item['fields']);
+                $output[$item['_id']] = \array_map('current', $item['fields']);
             }
         } else {
             // If empty fields param was supplied (meaning no fields are returned)
@@ -339,10 +318,6 @@ class Finder
 
     /**
      * Verify that all types are in indices using the same connection object and return that object
-     *
-     * @param array $documentClasses
-     *
-     * @return ConnectionManager|null
      */
     private function getConnection(array $documentClasses): ?ConnectionManager
     {
@@ -350,8 +325,8 @@ class Finder
         foreach ($documentClasses as $documentClass) {
             $indexManagerName = $this->documentMetadataCollector->getDocumentClassIndex($documentClass);
             $indexManager = $this->indexManagerRegistry->get($indexManagerName);
-            if (!is_null($connection) && $indexManager->getConnection()->getConnectionName() !== $connection->getConnectionName()) {
-                throw new \InvalidArgumentException(sprintf('All searched types must be in indices within the same connection'));
+            if (null !== $connection && $indexManager->getConnection()->getConnectionName() !== $connection->getConnectionName()) {
+                throw new \InvalidArgumentException('All searched types must be in indices within the same connection');
             }
             $connection = $indexManager->getConnection();
         }

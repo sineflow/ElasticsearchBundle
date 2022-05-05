@@ -37,7 +37,6 @@ class EntityTrackerSubscriberTest extends AbstractElasticsearchTestCase
         // Make sure this index manager has a separate connection manager
         $this->assertNotSame($imWithAliases->getConnection(), $backupIm->getConnection());
 
-
         // Persist raw document - ignored by the subscriber as there's no entity to update
         $rawCustomer = new Customer();
         $rawCustomer->name = 'firstRaw';
@@ -71,7 +70,6 @@ class EntityTrackerSubscriberTest extends AbstractElasticsearchTestCase
         $this->assertNull($customer->id);
         $this->assertNull($secondRawCustomer->id);
         $this->assertEquals('555', $secondCustomer->id);
-
 
         $imWithAliases->getConnection()->commit();
         $backupIm->getConnection()->commit();

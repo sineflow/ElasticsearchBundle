@@ -97,15 +97,6 @@ class IndexManager
      */
     protected $eventDispatcher;
 
-    /**
-     * @param string                    $managerName
-     * @param ConnectionManager         $connection
-     * @param DocumentMetadataCollector $metadataCollector
-     * @param ProviderRegistry          $providerRegistry
-     * @param Finder                    $finder
-     * @param DocumentConverter         $documentConverter
-     * @param array                     $indexSettings
-     */
     public function __construct(
         string $managerName,
         array $indexSettings,
@@ -134,28 +125,19 @@ class IndexManager
         }
     }
 
-    /**
-     * @return EventDispatcherInterface
-     */
     public function getEventDispatcher(): EventDispatcherInterface
     {
         return $this->eventDispatcher;
     }
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * @return array
-     */
     public function getIndexMapping(): array
     {
-        if (is_null($this->indexMapping)) {
+        if (null === $this->indexMapping) {
             $this->indexMapping = $this->buildIndexMapping();
         }
 
@@ -164,8 +146,6 @@ class IndexManager
 
     /**
      * Returns mapping array for index
-     *
-     * @return array
      */
     private function buildIndexMapping(): array
     {
@@ -180,17 +160,11 @@ class IndexManager
         return $index;
     }
 
-    /**
-     * @return string
-     */
     public function getManagerName(): string
     {
         return $this->managerName;
     }
 
-    /**
-     * @return bool
-     */
     public function getUseAliases(): bool
     {
         return $this->useAliases;
@@ -198,8 +172,6 @@ class IndexManager
 
     /**
      * Returns the 'read' alias when using aliases, or the index name, when not
-     *
-     * @return string
      */
     public function getReadAlias(): string
     {
@@ -208,17 +180,12 @@ class IndexManager
 
     /**
      * Returns the 'write' alias when using aliases, or the index name, when not
-     *
-     * @return string
      */
     public function getWriteAlias(): string
     {
         return $this->writeAlias;
     }
 
-    /**
-     * @param string $writeAlias
-     */
     private function setWriteAlias(string $writeAlias)
     {
         $this->writeAlias = $writeAlias;
@@ -226,8 +193,6 @@ class IndexManager
 
     /**
      * Returns Elasticsearch connection.
-     *
-     * @return ConnectionManager
      */
     public function getConnection(): ConnectionManager
     {
@@ -236,8 +201,6 @@ class IndexManager
 
     /**
      * Returns repository for a document class
-     *
-     * @return Repository
      */
     public function getRepository(): Repository
     {
@@ -246,8 +209,6 @@ class IndexManager
 
     /**
      * Returns the data provider object for an index
-     *
-     * @return ProviderInterface
      */
     public function getDataProvider(): ProviderInterface
     {
@@ -265,8 +226,6 @@ class IndexManager
      *
      * When using aliases, this would not represent an actual physical index.
      * getReadAlias() and getWriteAlias() should be used instead
-     *
-     * @return string
      */
     private function getBaseIndexName(): string
     {
@@ -275,37 +234,29 @@ class IndexManager
 
     /**
      * Return a name for a new index, which does not already exist
-     *
-     * @param string|null $suffix
-     *
-     * @return string
      */
     protected function getUniqueIndexName(?string $suffix): string
     {
-        $indexName = $baseName = $this->getBaseIndexName().($suffix ?? '_'.date('YmdHis'));
+        $indexName = $baseName = $this->getBaseIndexName().($suffix ?? '_'.\date('YmdHis'));
 
         $i = 1;
         // Keep trying other names until there is no such existing index or alias
         while ($this->getConnection()->existsIndexOrAlias(['index' => $indexName])) {
             $indexName = $baseName.'_'.$i;
-            $i++;
+            ++$i;
         }
 
         return $indexName;
     }
 
     /**
-     * @param string|null $alias
-     *
-     * @return array
-     *
      * @throws IndexOrAliasNotFoundException
      */
     private function getIndicesForAlias(?string $alias): array
     {
         if (true === $this->getUseAliases()) {
             $aliases = $this->getConnection()->getAliases();
-            $indices = array_keys($aliases[$alias] ?? []);
+            $indices = \array_keys($aliases[$alias] ?? []);
             if (!$indices) {
                 throw new IndexOrAliasNotFoundException($alias, true);
             }
@@ -324,8 +275,6 @@ class IndexManager
      * Get and verify the existence of all indices pointed by the read alias (if using aliases),
      * or the one actual index (if not using aliases)
      *
-     * @return array
-     *
      * @throws IndexOrAliasNotFoundException
      */
     public function getReadIndices(): array
@@ -336,8 +285,6 @@ class IndexManager
     /**
      * Get and verify the existence of all indices pointed by the write alias (if using aliases),
      * or the one actual index (if not using aliases)
-     *
-     * @return array
      *
      * @throws IndexOrAliasNotFoundException
      */
@@ -350,8 +297,6 @@ class IndexManager
      * Returns the physical index name of the live (aka "hot") index - the one both read and write aliases point to.
      * And verify that it exists
      *
-     * @return string
-     *
      * @throws IndexOrAliasNotFoundException If there are no indices for the read or write alias
      * @throws InvalidLiveIndexException     If live index is not found or there are more than one
      */
@@ -361,8 +306,8 @@ class IndexManager
 
         if (true === $this->getUseAliases()) {
             $aliases = $this->getConnection()->getAliases();
-            $readIndices = array_keys($aliases[$this->readAlias] ?? []);
-            $writeIndices = array_keys($aliases[$this->writeAlias] ?? []);
+            $readIndices = \array_keys($aliases[$this->readAlias] ?? []);
+            $writeIndices = \array_keys($aliases[$this->writeAlias] ?? []);
 
             if (!$readIndices) {
                 throw new IndexOrAliasNotFoundException($this->readAlias, true);
@@ -372,16 +317,16 @@ class IndexManager
             }
 
             // Get the indices pointed to by both the read and write alias
-            $liveIndices = array_intersect($readIndices, $writeIndices);
+            $liveIndices = \array_intersect($readIndices, $writeIndices);
 
             // Make sure there is just one such index
-            if (count($liveIndices) === 0) {
-                throw new InvalidLiveIndexException(sprintf('There is no index pointed by the "%s" and "%s" aliases', $this->readAlias, $this->writeAlias));
+            if (0 === \count($liveIndices)) {
+                throw new InvalidLiveIndexException(\sprintf('There is no index pointed by the "%s" and "%s" aliases', $this->readAlias, $this->writeAlias));
             }
-            if (count($liveIndices) > 1) {
-                throw new InvalidLiveIndexException(sprintf('There is more than one index pointed by the "%s" and "%s" aliases', $this->readAlias, $this->writeAlias));
+            if (\count($liveIndices) > 1) {
+                throw new InvalidLiveIndexException(\sprintf('There is more than one index pointed by the "%s" and "%s" aliases', $this->readAlias, $this->writeAlias));
             }
-            $indexName = current($liveIndices);
+            $indexName = \current($liveIndices);
         } else {
             $indexName = $this->getIndicesForAlias(null)[0];
         }
@@ -398,11 +343,11 @@ class IndexManager
     {
         if (true === $this->getUseAliases()) {
             // Make sure the read and write aliases do not exist already as aliases or physical indices
-            if ($this->getConnection()->existsIndexOrAlias(array('index' => $this->readAlias))) {
-                throw new Exception(sprintf('Read alias "%s" already exists as an alias or an index', $this->readAlias));
+            if ($this->getConnection()->existsIndexOrAlias(['index' => $this->readAlias])) {
+                throw new Exception(\sprintf('Read alias "%s" already exists as an alias or an index', $this->readAlias));
             }
-            if ($this->getConnection()->existsIndexOrAlias(array('index' => $this->writeAlias))) {
-                throw new Exception(sprintf('Write alias "%s" already exists as an alias or an index', $this->writeAlias));
+            if ($this->getConnection()->existsIndexOrAlias(['index' => $this->writeAlias])) {
+                throw new Exception(\sprintf('Write alias "%s" already exists as an alias or an index', $this->writeAlias));
             }
 
             // Create physical index with a unique name
@@ -422,7 +367,7 @@ class IndexManager
             $settings = $this->getIndexMapping();
             // Make sure the index name does not exist already as a physical index or alias
             if ($this->getConnection()->existsIndexOrAlias(['index' => $this->getBaseIndexName()])) {
-                throw new Exception(sprintf('Index "%s" already exists as an alias or an index', $this->getBaseIndexName()));
+                throw new Exception(\sprintf('Index "%s" already exists as an alias or an index', $this->getBaseIndexName()));
             }
             $this->getConnection()->getClient()->indices()->create($settings);
         }
@@ -437,8 +382,8 @@ class IndexManager
             if (true === $this->getUseAliases()) {
                 // Delete all physical indices aliased by the read and write aliases
                 $aliasNames = $this->readAlias.','.$this->writeAlias;
-                $indices = $this->getConnection()->getClient()->indices()->getAlias(array('name' => $aliasNames));
-                $this->getConnection()->getClient()->indices()->delete(['index' => implode(',', array_keys($indices))]);
+                $indices = $this->getConnection()->getClient()->indices()->getAlias(['name' => $aliasNames]);
+                $this->getConnection()->getClient()->indices()->delete(['index' => \implode(',', \array_keys($indices))]);
             } else {
                 $this->getConnection()->getClient()->indices()->delete(['index' => $this->getBaseIndexName()]);
             }
@@ -460,7 +405,7 @@ class IndexManager
     {
         try {
             if (false === $this->getUseAliases()) {
-                throw new Exception(sprintf('Index rebuilding is not supported for "%s", unless you use aliases', $this->getBaseIndexName()));
+                throw new Exception(\sprintf('Index rebuilding is not supported for "%s", unless you use aliases', $this->getBaseIndexName()));
             }
 
             $oldIndex = $this->getLiveIndexPreparedForRebuilding($cancelExistingRebuild);
@@ -493,7 +438,7 @@ class IndexManager
             // Delete the old index
             if ($deleteOld) {
                 $this->getConnection()->getClient()->indices()->delete(['index' => $oldIndex]);
-                $this->getConnection()->getLogger()->notice(sprintf('Deleted old index %s', $oldIndex));
+                $this->getConnection()->getLogger()->notice(\sprintf('Deleted old index %s', $oldIndex));
             }
         } catch (\Exception $e) {
             // Do not log BulkRequestException here as they are logged in the connection manager
@@ -505,7 +450,7 @@ class IndexManager
             // Try to delete the new incomplete index
             if (isset($newIndex)) {
                 $this->getConnection()->getClient()->indices()->delete(['index' => $newIndex]);
-                $this->getConnection()->getLogger()->notice(sprintf('Deleted incomplete index "%s"', $newIndex));
+                $this->getConnection()->getLogger()->notice(\sprintf('Deleted incomplete index "%s"', $newIndex));
             }
 
             // Rethrow exception to be further handled
@@ -528,18 +473,18 @@ class IndexManager
 
         switch (true) {
             case $document instanceof DocumentInterface:
-                if (get_class($document) !== $documentClass) {
-                    throw new Exception(sprintf('Document must be [%s], but [%s] was returned from data provider', $documentClass, get_class($document)));
+                if (\get_class($document) !== $documentClass) {
+                    throw new Exception(\sprintf('Document must be [%s], but [%s] was returned from data provider', $documentClass, \get_class($document)));
                 }
                 $this->persist($document);
                 break;
 
-            case is_array($document):
+            case \is_array($document):
                 if (!isset($document['_id'])) {
-                    throw new Exception(sprintf('The returned document array must include an "_id" field: (%s)', serialize($document)));
+                    throw new Exception(\sprintf('The returned document array must include an "_id" field: (%s)', \serialize($document)));
                 }
                 if ($document['_id'] != $id) {
-                    throw new Exception(sprintf('The document id must be [%s], but "%s" was returned from data provider', $id, $document['_id']));
+                    throw new Exception(\sprintf('The document id must be [%s], but "%s" was returned from data provider', $id, $document['_id']));
                 }
                 $this->persistRaw($document);
                 break;
@@ -585,14 +530,14 @@ class IndexManager
     public function update(string $id, array $fields = [], $script = null, array $queryParams = [], array $metaParams = [])
     {
         // Add the id of the updated document to the meta params for the bulk request
-        $metaParams = array_merge(
+        $metaParams = \array_merge(
             $metaParams,
             [
                 '_id' => $id,
             ]
         );
 
-        $query = array_filter(array_merge(
+        $query = \array_filter(\array_merge(
             $queryParams,
             [
                 'doc' => $fields,
@@ -655,10 +600,6 @@ class IndexManager
 
     /**
      * Created a new index with a unique name
-     *
-     * @param string|null $suffix
-     *
-     * @return string
      */
     protected function createNewIndexWithUniqueName(?string $suffix = null): string
     {
@@ -673,7 +614,6 @@ class IndexManager
     /**
      * Retrieves all documents from the index's data provider and populates them in a new index
      *
-     * @param string $newIndex
      * @param string $oldIndex This is not used here but passed in case an overriding class may need it
      */
     protected function copyDataToNewIndex(string $newIndex, string $oldIndex)
@@ -691,7 +631,7 @@ class IndexManager
             $originalWriteAlias = $this->writeAlias;
             $this->setWriteAlias($newIndex);
 
-            if (is_array($document)) {
+            if (\is_array($document)) {
                 $this->persistRaw($document);
             } else {
                 $this->persist($document);
@@ -704,7 +644,7 @@ class IndexManager
             if (0 === $i % $batchSize) {
                 $this->getConnection()->commit();
             }
-            $i++;
+            ++$i;
         }
 
         // Save any remaining documents to ES
@@ -717,8 +657,7 @@ class IndexManager
     /**
      * Verify index and aliases state and try to recover if state is not ok
      *
-     * @param bool $cancelExistingRebuild
-     * @param null $retryForException     (internal) Set on recursive calls to the exception class thrown
+     * @param null $retryForException (internal) Set on recursive calls to the exception class thrown
      *
      * @return string The live (aka "hot") index name
      */
@@ -730,12 +669,12 @@ class IndexManager
             $writeIndices = $this->getWriteIndices();
 
             // Check if write alias points to more than one index
-            if (count($writeIndices) > 1) {
-                throw new IndexRebuildingException(array_diff($writeIndices, [$liveIndex]));
+            if (\count($writeIndices) > 1) {
+                throw new IndexRebuildingException(\array_diff($writeIndices, [$liveIndex]));
             }
         } catch (IndexOrAliasNotFoundException $e) {
             // If this is a second attempt with the same exception, then we can't do anything more
-            if (get_class($e) === $retryForException) {
+            if (\get_class($e) === $retryForException) {
                 throw $e;
             }
 
@@ -743,11 +682,11 @@ class IndexManager
             $this->createIndex();
 
             // Now try again
-            $liveIndex = $this->getLiveIndexPreparedForRebuilding($cancelExistingRebuild, get_class($e));
+            $liveIndex = $this->getLiveIndexPreparedForRebuilding($cancelExistingRebuild, \get_class($e));
         } catch (IndexRebuildingException $e) {
             // If we don't want to cancel the current rebuild or this is a second attempt with the same exception,
             // then we can't do anything more
-            if (!$cancelExistingRebuild || (get_class($e) === $retryForException)) {
+            if (!$cancelExistingRebuild || (\get_class($e) === $retryForException)) {
                 throw $e;
             }
 
@@ -757,7 +696,7 @@ class IndexManager
             }
 
             // Now try again
-            $liveIndex = $this->getLiveIndexPreparedForRebuilding($cancelExistingRebuild, get_class($e));
+            $liveIndex = $this->getLiveIndexPreparedForRebuilding($cancelExistingRebuild, \get_class($e));
         }
 
         return $liveIndex;
@@ -765,8 +704,6 @@ class IndexManager
 
     /**
      * Get document metadata
-     *
-     * @return DocumentMetadata
      *
      * @throws \Psr\Cache\InvalidArgumentException
      */
@@ -777,8 +714,6 @@ class IndexManager
 
     /**
      * Get FQN of document class managed by this index manager
-     *
-     * @return string
      *
      * @throws \Psr\Cache\InvalidArgumentException
      */

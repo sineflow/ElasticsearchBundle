@@ -26,9 +26,6 @@ class EntityTrackerSubscriber implements EventSubscriberInterface
      */
     private $documentMetadataCollector;
 
-    /**
-     * @param DocumentMetadataCollector $documentMetadataCollector
-     */
     public function __construct(DocumentMetadataCollector $documentMetadataCollector)
     {
         $this->documentMetadataCollector = $documentMetadataCollector;
@@ -46,15 +43,13 @@ class EntityTrackerSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param PrePersistEvent $prePersistEvent
-     *
      * @throws \ReflectionException
      */
     public function onPrePersist(PrePersistEvent $prePersistEvent)
     {
         // Track entity only if it has an @Id field
         $propertiesMetadata = $this->documentMetadataCollector->getObjectPropertiesMetadata(
-            get_class($prePersistEvent->getDocument())
+            \get_class($prePersistEvent->getDocument())
         );
         if (isset($propertiesMetadata['_id'])) {
             $bulkOperationIndex = $prePersistEvent->getBulkOperationIndex();
@@ -63,9 +58,6 @@ class EntityTrackerSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param PostCommitEvent $postCommitEvent
-     */
     public function onPostCommit(PostCommitEvent $postCommitEvent)
     {
         // No need to do anything if there are no persisted entities for that connection
@@ -75,7 +67,7 @@ class EntityTrackerSubscriber implements EventSubscriberInterface
 
         // Update the ids of persisted entity objects
         foreach ($this->entitiesData[$postCommitEvent->getConnectionName()] as $bulkOperationIndex => $entityData) {
-            $idValue = current($postCommitEvent->getBulkResponse()['items'][$bulkOperationIndex])['_id'];
+            $idValue = \current($postCommitEvent->getBulkResponse()['items'][$bulkOperationIndex])['_id'];
             $idPropertyMetadata = $entityData['metadata']['_id'];
             $entity = $entityData['entity'];
             if (DocumentMetadata::PROPERTY_ACCESS_PRIVATE === $idPropertyMetadata['propertyAccess']) {

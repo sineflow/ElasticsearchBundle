@@ -25,12 +25,12 @@ class IndicesToDocumentClasses
     {
         if (!$index) {
             if (!empty($this->documentClasses)) {
-                throw new \InvalidArgumentException(sprintf('Cannot set document class without index, as there are already classes set for concrete indices: [%s]', implode(',', array_keys($this->documentClasses))));
+                throw new \InvalidArgumentException(\sprintf('Cannot set document class without index, as there are already classes set for concrete indices: [%s]', \implode(',', \array_keys($this->documentClasses))));
             }
             $this->documentClasses['*'] = $documentClass;
         } else {
             if (isset($this->documentClasses['*'])) {
-                throw new \InvalidArgumentException(sprintf('Cannot set document class for index [%s], as there is already a class set for any index: [%s]', $documentClass, $this->documentClasses['*']));
+                throw new \InvalidArgumentException(\sprintf('Cannot set document class for index [%s], as there is already a class set for any index: [%s]', $documentClass, $this->documentClasses['*']));
             }
             $this->documentClasses[$index] = $documentClass;
         }
@@ -53,6 +53,6 @@ class IndicesToDocumentClasses
             return $this->documentClasses['*'];
         }
 
-        throw new \InvalidArgumentException(sprintf('Document class for index [%s] is not set', $index));
+        throw new \InvalidArgumentException(\sprintf('Document class for index [%s] is not set', $index));
     }
 }
