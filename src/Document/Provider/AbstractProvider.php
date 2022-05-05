@@ -33,7 +33,7 @@ abstract class AbstractProvider implements ProviderInterface
      *
      * @return int|null
      */
-    public function getPersistRequestBatchSize() : ?int
+    public function getPersistRequestBatchSize(): ?int
     {
         return null;
     }

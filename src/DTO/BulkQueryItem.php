@@ -9,7 +9,6 @@ use Elasticsearch\Common\Exceptions\InvalidArgumentException;
  */
 class BulkQueryItem
 {
-
     /**
      * @var string
      */

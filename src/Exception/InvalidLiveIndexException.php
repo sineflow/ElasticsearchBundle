@@ -7,5 +7,4 @@ namespace Sineflow\ElasticsearchBundle\Exception;
  */
 class InvalidLiveIndexException extends Exception
 {
-
 }

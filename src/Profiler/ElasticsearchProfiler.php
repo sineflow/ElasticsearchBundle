@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  */
 class ElasticsearchProfiler extends DataCollector
 {
-    const UNDEFINED_ROUTE = 'undefined_route';
+    public const UNDEFINED_ROUTE = 'undefined_route';
 
     /**
      * @var Logger[] Watched loggers.

@@ -14,12 +14,12 @@ class DocumentMetadataCollector implements WarmableInterface
     /**
      * For caching the full metadata of all available document entities
      */
-    const DOCUMENTS_CACHE_KEY_PREFIX = 'sfes.documents_metadata.';
+    public const DOCUMENTS_CACHE_KEY_PREFIX = 'sfes.documents_metadata.';
 
     /**
      * For caching just the properties metadata of a document or object entity
      */
-    const OBJECTS_CACHE_KEY_PREFIX = 'sfes.object_properties_metadata.';
+    public const OBJECTS_CACHE_KEY_PREFIX = 'sfes.object_properties_metadata.';
 
     /**
      * @var array

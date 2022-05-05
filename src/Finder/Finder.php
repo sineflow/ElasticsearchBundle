@@ -16,16 +16,16 @@ use Sineflow\ElasticsearchBundle\Result\DocumentIterator;
  */
 class Finder
 {
-    const BITMASK_RESULT_TYPES = 63;
-    const RESULTS_ARRAY = 1;
-    const RESULTS_OBJECT = 2;
-    const RESULTS_RAW = 4;
+    public const BITMASK_RESULT_TYPES = 63;
+    public const RESULTS_ARRAY = 1;
+    public const RESULTS_OBJECT = 2;
+    public const RESULTS_RAW = 4;
 
-    const BITMASK_RESULT_ADAPTERS = 192;
-    const ADAPTER_KNP = 64;
-    const ADAPTER_SCROLL = 128;
+    public const BITMASK_RESULT_ADAPTERS = 192;
+    public const ADAPTER_KNP = 64;
+    public const ADAPTER_SCROLL = 128;
 
-    const SCROLL_TIME = '1m';
+    public const SCROLL_TIME = '1m';
 
     /**
      * @var DocumentMetadataCollector
@@ -230,7 +230,7 @@ class Finder
      *
      * @return array
      */
-    public function getTargetIndices(array $documentClasses) : array
+    public function getTargetIndices(array $documentClasses): array
     {
         $indices = [];
         foreach ($documentClasses as $documentClass) {
