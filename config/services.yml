@@ -91,7 +91,7 @@ services:
     Sineflow\ElasticsearchBundle\Subscriber\KnpPaginateQuerySubscriber:
         arguments: ['@request_stack']
         tags:
-            - { name: knp_paginator.subscriber }
+            - { name: kernel.event_subscriber }
 
     Sineflow\ElasticsearchBundle\Subscriber\EntityTrackerSubscriber:
         arguments:
