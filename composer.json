@@ -48,11 +48,16 @@
         "doctrine/orm": "Allows for using Doctrine as source for rebuilding indices"
     },
     "autoload": {
-        "psr-4": { "Sineflow\\ElasticsearchBundle\\": "" },
-        "exclude-from-classmap": ["/Tests/"]
+        "psr-4": {
+            "Sineflow\\ElasticsearchBundle\\": "src/"
+        },
+        "exclude-from-classmap": ["/tests/"]
     },
     "autoload-dev": {
-        "psr-4": { "Sineflow\\ElasticsearchBundle\\Tests\\": "Tests/" }
+        "psr-4": {
+            "Sineflow\\ElasticsearchBundle\\Tests\\": "tests/",
+            "Sineflow\\ElasticsearchBundle\\Tests\\App\\Fixture\\": "tests/App/fixture/"
+        }
     },
     "config": {
         "prepend-autoloader": false

@@ -10,17 +10,17 @@
         convertWarningsToExceptions="true"
         processIsolation="false"
         stopOnFailure="false"
-        bootstrap="Tests/tests.bootstrap.php">
+        bootstrap="tests/tests.bootstrap.php">
 
     <testsuites>
         <testsuite name="Unit">
-            <directory>./Tests/Unit/</directory>
+            <directory>./tests/Unit/</directory>
         </testsuite>
         <testsuite name="Functional">
-            <directory>./Tests/Functional/</directory>
+            <directory>./tests/Functional/</directory>
         </testsuite>
         <testsuite name="All">
-            <directory>./Tests/</directory>
+            <directory>./tests/</directory>
         </testsuite>
     </testsuites>
 
@@ -36,13 +36,13 @@
             <directory>./</directory>
         </include>
         <exclude>
-            <directory>./Tests</directory>
+            <directory>./tests</directory>
             <directory>./vendor</directory>
             <directory>./var</directory>
         </exclude>
         <report>
             <text outputFile="php://stdout" showOnlySummary="true"/>
-            <!--<html outputDirectory="Tests/App/build/coverage" lowUpperBound="50" highLowerBound="90"/>-->
+            <!--<html outputDirectory="tests/App/build/coverage" lowUpperBound="50" highLowerBound="90"/>-->
         </report>
     </coverage>
 </phpunit>

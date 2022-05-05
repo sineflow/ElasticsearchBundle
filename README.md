@@ -17,7 +17,7 @@
 
 ## Documentation
 
-Installation instructions and documentation of the bundle can be found [here](Resources/doc/index.md).
+Installation instructions and documentation of the bundle can be found [here](src/docs/index.md).
 
 ## Version matrix
 

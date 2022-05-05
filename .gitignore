@@ -1,7 +1,7 @@
 /vendor/
-/Tests/App/cache/
-/Tests/App/logs/
-/Tests/App/build/
+/tests/App/cache/
+/tests/App/logs/
+/tests/App/build/
 /phpunit.xml
 /composer.lock
 /var/
