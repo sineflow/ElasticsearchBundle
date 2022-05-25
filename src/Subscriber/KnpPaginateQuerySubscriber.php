@@ -82,8 +82,8 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
 
         $request = $this->requestStack->getCurrentRequest();
         if ($request instanceof Request) {
-            $sortField = $request->get($event->options['sortFieldParameterName']);
-            $sortDirection = $request->get($event->options['sortDirectionParameterName'], 'desc');
+            $sortField = isset($event->options['sortFieldParameterName']) ? $request->get($event->options['sortFieldParameterName']) : null;
+            $sortDirection = isset($event->options['sortDirectionParameterName']) ? $request->get($event->options['sortDirectionParameterName'], 'desc') : null;
             $sortDirection = 'desc' === \strtolower($sortDirection) ? 'desc' : 'asc';
 
             if ($sortField) {

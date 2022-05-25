@@ -4,7 +4,6 @@
 [![Latest Stable Version](https://img.shields.io/github/release/sineflow/elasticsearchbundle.svg)](https://packagist.org/packages/sineflow/elasticsearch-bundle)
 [![Build Status](https://travis-ci.com/sineflow/ElasticsearchBundle.svg?branch=master)](https://travis-ci.com/sineflow/ElasticsearchBundle)
 [![Coverage Status](https://coveralls.io/repos/sineflow/ElasticsearchBundle/badge.svg?branch=master&service=github)](https://coveralls.io/github/sineflow/ElasticsearchBundle?branch=master)
-[![SensioLabsInsight](https://insight.symfony.com/projects/4a865639-e552-4aef-8237-1aeb38aaaecd/mini.svg)](https://insight.symfony.com/account/widget?project=4a865639-e552-4aef-8237-1aeb38aaaecd)
 
 ## Key points
 
