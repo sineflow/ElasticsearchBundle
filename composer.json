@@ -34,7 +34,7 @@
         "symfony/browser-kit": "^4.4 || ^5.0",
         "doctrine/orm": "^2.6.3",
 
-        "monolog/monolog": "^1.0",
+        "monolog/monolog": "^1.0|^2.0|^3.0",
         "knplabs/knp-paginator-bundle": "^4.0 || ^5.0",
         "squizlabs/php_codesniffer": "^3.0",
         "php-coveralls/php-coveralls": "^2.1",

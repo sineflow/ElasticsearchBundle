@@ -38,7 +38,7 @@ class CollectionHandler extends AbstractProcessingHandler
     /**
      * {@inheritdoc}
      */
-    protected function write(array $record)
+    protected function write(array $record): void
     {
         $request = $this->requestStack->getCurrentRequest();
         if ($request instanceof Request) {
