@@ -28,6 +28,16 @@ class IndexManagerRegistryTest extends AbstractContainerAwareTestCase
         $im = $registry->get('nonexisting');
     }
 
+    public function testGetByClass()
+    {
+        $registry = $this->getContainer()->get(IndexManagerRegistry::class);
+
+        $product = new Product();
+        $im = $registry->getByClass(get_class($product));
+        $this->assertInstanceOf(IndexManager::class, $im);
+        $this->assertEquals('bar', $im->getManagerName());
+    }
+
     public function testGetByEntity()
     {
         $registry = $this->getContainer()->get(IndexManagerRegistry::class);

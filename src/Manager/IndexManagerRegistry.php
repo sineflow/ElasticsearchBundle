@@ -58,7 +58,15 @@ class IndexManagerRegistry
      */
     public function getByEntity(DocumentInterface $entity): IndexManager
     {
-        $indexManagerName = $this->metadataCollector->getDocumentClassIndex(\get_class($entity));
+        return $this->getByClass(get_class($entity));
+    }
+
+    /**
+     * Returns the index manager managing a given Elasticsearch entity class
+     */
+    public function getByClass(string $className): IndexManager
+    {
+        $indexManagerName = $this->metadataCollector->getDocumentClassIndex($className);
 
         return $this->get($indexManagerName);
     }
