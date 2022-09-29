@@ -2,7 +2,7 @@
 
 ![License](https://img.shields.io/github/license/sineflow/elasticsearchbundle.svg)
 [![Latest Stable Version](https://img.shields.io/github/release/sineflow/elasticsearchbundle.svg)](https://packagist.org/packages/sineflow/elasticsearch-bundle)
-[![Build Status](https://travis-ci.com/sineflow/ElasticsearchBundle.svg?branch=master)](https://travis-ci.com/sineflow/ElasticsearchBundle)
+[![Build Status](https://travis-ci.com/sineflow/ElasticsearchBundle.svg?branch=main)](https://app.travis-ci.com/github/sineflow/ElasticsearchBundle)
 [![Coverage Status](https://coveralls.io/repos/sineflow/ElasticsearchBundle/badge.svg?branch=master&service=github)](https://coveralls.io/github/sineflow/ElasticsearchBundle?branch=master)
 
 ## Key points
