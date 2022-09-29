@@ -47,7 +47,23 @@ class ElasticsearchExtensionTest extends TestCase
                     ],
                 ],
                 'indices' => [
+                    '_base' => [
+                        'settings' => [
+                            'index' => [
+                                'mapping.nested_fields.limit' => 10,
+                            ],
+                            'number_of_replicas' => 1,
+                            'analysis' => [
+                                'filter' => [
+                                    'base_filter' => [
+                                        'type' => 'custom',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
                     'test' => [
+                        'extends' => '_base',
                         'name' => 'testname',
                         'connection' => 'test1',
                         'use_aliases' => false,
@@ -102,8 +118,14 @@ class ElasticsearchExtensionTest extends TestCase
                 'settings' => [
                     'refresh_interval' => 2,
                     'number_of_replicas' => 3,
+                    'index' => [
+                        'mapping.nested_fields.limit' => 10,
+                    ],
                     'analysis' => [
                         'filter' => [
+                            'base_filter' => [
+                                'type' => 'custom',
+                            ],
                             'test_filter' => [
                                 'type' => 'ngram',
                             ],

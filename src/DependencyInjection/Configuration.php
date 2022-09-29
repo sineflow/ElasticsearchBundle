@@ -140,7 +140,7 @@ class Configuration implements ConfigurationInterface
                             if (!isset($templates[$values['extends']])) {
                                 throw new \InvalidArgumentException(\sprintf('Index manager "%s" extends "%s", but it is not defined', $indexManager, $values['extends']));
                             }
-                            $v[$indexManager] = \array_merge($templates[$values['extends']], $v[$indexManager]);
+                            $v[$indexManager] = \array_replace_recursive($templates[$values['extends']], $v[$indexManager]);
                         }
                         unset($v[$indexManager]['extends']);
                     }
