@@ -112,6 +112,9 @@ class ConnectionManager
         if (!$this->client) {
             $clientBuilder = ClientBuilder::create();
             $clientBuilder->setHosts($this->connectionSettings['hosts']);
+            if (isset($this->connectionSettings['ssl_verification'])) {
+                $clientBuilder->setSSLVerification($this->connectionSettings['ssl_verification']);
+            }
             if ($this->tracer && $this->kernelDebug) {
                 $clientBuilder->setTracer($this->tracer);
             }
