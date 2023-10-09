@@ -216,15 +216,15 @@ class ConnectionManager
 
         $this->bulkQueries = [];
 
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(new PostCommitEvent($response, $this), Events::POST_COMMIT);
+        }
+
         if ($response['errors']) {
             $errorCount = $this->logBulkRequestErrors($response['items']);
             $e = new BulkRequestException(\sprintf('Bulk request failed with %s error(s)', $errorCount));
             $e->setBulkResponseItems($response['items'], $bulkRequest);
             throw $e;
-        }
-
-        if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(new PostCommitEvent($response, $this), Events::POST_COMMIT);
         }
     }
 

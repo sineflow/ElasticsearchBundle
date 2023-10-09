@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Subscriber;
 
+use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Result\DocumentConverter;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
@@ -13,6 +14,50 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Log;
  */
 class EntityTrackerSubscriberTest extends AbstractElasticsearchTestCase
 {
+    /**
+     * Test executing 2 separate bulk requests, where there's an error in the first one,
+     * to make sure the subscriber properly keeps track of bulk request items.
+     */
+    public function testTwoBulkRequestWithErrorInFirstOne()
+    {
+        $imWithAliases = $this->getIndexManager('customer');
+        $customer1 = new Customer();
+        $customer1->name = 'batman';
+        $customer1->setActive('invalid value');
+        $customer2 = new Customer();
+        $customer2->name = 'robin';
+        $imWithAliases->persist($customer1);
+        $imWithAliases->persist($customer2);
+        try {
+            $imWithAliases->getConnection()->commit();
+        } catch (BulkRequestException $e) {
+            // ignore the exception
+        }
+
+        $customer3 = new Customer();
+        $customer3->name = 'superman';
+        $imWithAliases->persist($customer3);
+        $imWithAliases->getConnection()->commit();
+
+        $this->assertNull($customer1->id, 'id should not have been set');
+        $this->assertNotNull($customer2->id, 'id should have been set');
+        $this->assertNotNull($customer3->id, 'id should have been set');
+
+        // Make sure that the correct id was assigned to the object, not the id of another customer
+        // Get the customer from ES by name
+        $finder = $this->getContainer()->get(Finder::class);
+
+        $docs = $finder->find(['AcmeFooBundle:Customer'], ['query' => ['match' => ['name' => 'robin']]]);
+        $this->assertCount(1, $docs);
+        $retrievedCustomer2 = $docs->current();
+        $this->assertEquals($customer2->id, $retrievedCustomer2->id);
+
+        $docs = $finder->find(['AcmeFooBundle:Customer'], ['query' => ['match' => ['name' => 'superman']]]);
+        $this->assertCount(1, $docs);
+        $retrievedCustomer3 = $docs->current();
+        $this->assertEquals($customer3->id, $retrievedCustomer3->id);
+    }
+
     /**
      * Test populating persisted entity ids after a bulk operation with several operations
      */

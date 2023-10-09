@@ -67,13 +67,18 @@ class EntityTrackerSubscriber implements EventSubscriberInterface
 
         // Update the ids of persisted entity objects
         foreach ($this->entitiesData[$postCommitEvent->getConnectionName()] as $bulkOperationIndex => $entityData) {
-            $idValue = \current($postCommitEvent->getBulkResponse()['items'][$bulkOperationIndex])['_id'];
-            $idPropertyMetadata = $entityData['metadata']['_id'];
-            $entity = $entityData['entity'];
-            if (DocumentMetadata::PROPERTY_ACCESS_PRIVATE === $idPropertyMetadata['propertyAccess']) {
-                $entity->{$idPropertyMetadata['methods']['setter']}($idValue);
-            } else {
-                $entity->{$idPropertyMetadata['propertyName']} = $idValue;
+            $bulkResponseItem = $postCommitEvent->getBulkResponse()['items'][$bulkOperationIndex];
+            $operation = \key($bulkResponseItem);
+            $bulkResponseItemValue = \current($bulkResponseItem);
+            if (in_array($operation, ['create', 'index']) && !isset($bulkResponseItemValue['error'])) {
+                $idValue = $bulkResponseItemValue['_id'];
+                $idPropertyMetadata = $entityData['metadata']['_id'];
+                $entity = $entityData['entity'];
+                if (DocumentMetadata::PROPERTY_ACCESS_PRIVATE === $idPropertyMetadata['propertyAccess']) {
+                    $entity->{$idPropertyMetadata['methods']['setter']}($idValue);
+                } else {
+                    $entity->{$idPropertyMetadata['propertyName']} = $idValue;
+                }
             }
         }
 
