@@ -2,8 +2,6 @@
 
 namespace Sineflow\ElasticsearchBundle\Exception;
 
-use Throwable;
-
 /**
  * Class IndexOrAliasNotFoundException
  */
@@ -19,7 +17,7 @@ class IndexOrAliasNotFoundException extends Exception
      *
      * @param int $code
      */
-    public function __construct(string $indexOrAlias, bool $isAlias = false, $code = 0, ?Throwable $previous = null)
+    public function __construct(string $indexOrAlias, bool $isAlias = false, $code = 0, \Throwable $previous = null)
     {
         $this->indexOrAlias = $indexOrAlias;
 

@@ -16,15 +16,15 @@ class ElasticsearchProviderTest extends AbstractElasticsearchTestCase
         return [
             'bar' => [
                 [
-                    '_id' => 1,
+                    '_id'   => 1,
                     'title' => 'Product 1',
                 ],
                 [
-                    '_id' => 2,
+                    '_id'   => 2,
                     'title' => 'Product 2',
                 ],
                 [
-                    '_id' => 3,
+                    '_id'   => 3,
                     'title' => 'Product 3',
                 ],
             ],
@@ -38,7 +38,7 @@ class ElasticsearchProviderTest extends AbstractElasticsearchTestCase
         $doc = $esProvider->getDocument(3);
 
         $this->assertEquals([
-            '_id' => 3,
+            '_id'   => 3,
             'title' => 'Product 3',
         ], $doc);
     }

@@ -41,15 +41,15 @@ class RepositoryTest extends AbstractElasticsearchTestCase
         return [
             'bar' => [
                 [
-                    '_id' => 'doc1',
+                    '_id'   => 'doc1',
                     'title' => 'aaa',
                 ],
                 [
-                    '_id' => 2,
+                    '_id'   => 2,
                     'title' => 'ccc',
                 ],
                 [
-                    '_id' => 3,
+                    '_id'   => 3,
                     'title' => 'ccc',
                 ],
             ],

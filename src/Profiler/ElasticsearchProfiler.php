@@ -44,7 +44,7 @@ class ElasticsearchProfiler extends DataCollector
     /**
      * {@inheritDoc}
      */
-    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->data['indexManagers'] = $this->cloneVar($this->indexManagers);
 
@@ -64,10 +64,10 @@ class ElasticsearchProfiler extends DataCollector
     public function reset()
     {
         $this->data = [
-            'indexManagers' => [],  // The list of all defined index managers
-            'queryCount' => 0,      // The queries count
-            'time' => .0,           // Total time for all queries in ms.
-            'queries' => [],        // Array with all the queries
+            'indexManagers' => [], // The list of all defined index managers
+            'queryCount'    => 0,  // The queries count
+            'time'          => .0, // Total time for all queries in ms.
+            'queries'       => [], // Array with all the queries
         ];
     }
 
@@ -148,10 +148,10 @@ class ElasticsearchProfiler extends DataCollector
         $parsedUrl = \array_merge(
             [
                 'scheme' => '',
-                'host' => '',
-                'port' => '',
-                'path' => '',
-                'query' => '',
+                'host'   => '',
+                'port'   => '',
+                'path'   => '',
+                'query'  => '',
             ],
             \parse_url($record['context']['uri'])
         );
@@ -165,10 +165,10 @@ class ElasticsearchProfiler extends DataCollector
 
         $this->data['queries'][$route][] = \array_merge(
             [
-                'time' => $record['context']['duration'] * 1000,
-                'curlRequest' => $rawRequest,
+                'time'         => $record['context']['duration'] * 1000,
+                'curlRequest'  => $rawRequest,
                 'senseRequest' => $senseRequest,
-                'backtrace' => $record['extra']['backtrace'],
+                'backtrace'    => $record['extra']['backtrace'],
             ],
             \array_diff_key(\parse_url($record['context']['uri']), \array_flip(['query']))
         );

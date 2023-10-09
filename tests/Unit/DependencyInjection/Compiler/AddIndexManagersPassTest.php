@@ -19,20 +19,20 @@ class AddIndexManagersPassTest extends TestCase
     {
         $connections = [
             'test1' => [
-                'hosts' => ['user:pass@eshost:1111'],
-                'profiling' => false,
-                'logging' => false,
+                'hosts'           => ['user:pass@eshost:1111'],
+                'profiling'       => false,
+                'logging'         => false,
                 'bulk_batch_size' => 123,
             ],
         ];
 
         $managers = [
             'test' => [
-                'name' => 'testname',
-                'connection' => 'test1',
+                'name'        => 'testname',
+                'connection'  => 'test1',
                 'use_aliases' => false,
-                'settings' => [
-                    'refresh_interval' => 2,
+                'settings'    => [
+                    'refresh_interval'   => 2,
                     'number_of_replicas' => 3,
                 ],
                 'class' => 'testBundle:Foo',

@@ -20,13 +20,13 @@ class DocumentTest extends TestCase
         $doc->type = 'product';
         $doc->options = [
             'dynamic' => 'strict',
-            'foo' => 'bar',
+            'foo'     => 'bar',
         ];
 
         $this->assertEquals(
             [
                 'dynamic' => 'strict',
-                'foo' => 'bar',
+                'foo'     => 'bar',
             ],
             $doc->dump(),
             'All and only options should be dumped'

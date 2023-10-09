@@ -25,6 +25,7 @@
     </testsuites>
 
     <php>
+        <server name="APP_ENV" value="test" force="true" />
         <server name="KERNEL_CLASS" value="Sineflow\ElasticsearchBundle\Tests\App\AppKernel" />
         <server name="SHELL_VERBOSITY" value="-1" />
         <env name="SYMFONY_PHPUNIT_VERSION" value="9" />

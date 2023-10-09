@@ -57,8 +57,8 @@ class MLPropertyTest extends TestCase
         $this->assertEquals(
             [
                 'default' => 'test default',
-                'en' => 'test en',
-                'bg' => 'test bg',
+                'en'      => 'test en',
+                'bg'      => 'test bg',
             ],
             $mlProperty->getValues(),
             'MLProperty does not return all values correctly.'
@@ -72,15 +72,15 @@ class MLPropertyTest extends TestCase
     {
         $mlProperty = new MLProperty([
             'default' => 'test default',
-            'en' => 'test en',
-            'bg' => 'test bg',
+            'en'      => 'test en',
+            'bg'      => 'test bg',
         ]);
 
         $this->assertEquals(
             [
                 'default' => 'test default',
-                'en' => 'test en',
-                'bg' => 'test bg',
+                'en'      => 'test en',
+                'bg'      => 'test bg',
             ],
             $mlProperty->getValues(),
             'MLProperty construct does not set all values correctly.'

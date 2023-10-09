@@ -23,11 +23,11 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
         return [
             'bar' => [
                 [
-                    '_id' => '1',
-                    'title' => 'Foo Product',
+                    '_id'      => '1',
+                    'title'    => 'Foo Product',
                     'category' => [
                         'title' => 'Bar',
-                        'tags' => [
+                        'tags'  => [
                             ['tagname' => 'first tag'],
                             ['tagname' => 'second tag'],
                         ],
@@ -35,7 +35,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
                     'related_categories' => [
                         [
                             'title' => 'Acme',
-                            'tags' => [
+                            'tags'  => [
                                 ['tagname' => 'tutu'],
                             ],
                         ],
@@ -47,9 +47,9 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
                     'ml_info-fr' => 'info in French',
                 ],
                 [
-                    '_id' => '2',
-                    'title' => 'Bar Product',
-                    'category' => null,
+                    '_id'                => '2',
+                    'title'              => 'Bar Product',
+                    'category'           => null,
                     'related_categories' => [
                         [
                             'title' => 'Acme',
@@ -60,8 +60,8 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
                     ],
                 ],
                 [
-                    '_id' => '3',
-                    'title' => '3rd Product',
+                    '_id'                => '3',
+                    'title'              => '3rd Product',
                     'related_categories' => [],
                 ],
                 [
@@ -197,7 +197,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
         /** @var DocumentIterator $iterator */
         $iterator = $repo->find([
             'query' => ['match_all' => (object) []],
-            'aggs' => [
+            'aggs'  => [
                 'my_count' => [
                     'value_count' => [
                         'field' => 'title.raw',
@@ -221,12 +221,12 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
 
         /** @var DocumentIterator $iterator */
         $iterator = $repo->find([
-            'query' => ['match_all' => (object) []],
+            'query'   => ['match_all' => (object) []],
             'suggest' => [
                 'title-suggestions' => [
                     'text' => ['prodcut foot'],
                     'term' => [
-                        'size' => 3,
+                        'size'  => 3,
                         'field' => 'title',
                     ],
                 ],

@@ -14,6 +14,7 @@ class ObjTag implements ObjectInterface
 {
     /**
      * @var string
+     *
      * @ES\Property(type="text", name="tagname")
      */
     public $tagName;

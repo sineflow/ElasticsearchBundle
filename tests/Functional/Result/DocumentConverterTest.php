@@ -17,8 +17,8 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
     use ArraySubsetAsserts;
 
     private $fullDocArray = [
-        '_id' => 'doc1',
-        'title' => 'Foo Product',
+        '_id'      => 'doc1',
+        'title'    => 'Foo Product',
         'category' => [
             'title' => 'Bar',
         ],
@@ -27,9 +27,9 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
                 'title' => 'Acme',
             ],
         ],
-        'ml_info-en' => 'info in English',
-        'ml_info-fr' => 'info in French',
-        'ml_info' => 'should be skipped',
+        'ml_info-en'  => 'info in English',
+        'ml_info-fr'  => 'info in French',
+        'ml_info'     => 'should be skipped',
         'nonexisting' => 'should be skipped',
     ];
 
@@ -40,9 +40,9 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
 
         // Raw doc with a single object value where an array of objects is expected according to metadata def
         $rawDoc = [
-            '_id' => 'rawDocWithSingleObjValueInsteadOfArray',
+            '_id'                => 'rawDocWithSingleObjValueInsteadOfArray',
             'related_categories' => [
-                'id' => '123',
+                'id'    => '123',
                 'title' => 'Acme',
             ],
         ];
@@ -65,10 +65,10 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
 
         // Raw doc with array of single object where a single object value is expected according to metadata def
         $rawDoc = [
-            '_id' => 'rawDocWithArrayValueInsteadOfSingleObject',
+            '_id'      => 'rawDocWithArrayValueInsteadOfSingleObject',
             'category' => [
                 [
-                    'id' => '123',
+                    'id'    => '123',
                     'title' => 'Acme',
                 ],
             ],
@@ -91,14 +91,14 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
 
         // Raw doc with array of many objects where a single object value is expected according to metadata def
         $rawDoc = [
-            '_id' => 'rawDocWithArrayValueInsteadOfSingleObject',
+            '_id'      => 'rawDocWithArrayValueInsteadOfSingleObject',
             'category' => [
                 [
-                    'id' => '123',
+                    'id'    => '123',
                     'title' => 'Acme',
                 ],
                 [
-                    'id' => '234',
+                    'id'    => '234',
                     'title' => 'Ucme',
                 ],
             ],
@@ -197,12 +197,12 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
     public function testConvertToDocumentWithSource()
     {
         $rawFromEs = [
-            '_index' => 'sineflow-esb-test-bar',
-            '_id' => 'doc1',
+            '_index'   => 'sineflow-esb-test-bar',
+            '_id'      => 'doc1',
             '_version' => 1,
-            'found' => true,
-            '_source' => [
-                    'title' => 'Foo Product',
+            'found'    => true,
+            '_source'  => [
+                    'title'    => 'Foo Product',
                     'category' => [
                             'title' => 'Bar',
                         ],
@@ -234,7 +234,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
     {
         $rawFromEs = [
             '_index' => 'sineflow-esb-test-bar',
-            '_id' => 'doc1',
+            '_id'    => 'doc1',
             '_score' => 1,
             'fields' => [
                     'title' => [

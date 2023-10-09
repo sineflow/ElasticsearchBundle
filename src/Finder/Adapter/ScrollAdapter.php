@@ -36,9 +36,9 @@ class ScrollAdapter
     private $resultsType;
 
     /**
-     * @var int
+     * @var int|null
      */
-    private $totalHits = null;
+    private $totalHits;
 
     /**
      * When a search query with a 'scroll' param is performed, not only the scroll id is returned, but also the

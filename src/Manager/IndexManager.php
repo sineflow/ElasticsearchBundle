@@ -65,7 +65,7 @@ class IndexManager
     /**
      * @var array
      */
-    protected $indexMapping = null;
+    protected $indexMapping;
 
     /**
      * @var array
@@ -540,7 +540,7 @@ class IndexManager
         $query = \array_filter(\array_merge(
             $queryParams,
             [
-                'doc' => $fields,
+                'doc'    => $fields,
                 'script' => $script,
             ]
         ));
@@ -601,7 +601,7 @@ class IndexManager
     /**
      * Created a new index with a unique name
      */
-    protected function createNewIndexWithUniqueName(?string $suffix = null): string
+    protected function createNewIndexWithUniqueName(string $suffix = null): string
     {
         $settings = $this->getIndexMapping();
         $newIndex = $this->getUniqueIndexName($suffix);
