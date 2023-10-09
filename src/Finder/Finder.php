@@ -68,7 +68,7 @@ class Finder
 
         $search = [
             'index' => $this->indexManagerRegistry->get($indexManagerName)->getReadAlias(),
-            'body' => ['query' => ['ids' => ['values' => [$id]]], 'version' => true],
+            'body'  => ['query' => ['ids' => ['values' => [$id]]], 'version' => true],
         ];
         $results = $this->getConnection([$documentClass])->getClient()->search($search);
 
@@ -127,7 +127,7 @@ class Finder
             // Set default scroll and size, unless custom ones were provided through $additionalRequestParams
             $params = \array_replace_recursive([
                 'scroll' => self::SCROLL_TIME,
-                'body' => ['sort' => ['_doc']],
+                'body'   => ['sort' => ['_doc']],
             ], $params);
 
             $rawResults = $client->search($params);
@@ -154,14 +154,14 @@ class Finder
      *
      * @return mixed
      */
-    public function scroll(array $documentClasses, string &$scrollId, string $scrollTime = self::SCROLL_TIME, int $resultsType = self::RESULTS_OBJECT, ?int &$totalHits = null)
+    public function scroll(array $documentClasses, string &$scrollId, string $scrollTime = self::SCROLL_TIME, int $resultsType = self::RESULTS_OBJECT, int &$totalHits = null)
     {
         $client = $this->getConnection($documentClasses)->getClient();
 
         $params = [
             'body' => [
                 'scroll_id' => $scrollId,
-                'scroll' => $scrollTime,
+                'scroll'    => $scrollTime,
             ],
         ];
 
@@ -235,7 +235,7 @@ class Finder
      *
      * @return array|DocumentIterator
      */
-    public function parseResult(array $raw, int $resultsType, ?array $documentClasses = null)
+    public function parseResult(array $raw, int $resultsType, array $documentClasses = null)
     {
         switch ($resultsType & self::BITMASK_RESULT_TYPES) {
             case self::RESULTS_OBJECT:

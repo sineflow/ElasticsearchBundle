@@ -27,19 +27,19 @@ class ProviderRegistryTest extends AbstractElasticsearchTestCase
         return [
             'bar' => [
                 [
-                    '_id' => 'product1',
+                    '_id'   => 'product1',
                     'title' => 'Product1',
                 ],
             ],
             'customer' => [
                 [
-                    '_id' => 'customer1',
+                    '_id'  => 'customer1',
                     'name' => 'Customer1',
                 ],
             ],
             'order' => [
                 [
-                    '_id' => 'order1',
+                    '_id'        => 'order1',
                     'order_time' => 11112222,
                 ],
             ],

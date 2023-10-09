@@ -83,12 +83,12 @@ class DocumentParser
             $properties = $this->getProperties($documentReflection, $indexAnalyzers);
 
             $metadata = [
-                'properties' => $properties,
-                'fields' => \array_filter($classAnnotation->dump()),
+                'properties'         => $properties,
+                'fields'             => \array_filter($classAnnotation->dump()),
                 'propertiesMetadata' => $this->getPropertiesMetadata($documentReflection),
-                'repositoryClass' => $classAnnotation->repositoryClass,
-                'providerClass' => $classAnnotation->providerClass,
-                'className' => $documentReflection->getName(),
+                'repositoryClass'    => $classAnnotation->repositoryClass,
+                'providerClass'      => $classAnnotation->providerClass,
+                'className'          => $documentReflection->getName(),
             ];
         }
 
@@ -125,8 +125,8 @@ class DocumentParser
             switch (\get_class($propertyAnnotation)) {
                 case Property::class:
                     $propertyMetadata[$propertyAnnotation->name] = [
-                        'propertyName' => $propertyName,
-                        'type' => $propertyAnnotation->type,
+                        'propertyName'  => $propertyName,
+                        'type'          => $propertyAnnotation->type,
                         'multilanguage' => $propertyAnnotation->multilanguage,
                     ];
 
@@ -139,9 +139,9 @@ class DocumentParser
                         $propertyMetadata[$propertyAnnotation->name] = \array_merge(
                             $propertyMetadata[$propertyAnnotation->name],
                             [
-                                'multiple' => $propertyAnnotation->multiple,
+                                'multiple'           => $propertyAnnotation->multiple,
                                 'propertiesMetadata' => $this->getPropertiesMetadata($child),
-                                'className' => $child->getName(),
+                                'className'          => $child->getName(),
                             ]
                         );
                     }
@@ -152,7 +152,7 @@ class DocumentParser
                     $propertyAnnotation->type = 'keyword';
                     $propertyMetadata[$propertyAnnotation->name] = [
                         'propertyName' => $propertyName,
-                        'type' => $propertyAnnotation->type,
+                        'type'         => $propertyAnnotation->type,
                     ];
                     break;
 
@@ -161,7 +161,7 @@ class DocumentParser
                     $propertyAnnotation->type = 'float';
                     $propertyMetadata[$propertyAnnotation->name] = [
                         'propertyName' => $propertyName,
-                        'type' => $propertyAnnotation->type,
+                        'type'         => $propertyAnnotation->type,
                     ];
                     break;
             }
@@ -295,7 +295,7 @@ class DocumentParser
                 // TODO: The application should decide whether it wants to use a default field at all and set its mapping on a global base
                 // The custom mapping from the application should be set here, using perhaps some kind of decorator
                 $mapping[$propertyAnnotation->name.$this->languageSeparator.Property::DEFAULT_LANG_SUFFIX] = $propertyAnnotation->multilanguageDefaultOptions ?: [
-                    'type' => 'keyword',
+                    'type'         => 'keyword',
                     'ignore_above' => 256,
                 ];
             } else {
@@ -311,10 +311,10 @@ class DocumentParser
      *
      * @throws \ReflectionException
      */
-    private function getPropertyMapping(Property $propertyAnnotation, ?string $language = null, array $indexAnalyzers = [])
+    private function getPropertyMapping(Property $propertyAnnotation, string $language = null, array $indexAnalyzers = [])
     {
         $propertyMapping = $propertyAnnotation->dump([
-            'language' => $language,
+            'language'       => $language,
             'indexAnalyzers' => $indexAnalyzers,
         ]);
 

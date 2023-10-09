@@ -25,23 +25,23 @@ class FinderTest extends AbstractElasticsearchTestCase
         return [
             'bar' => [
                 [
-                    '_id' => 'doc1',
+                    '_id'   => 'doc1',
                     'title' => 'aaa',
                 ],
                 [
-                    '_id' => 'doc2',
+                    '_id'   => 'doc2',
                     'title' => 'bbb',
                 ],
                 [
-                    '_id' => 3,
+                    '_id'   => 3,
                     'title' => 'ccc',
                 ],
             ],
             'customer' => [
                 [
-                    '_id' => 111,
-                    'name' => 'Jane Doe',
-                    'title' => 'aaa bbb',
+                    '_id'    => 111,
+                    'name'   => 'Jane Doe',
+                    'title'  => 'aaa bbb',
                     'active' => true,
                 ],
             ],
@@ -92,18 +92,18 @@ class FinderTest extends AbstractElasticsearchTestCase
 
         // Enter data in the read-only index
         $im->getConnection()->getClient()->index([
-            'index' => $this->readOnlyIndexName,
-            'id' => 111,
+            'index'   => $this->readOnlyIndexName,
+            'id'      => 111,
             'refresh' => true,
-            'body' => [
+            'body'    => [
                 'name' => 'Another Jane',
             ],
         ]);
         $im->getConnection()->getClient()->index([
-            'index' => $this->readOnlyIndexName,
-            'id' => 123,
+            'index'   => $this->readOnlyIndexName,
+            'id'      => 123,
             'refresh' => true,
-            'body' => [
+            'body'    => [
                 'name' => 'Jason Bourne',
             ],
         ]);
@@ -123,10 +123,10 @@ class FinderTest extends AbstractElasticsearchTestCase
 
         $docAsRaw = $finder->get('AcmeBarBundle:Product', 'doc1', Finder::RESULTS_RAW);
         $this->assertArraySubset([
-            '_index' => 'sineflow-esb-test-bar',
-            '_id' => 'doc1',
+            '_index'   => 'sineflow-esb-test-bar',
+            '_id'      => 'doc1',
             '_version' => 1,
-            '_source' => ['title' => 'aaa'],
+            '_source'  => ['title' => 'aaa'],
         ], $docAsRaw);
 
         $docAsObjectKNP = $finder->get('AcmeBarBundle:Product', 'doc1', Finder::RESULTS_OBJECT | Finder::ADAPTER_KNP);
@@ -166,8 +166,8 @@ class FinderTest extends AbstractElasticsearchTestCase
                 'title' => 'bbb',
             ],
             111 => [
-                'name' => 'Jane Doe',
-                'title' => 'aaa bbb',
+                'name'   => 'Jane Doe',
+                'title'  => 'aaa bbb',
                 'active' => true,
             ],
         ], $res);

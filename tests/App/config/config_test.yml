@@ -1,6 +1,6 @@
 parameters:
     elasticsearch_hosts:
-        - '127.0.0.1:9200'
+        - '127.0.0.1:%env(ELASTICSEARCH_PORT)%'
 
 # Framework Configuration
 framework:

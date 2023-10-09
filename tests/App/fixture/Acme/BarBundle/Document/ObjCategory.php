@@ -19,18 +19,21 @@ class ObjCategory implements ObjectInterface
 
     /**
      * @var int
+     *
      * @ES\Property(type="integer", name="id")
      */
     public $id;
 
     /**
      * @var string
+     *
      * @ES\Property(type="keyword", name="title")
      */
     public $title;
 
     /**
      * @var ObjTag[]
+     *
      * @ES\Property(type="object", name="tags", multiple=true, objectName="AcmeBarBundle:ObjTag")
      */
     public $tags;

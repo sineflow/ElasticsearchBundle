@@ -1,0 +1,124 @@
+name: tests
+
+concurrency:
+    group: phpunit-tests-${{ github.ref_name }}
+    cancel-in-progress: true
+
+on: ['push', 'pull_request', 'workflow_dispatch']
+
+env:
+    ELASTICSEARCH_PORT: 9201
+
+jobs:
+    static_code_analysis:
+        runs-on: 'ubuntu-20.04'
+        name: 'Static code analysis'
+        steps:
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.1'
+
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: 'Validate composer.json and composer.lock'
+              run: composer validate
+
+            - name: 'Install dependencies with Composer'
+              uses: 'ramsey/composer-install@v2'
+              with:
+                  dependency-versions: 'highest'
+                  composer-options: '--prefer-dist'
+
+            - name: Check PHP coding standards
+              run: php vendor/bin/php-cs-fixer fix --verbose --dry-run
+
+    phpunit:
+        needs: [ static_code_analysis ]
+        runs-on: 'ubuntu-20.04'
+        name: 'PHPUnit (PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, ES ${{ matrix.elasticsearch }})'
+        timeout-minutes: 30
+        continue-on-error: ${{ matrix.experimental }}
+        strategy:
+            matrix:
+                experimental:
+                    - false
+                dependencies:
+                    - 'highest'
+                php:
+                    - '8.1'
+                    - '8.2'
+                elasticsearch:
+                    - '7.17.13'
+                symfony:
+                    - '~5.0'
+                include:
+                    - php: '8.1'
+                      symfony: '~5.0'
+                      elasticsearch: '8.0.1'
+                      experimental: false
+                    - php: '8.1'
+                      symfony: '~5.0'
+                      elasticsearch: '8.1.3' # there are some bc in minor version https://www.elastic.co/guide/en/elasticsearch/reference/current/migrating-8.1.html#breaking-changes-8.1
+                      experimental: false
+                    - php: '8.1'
+                      symfony: '~5.0'
+                      elasticsearch: '8.5.3' # there are some bc in minor version https://www.elastic.co/guide/en/elasticsearch/reference/current/migrating-8.5.html
+                      experimental: false
+                    - php: '8.1'
+                      symfony: '~5.0'
+                      elasticsearch: '8.6.2' # there are no bc in minor version https://www.elastic.co/guide/en/elasticsearch/reference/current/migrating-8.6.html
+                      experimental: false
+                    - php: '8.1'
+                      symfony: '~5.0'
+                      elasticsearch: '8.7.1' # there are no bc in minor version https://www.elastic.co/guide/en/elasticsearch/reference/current/migrating-8.7.html
+                      experimental: false
+                    - php: '8.1'
+                      symfony: '~5.0'
+                      elasticsearch: '8.8.0' # there are no bc in minor version https://www.elastic.co/guide/en/elasticsearch/reference/current/migrating-8.8.html
+                      experimental: false
+                    - php: '8.1'
+                      symfony: '~6.0'
+                      elasticsearch: '8.10.2' # newest version
+                      experimental: false
+            fail-fast: false
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '${{ matrix.php }}'
+                  coverage: 'pcov'
+                  tools: 'composer:v2'
+                  extensions: 'curl, json, mbstring, openssl'
+                  ini-values: 'memory_limit=256M'
+
+            - name: 'Fix symfony/framework-bundle version'
+              run: composer require --no-update symfony/framework-bundle:${{ matrix.symfony }}
+
+            - name: 'Install dependencies with Composer'
+              uses: 'ramsey/composer-install@v2'
+              with:
+                  dependency-versions: '${{ matrix.dependencies }}'
+                  composer-options: '--prefer-dist'
+
+            - name: 'Dump composer autoloader'
+              run: composer dump-autoload --classmap-authoritative --no-ansi --no-interaction --no-scripts
+
+            - name: 'Setup Elasticsearch'
+              env:
+                  ELASTICSEARCH_VERSION: ${{ matrix.elasticsearch }}
+              run: docker compose up --detach --wait ; curl -XGET 'http://localhost:'"$ELASTICSEARCH_PORT"
+
+            - name: 'Run phpunit tests'
+              run: |
+                  vendor/bin/simple-phpunit --coverage-clover=tests/App/build/clover.xml 2>/dev/null
+
+            - name: Upload coverage results to Coveralls
+              env:
+                  COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+              run: |
+                  vendor/bin/php-coveralls --coverage_clover=tests/App/build/clover.xml --json_path=tests/App/build/coveralls.json -v

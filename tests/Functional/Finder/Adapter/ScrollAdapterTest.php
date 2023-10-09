@@ -18,34 +18,34 @@ class ScrollAdapterTest extends AbstractElasticsearchTestCase
         return [
             'bar' => [
                 [
-                    '_id' => '1',
+                    '_id'   => '1',
                     'title' => 'Foo Product',
                 ],
                 [
-                    '_id' => '2',
+                    '_id'   => '2',
                     'title' => 'Bar Product',
                 ],
                 [
-                    '_id' => '3',
+                    '_id'   => '3',
                     'title' => '3rd product',
                 ],
                 [
-                    '_id' => 'aaa',
+                    '_id'   => 'aaa',
                     'title' => 'bla bla product',
                 ],
                 [
-                    '_id' => 'bbb',
+                    '_id'   => 'bbb',
                     'title' => 'blu blu',
                 ],
                 [
                     '_id' => '54321',
                 ],
                 [
-                    '_id' => '8',
+                    '_id'   => '8',
                     'title' => 'product X',
                 ],
                 [
-                    '_id' => '9',
+                    '_id'   => '9',
                     'title' => 'product Y',
                 ],
             ],

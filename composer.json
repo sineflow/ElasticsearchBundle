@@ -32,11 +32,12 @@
         "symfony/stopwatch": "^4.4 || ^5.0",
         "symfony/phpunit-bridge": "^4.4 || ^5.0",
         "symfony/browser-kit": "^4.4 || ^5.0",
+        "symfony/dotenv": "^4.4 || ^5.0",
         "doctrine/orm": "^2.6.3",
 
         "monolog/monolog": "^1.0|^2.0|^3.0",
         "knplabs/knp-paginator-bundle": "^4.0 || ^5.0",
-        "squizlabs/php_codesniffer": "^3.0",
+        "friendsofphp/php-cs-fixer": "^3.34",
         "php-coveralls/php-coveralls": "^2.1",
         "escapestudios/symfony2-coding-standard": "^3.0",
         "jchook/phpunit-assert-throws": "^1.0",
@@ -50,8 +51,7 @@
     "autoload": {
         "psr-4": {
             "Sineflow\\ElasticsearchBundle\\": "src/"
-        },
-        "exclude-from-classmap": ["/tests/"]
+        }
     },
     "autoload-dev": {
         "psr-4": {

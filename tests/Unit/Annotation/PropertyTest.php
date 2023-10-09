@@ -23,17 +23,17 @@ class PropertyTest extends TestCase
         $type->objectName = 'foo/bar';
         $type->multiple = null;
         $type->options = [
-            'type' => 'this should not be set here',
+            'type'     => 'this should not be set here',
             'analyzer' => 'standard',
-            'foo' => 'bar',
+            'foo'      => 'bar',
         ];
         $type->foo = 'bar';
 
         $this->assertEquals(
             [
                 'analyzer' => 'standard',
-                'foo' => 'bar',
-                'type' => 'mytype',
+                'foo'      => 'bar',
+                'type'     => 'mytype',
             ],
             $type->dump(),
             'Properties should be filtered'
@@ -53,9 +53,9 @@ class PropertyTest extends TestCase
         $type->objectName = 'foo/bar';
         $type->multiple = null;
         $type->options = [
-            'copy_to' => '{lang}_all',
+            'copy_to'  => '{lang}_all',
             'analyzer' => '{lang}_analyzer',
-            'fields' => [
+            'fields'   => [
                 'ngram' => [
                     'analyzer' => '{lang}_analyzer',
                 ],
@@ -63,7 +63,7 @@ class PropertyTest extends TestCase
         ];
 
         $settings = [
-            'language' => 'en',
+            'language'       => 'en',
             'indexAnalyzers' => [
                 'default_analyzer' => [
                     'type' => 'standard',
@@ -76,9 +76,9 @@ class PropertyTest extends TestCase
 
         $this->assertEquals(
             [
-                'copy_to' => 'en_all',
+                'copy_to'  => 'en_all',
                 'analyzer' => 'en_analyzer',
-                'fields' => [
+                'fields'   => [
                         'ngram' => [
                                 'analyzer' => 'en_analyzer',
                             ],
@@ -131,7 +131,7 @@ class PropertyTest extends TestCase
         ];
 
         $settings = [
-            'language' => 'en',
+            'language'       => 'en',
             'indexAnalyzers' => [
                 'en_analyzer' => [
                     'type' => 'standard',

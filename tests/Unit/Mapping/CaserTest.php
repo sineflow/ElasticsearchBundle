@@ -35,6 +35,7 @@ class CaserTest extends TestCase
     /**
      * @param string $input
      * @param string $expected
+     *
      * @dataProvider providerForCamel
      */
     public function testCamel($input, $expected)
@@ -45,6 +46,7 @@ class CaserTest extends TestCase
     /**
      * @param string $input
      * @param string $expected
+     *
      * @dataProvider providerForSnake
      */
     public function testSnake($input, $expected)

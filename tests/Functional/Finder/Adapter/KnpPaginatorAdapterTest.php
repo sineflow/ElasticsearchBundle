@@ -20,12 +20,12 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         return [
             'bar' => [
                 [
-                    '_id' => '1',
-                    'title' => 'Foo Product',
-                    'price' => 10,
+                    '_id'      => '1',
+                    'title'    => 'Foo Product',
+                    'price'    => 10,
                     'category' => [
                         'title' => 'Bar',
-                        'tags' => [
+                        'tags'  => [
                             ['tagname' => 'first tag'],
                             ['tagname' => 'second tag'],
                         ],
@@ -33,7 +33,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
                     'related_categories' => [
                         [
                             'title' => 'Acme',
-                            'tags' => [
+                            'tags'  => [
                                 ['tagname' => 'tutu'],
                             ],
                         ],
@@ -45,10 +45,10 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
                     'ml_info-fr' => 'info in French',
                 ],
                 [
-                    '_id' => '2',
-                    'title' => 'Bar Product',
-                    'price' => 15,
-                    'category' => null,
+                    '_id'                => '2',
+                    'title'              => 'Bar Product',
+                    'price'              => 15,
+                    'category'           => null,
                     'related_categories' => [
                         [
                             'title' => 'Acme',
@@ -59,9 +59,9 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
                     ],
                 ],
                 [
-                    '_id' => '3',
-                    'price' => 5,
-                    'title' => '3rd Product',
+                    '_id'                => '3',
+                    'price'              => 5,
+                    'title'              => '3rd Product',
                     'related_categories' => [],
                 ],
                 [

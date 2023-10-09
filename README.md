@@ -2,8 +2,8 @@
 
 ![License](https://img.shields.io/github/license/sineflow/elasticsearchbundle.svg)
 [![Latest Stable Version](https://img.shields.io/github/release/sineflow/elasticsearchbundle.svg)](https://packagist.org/packages/sineflow/elasticsearch-bundle)
-[![Build Status](https://travis-ci.com/sineflow/ElasticsearchBundle.svg?branch=main)](https://app.travis-ci.com/github/sineflow/ElasticsearchBundle)
-[![Coverage Status](https://coveralls.io/repos/sineflow/ElasticsearchBundle/badge.svg?branch=master&service=github)](https://coveralls.io/github/sineflow/ElasticsearchBundle?branch=master)
+![Tests Workflow](https://github.com/sineflow/ElasticsearchBundle/actions/workflows/phpunit-tests.yml/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/sineflow/ElasticsearchBundle/badge.svg?branch=main)](https://coveralls.io/github/sineflow/ElasticsearchBundle?branch=main)
 
 ## Key points
 
@@ -31,3 +31,12 @@ Installation instructions and documentation of the bundle can be found [here](do
 ## License
 
 This bundle is licensed under the MIT license. Please, see the complete license in the [LICENSE](LICENSE) file.
+
+## Running tests
+
+```
+composer install
+docker compose up --detach --wait
+vendor/bin/simple-phpunit
+docker compose down --remove-orphans
+```

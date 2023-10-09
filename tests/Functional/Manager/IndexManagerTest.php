@@ -30,8 +30,8 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         return [
             'bar' => [
                 [
-                    '_id' => 'doc1',
-                    'title' => 'Foo Product',
+                    '_id'      => 'doc1',
+                    'title'    => 'Foo Product',
                     'category' => [
                         'title' => 'Bar',
                     ],
@@ -46,14 +46,14 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
             ],
             'customer' => [
                 [
-                    '_id' => 111,
-                    'name' => 'Jane Doe',
+                    '_id'    => 111,
+                    'name'   => 'Jane Doe',
                     'active' => true,
                 ],
             ],
             'backup' => [
                 [
-                    '_id' => 'abcde',
+                    '_id'   => 'abcde',
                     'entry' => 'log entry',
                 ],
             ],
@@ -214,7 +214,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         // Simulate state during rebuilding when write alias points to more than 1 index
         $settings = [
             'index' => 'sineflow-esb-test-temp',
-            'body' => ['mappings' => ['properties' => ['name' => ['type' => 'keyword']]]],
+            'body'  => ['mappings' => ['properties' => ['name' => ['type' => 'keyword']]]],
         ];
         $imWithAliases->getConnection()->getClient()->indices()->create($settings);
         $setAliasParams = [
@@ -239,7 +239,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         // Check that value is set in the additional index for the write alias as well
         $raw = $imWithAliases->getConnection()->getClient()->get([
             'index' => 'sineflow-esb-test-temp',
-            'id' => 555,
+            'id'    => 555,
         ]);
         $this->assertEquals('John Doe', $raw['_source']['name']);
 
@@ -252,8 +252,8 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases->getConnection()->setAutocommit(true);
 
         $imWithAliases->persistRaw([
-            '_id' => 444,
-            'name' => 'Jane',
+            '_id'    => 444,
+            'name'   => 'Jane',
             '_score' => 1,
         ]);
 
@@ -307,7 +307,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         // Simulate state during rebuilding when write alias points to more than 1 index
         $settings = [
             'index' => 'sineflow-esb-test-temp',
-            'body' => ['mappings' => ['properties' => ['name' => ['type' => 'keyword']]]],
+            'body'  => ['mappings' => ['properties' => ['name' => ['type' => 'keyword']]]],
         ];
         $imWithAliases->getConnection()->getClient()->indices()->create($settings);
         $setAliasParams = [
@@ -330,7 +330,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         // Check that value is deleted in the additional index for the write alias as well
         $imWithAliases->getConnection()->getClient()->get([
             'index' => 'sineflow-esb-test-temp',
-            'id' => 111,
+            'id'    => 111,
         ]);
     }
 

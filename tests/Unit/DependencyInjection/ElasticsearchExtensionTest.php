@@ -41,8 +41,8 @@ class ElasticsearchExtensionTest extends TestCase
                         'hosts' => [
                             'user:pass@eshost:1111',
                         ],
-                        'profiling' => false,
-                        'logging' => false,
+                        'profiling'       => false,
+                        'logging'         => false,
                         'bulk_batch_size' => 123,
                     ],
                 ],
@@ -53,7 +53,7 @@ class ElasticsearchExtensionTest extends TestCase
                                 'mapping.nested_fields.limit' => 10,
                             ],
                             'number_of_replicas' => 1,
-                            'analysis' => [
+                            'analysis'           => [
                                 'filter' => [
                                     'base_filter' => [
                                         'type' => 'custom',
@@ -63,14 +63,14 @@ class ElasticsearchExtensionTest extends TestCase
                         ],
                     ],
                     'test' => [
-                        'extends' => '_base',
-                        'name' => 'testname',
-                        'connection' => 'test1',
+                        'extends'     => '_base',
+                        'name'        => 'testname',
+                        'connection'  => 'test1',
                         'use_aliases' => false,
-                        'settings' => [
-                            'refresh_interval' => 2,
+                        'settings'    => [
+                            'refresh_interval'   => 2,
                             'number_of_replicas' => 3,
-                            'analysis' => [
+                            'analysis'           => [
                                 'filter' => [
                                     'test_filter' => [
                                         'type' => 'ngram',
@@ -103,23 +103,23 @@ class ElasticsearchExtensionTest extends TestCase
 
         $expectedConnections = [
             'test1' => [
-                'hosts' => ['user:pass@eshost:1111'],
-                'profiling' => false,
-                'logging' => false,
-                'bulk_batch_size' => 123,
+                'hosts'            => ['user:pass@eshost:1111'],
+                'profiling'        => false,
+                'logging'          => false,
+                'bulk_batch_size'  => 123,
                 'ssl_verification' => null,
             ],
         ];
 
         $expectedManagers = [
             'test' => [
-                'name' => 'testname',
-                'connection' => 'test1',
+                'name'        => 'testname',
+                'connection'  => 'test1',
                 'use_aliases' => false,
-                'settings' => [
-                    'refresh_interval' => 2,
+                'settings'    => [
+                    'refresh_interval'   => 2,
                     'number_of_replicas' => 3,
-                    'index' => [
+                    'index'              => [
                         'mapping.nested_fields.limit' => 10,
                     ],
                     'analysis' => [

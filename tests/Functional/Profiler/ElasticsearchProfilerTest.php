@@ -22,15 +22,15 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
             'default' => [
                 'product' => [
                     [
-                        '_id' => 1,
+                        '_id'   => 1,
                         'title' => 'foo',
                     ],
                     [
-                        '_id' => 2,
+                        '_id'   => 2,
                         'title' => 'bar',
                     ],
                     [
-                        '_id' => 3,
+                        '_id'   => 3,
                         'title' => 'pizza',
                     ],
                 ],
@@ -95,13 +95,13 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
 
         $this->assertArraySubset(
             [
-                'curlRequest' => "curl -XPOST 'http://".\implode(':', $esHostAndPort)."/sineflow-esb-test-bar/_search?pretty=true' -d '{\"query\":{\"ids\":{\"values\":[\"3\"]}},\"version\":true}'",
+                'curlRequest'  => "curl -XPOST 'http://".\implode(':', $esHostAndPort)."/sineflow-esb-test-bar/_search?pretty=true' -d '{\"query\":{\"ids\":{\"values\":[\"3\"]}},\"version\":true}'",
                 'senseRequest' => "POST /sineflow-esb-test-bar/_search\n{\"query\":{\"ids\":{\"values\":[\"3\"]}},\"version\":true}",
-                'backtrace' => null,
-                'scheme' => 'http',
-                'host' => $esHostAndPort[0],
-                'port' => (int) $esHostAndPort[1],
-                'path' => '/sineflow-esb-test-bar/_search',
+                'backtrace'    => null,
+                'scheme'       => 'http',
+                'host'         => $esHostAndPort[0],
+                'port'         => (int) $esHostAndPort[1],
+                'path'         => '/sineflow-esb-test-bar/_search',
             ],
             $lastQuery,
             'Logged data did not match expected data.'

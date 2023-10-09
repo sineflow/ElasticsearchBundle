@@ -117,8 +117,6 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
     /**
      * Return whether a given index manager has already been created in the current class instance
      *
-     * @param $name
-     *
      * @return bool
      */
     protected function hasCreatedIndexManager($name)

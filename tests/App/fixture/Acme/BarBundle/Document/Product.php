@@ -21,6 +21,7 @@ class Product extends AbstractDocument
 {
     /**
      * @var string
+     *
      * @ES\Property(
      *  type="text",
      *  name="title",
@@ -36,42 +37,49 @@ class Product extends AbstractDocument
 
     /**
      * @var string
+     *
      * @ES\Property(type="text", name="description")
      */
     public $description;
 
     /**
      * @var ObjCategory
+     *
      * @ES\Property(type="object", name="category", objectName="AcmeBarBundle:ObjCategory")
      */
     public $category;
 
     /**
      * @var ObjCategory[]|ObjectIterator<ObjCategory>
+     *
      * @ES\Property(type="object", name="related_categories", multiple=true, objectName="AcmeBarBundle:ObjCategory")
      */
     public $relatedCategories;
 
     /**
      * @var int
+     *
      * @ES\Property(type="float", name="price")
      */
     public $price;
 
     /**
      * @var string
+     *
      * @ES\Property(type="geo_point", name="location")
      */
     public $location;
 
     /**
      * @var string
+     *
      * @ES\Property(type="boolean", name="limited")
      */
     public $limited;
 
     /**
      * @var string
+     *
      * @ES\Property(type="date", name="released")
      */
     public $released;

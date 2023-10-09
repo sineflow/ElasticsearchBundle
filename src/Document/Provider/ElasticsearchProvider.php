@@ -66,8 +66,8 @@ class ElasticsearchProvider extends AbstractProvider
             ['sort' => ['_doc']],
             Finder::RESULTS_RAW | Finder::ADAPTER_SCROLL,
             [
-                'index' => $this->sourceIndexManager->getLiveIndex(),
-                'size' => $this->chunkSize,
+                'index'  => $this->sourceIndexManager->getLiveIndex(),
+                'size'   => $this->chunkSize,
                 'scroll' => $this->scrollTime,
             ]
         );
@@ -90,7 +90,7 @@ class ElasticsearchProvider extends AbstractProvider
     {
         $params = [
             'index' => $this->sourceIndexManager->getLiveIndex(),
-            'id' => $id,
+            'id'    => $id,
         ];
         $doc = $this->sourceIndexManager->getConnection()->getClient()->get($params);
         $result = $doc['_source'];
