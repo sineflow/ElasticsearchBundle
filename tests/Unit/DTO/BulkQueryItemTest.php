@@ -76,7 +76,7 @@ class BulkQueryItemTest extends TestCase
      *
      * @dataProvider getLinesProvider
      */
-    public function testGetLines($input, $expected)
+    public function testGetLines($input, $expected): void
     {
         $bqi = new BulkQueryItem($input[0], $input[1], $input[2]);
         $lines = $bqi->getLines($input[3]);

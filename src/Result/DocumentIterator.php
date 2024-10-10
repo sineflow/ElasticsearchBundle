@@ -10,96 +10,50 @@ use Sineflow\ElasticsearchBundle\DTO\IndicesToDocumentClasses;
  */
 class DocumentIterator implements \Countable, \Iterator
 {
-    /**
-     * @var array
-     */
-    private $rawData;
+    private array $suggestions = [];
+    private array $aggregations = [];
+    private array $documents = [];
 
-    /**
-     * @var DocumentConverter
-     */
-    private $documentConverter;
-
-    /**
-     * @var IndicesToDocumentClasses
-     */
-    private $indicesToDocumentClasses;
-
-    /**
-     * @var array
-     */
-    private $suggestions = [];
-
-    /**
-     * @var array
-     */
-    private $aggregations = [];
-
-    /**
-     * @var array
-     */
-    private $documents = [];
-
-    /**
-     * Constructor.
-     *
-     * @param array $rawData
-     */
-    public function __construct($rawData, DocumentConverter $documentConverter, IndicesToDocumentClasses $indicesToDocumentClasses)
-    {
-        $this->rawData = $rawData;
-        $this->documentConverter = $documentConverter;
-        $this->indicesToDocumentClasses = $indicesToDocumentClasses;
-
-        if (isset($rawData['suggest'])) {
-            $this->suggestions = &$rawData['suggest'];
+    public function __construct(
+        private array $rawData,
+        private readonly DocumentConverter $documentConverter,
+        private readonly IndicesToDocumentClasses $indicesToDocumentClasses,
+    ) {
+        if (isset($this->rawData['suggest'])) {
+            $this->suggestions = &$this->rawData['suggest'];
         }
-        if (isset($rawData['aggregations'])) {
-            $this->aggregations = &$rawData['aggregations'];
+        if (isset($this->rawData['aggregations'])) {
+            $this->aggregations = &$this->rawData['aggregations'];
         }
-        if (isset($rawData['hits']['hits'])) {
-            $this->documents = &$rawData['hits']['hits'];
+        if (isset($this->rawData['hits']['hits'])) {
+            $this->documents = &$this->rawData['hits']['hits'];
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getSuggestions()
+    public function getSuggestions(): array
     {
         return $this->suggestions;
     }
 
-    /**
-     * @return array
-     */
-    public function getAggregations()
+    public function getAggregations(): array
     {
         return $this->aggregations;
     }
 
     /**
      * Returns total count of records matching the query.
-     *
-     * @return int
      */
-    public function getTotalCount()
+    public function getTotalCount(): int
     {
         return $this->rawData['hits']['total']['value'];
     }
 
-    /**
-     * @return int
-     */
-    public function count()
+    public function count(): int
     {
         return \count($this->documents);
     }
 
-    /**
-     * @return DocumentInterface
-     */
-    public function current()
+    public function current(): ?DocumentInterface
     {
         return isset($this->documents[$this->key()]) ? $this->convertToDocument($this->documents[$this->key()]) : null;
     }
@@ -107,7 +61,7 @@ class DocumentIterator implements \Countable, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         \next($this->documents);
     }
@@ -115,7 +69,7 @@ class DocumentIterator implements \Countable, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): ?int
     {
         return \key($this->documents);
     }
@@ -123,7 +77,7 @@ class DocumentIterator implements \Countable, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return null !== $this->key();
     }
@@ -131,7 +85,7 @@ class DocumentIterator implements \Countable, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         \reset($this->documents);
     }
@@ -139,13 +93,9 @@ class DocumentIterator implements \Countable, \Iterator
     /**
      * Converts raw array to document.
      *
-     * @param array $rawData
-     *
-     * @return DocumentInterface
-     *
      * @throws \LogicException
      */
-    private function convertToDocument($rawData)
+    private function convertToDocument(array $rawData): DocumentInterface
     {
         $documentClass = $this->indicesToDocumentClasses->get($rawData['_index']);
 

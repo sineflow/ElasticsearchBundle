@@ -13,43 +13,25 @@ use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 class ElasticsearchProvider extends AbstractProvider
 {
     /**
-     * @var DocumentMetadataCollector
+     * Specify how long a consistent view of the index should be maintained for a scrolled search
      */
-    protected $metadataCollector;
+    protected string $scrollTime = '5m';
 
     /**
-     * @var string The index manager of the data source
+     * Number of documents in one chunk sent to ES
      */
-    protected $sourceIndexManager;
-
-    /**
-     * @var string The document class the data is coming from
-     */
-    protected $sourceDocumentClass;
-
-    /**
-     * @var string Specify how long a consistent view of the index should be maintained for a scrolled search
-     */
-    protected $scrollTime = '5m';
-
-    /**
-     * @var int Number of documents in one chunk sent to ES
-     */
-    protected $chunkSize = 500;
+    protected int $chunkSize = 500;
 
     /**
      * @param DocumentMetadataCollector $metadataCollector   The metadata collector
-     * @param IndexManager              $sourceIndexManager  The index manager of the data source
+     * @param string|IndexManager       $sourceIndexManager  The index manager of the data source
      * @param string                    $sourceDocumentClass The document class the data is coming from
      */
     public function __construct(
-        DocumentMetadataCollector $metadataCollector,
-        IndexManager $sourceIndexManager,
-        string $sourceDocumentClass
+        protected DocumentMetadataCollector $metadataCollector,
+        protected string|IndexManager $sourceIndexManager,
+        protected string $sourceDocumentClass,
     ) {
-        $this->metadataCollector = $metadataCollector;
-        $this->sourceIndexManager = $sourceIndexManager;
-        $this->sourceDocumentClass = $sourceDocumentClass;
     }
 
     /**
@@ -57,7 +39,7 @@ class ElasticsearchProvider extends AbstractProvider
      *
      * @return \Generator<array>
      */
-    public function getDocuments()
+    public function getDocuments(): \Generator
     {
         $repo = $this->sourceIndexManager->getRepository();
 
@@ -83,10 +65,8 @@ class ElasticsearchProvider extends AbstractProvider
 
     /**
      * Build and return a document from the data source, ready for insertion into ES
-     *
-     * @param int|string $id
      */
-    public function getDocument($id): array
+    public function getDocument(int|string $id): array
     {
         $params = [
             'index' => $this->sourceIndexManager->getLiveIndex(),

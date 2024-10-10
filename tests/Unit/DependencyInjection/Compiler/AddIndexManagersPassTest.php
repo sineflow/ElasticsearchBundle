@@ -5,6 +5,7 @@ namespace Sineflow\ElasticsearchBundle\Tests\Unit\DependencyInjection\Compiler;
 use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\DependencyInjection\Compiler\AddIndexManagersPass;
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
@@ -15,7 +16,7 @@ class AddIndexManagersPassTest extends TestCase
     /**
      * Before a test method is run, a template method called setUp() is invoked.
      */
-    public function testProcessWithSeveralManagers()
+    public function testProcessWithSeveralManagers(): void
     {
         $connections = [
             'test1' => [
@@ -39,33 +40,24 @@ class AddIndexManagersPassTest extends TestCase
             ],
         ];
 
-        $containerMock = $this->getMockBuilder('\Symfony\Component\DependencyInjection\ContainerBuilder')
+        $containerMock = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $containerMock->method('hasDefinition')->with($this->anything())
             ->willReturnCallback(
-                static function ($parameter) {
-                    switch ($parameter) {
-                        case 'sfes.connection.test1':
-                            return true;
-                        default:
-                            return null;
-                    }
+                static fn ($parameter): ?bool => match ($parameter) {
+                    'sfes.connection.test1' => true,
+                    default                 => null,
                 }
             );
 
         $containerMock->expects($this->exactly(1))->method('getParameter')->with($this->anything())
             ->willReturnCallback(
-                static function ($parameter) use ($connections, $managers) {
-                    switch ($parameter) {
-                        case 'sfes.indices':
-                            return $managers;
-                        case 'sfes.connections':
-                            return $connections;
-                        default:
-                            return null;
-                    }
+                static fn ($parameter): ?array => match ($parameter) {
+                    'sfes.indices'     => $managers,
+                    'sfes.connections' => $connections,
+                    default            => null,
                 }
             );
 

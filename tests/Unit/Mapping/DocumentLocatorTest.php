@@ -4,6 +4,7 @@ namespace Sineflow\ElasticsearchBundle\Tests\Unit\Mapping;
 
 use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product;
 
 /**
  * Class DocumentLocatorTest
@@ -31,23 +32,21 @@ class DocumentLocatorTest extends TestCase
 
     /**
      * Data provider
-     *
-     * @return array
      */
-    public function getTestResolveClassNameDataProvider()
+    public function getTestResolveClassNameDataProvider(): array
     {
         $out = [
             [
                 'AcmeBarBundle:Product',
-                'Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product',
+                Product::class,
             ],
             [
                 'AcmeFooBundle:Product',
                 'Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Product',
             ],
             [
-                'Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product',
-                'Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product',
+                Product::class,
+                Product::class,
             ],
         ];
 
@@ -56,14 +55,12 @@ class DocumentLocatorTest extends TestCase
 
     /**
      * Data provider
-     *
-     * @return array
      */
-    public function getShortClassNameDataProvider()
+    public function getShortClassNameDataProvider(): array
     {
         $out = [
             [
-                'Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product',
+                Product::class,
                 'AcmeBarBundle:Product',
             ],
             [
@@ -81,10 +78,8 @@ class DocumentLocatorTest extends TestCase
 
     /**
      * Data provider
-     *
-     * @return array
      */
-    public function getShortClassNameExceptionsDataProvider()
+    public function getShortClassNameExceptionsDataProvider(): array
     {
         $out = [
             [
@@ -104,7 +99,7 @@ class DocumentLocatorTest extends TestCase
     /**
      * Tests getAllDocumentDirs
      */
-    public function testGetAllDocumentDirs()
+    public function testGetAllDocumentDirs(): void
     {
         $this->assertCount(2, $this->locator->getAllDocumentDirs());
     }
@@ -117,7 +112,7 @@ class DocumentLocatorTest extends TestCase
      *
      * @dataProvider getTestResolveClassNameDataProvider
      */
-    public function testResolveClassName($className, $expectedClassName)
+    public function testResolveClassName($className, $expectedClassName): void
     {
         $this->assertEquals($expectedClassName, $this->locator->resolveClassName($className));
     }

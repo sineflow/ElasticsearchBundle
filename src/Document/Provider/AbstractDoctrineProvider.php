@@ -12,42 +12,34 @@ use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
  */
 abstract class AbstractDoctrineProvider extends AbstractProvider
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $em;
+    protected Query $query;
 
     /**
-     * @var Query
+     * How many records to retrieve from DB at once
      */
-    protected $query;
+    protected int $batchSize = 1000;
 
     /**
-     * @var int How many records to retrieve from DB at once
+     * The Doctrine entity name
      */
-    protected $batchSize = 1000;
+    protected string $doctrineEntityName;
 
     /**
-     * @var string The Doctrine entity name
+     * How to hydrate doctrine results
+     *
+     * @phpstan-param AbstractQuery::HYDRATE_* $sourceDataHydration
      */
-    protected $doctrineEntityName;
-
-    /**
-     * @var int How to hydrate doctrine results
-     */
-    protected $sourceDataHydration = AbstractQuery::HYDRATE_OBJECT;
+    protected int|string $sourceDataHydration = AbstractQuery::HYDRATE_OBJECT;
 
     /**
      * @param string                 $documentClass The document class the provider is for
      * @param EntityManagerInterface $em            The Doctrine entity manager
      */
-    public function __construct(string $documentClass, EntityManagerInterface $em)
+    public function __construct(protected string $documentClass, protected EntityManagerInterface $em)
     {
-        parent::__construct($documentClass);
-        $this->em = $em;
     }
 
-    public function setBatchSize(int $batchSize)
+    public function setBatchSize(int $batchSize): void
     {
         $this->batchSize = $batchSize;
     }
@@ -60,21 +52,19 @@ abstract class AbstractDoctrineProvider extends AbstractProvider
     /**
      * Converts a Doctrine entity to Elasticsearch entity
      *
-     * @param mixed $entity A doctrine entity object or data array
+     * @param object|array $entity A doctrine entity object or data array
      *
-     * @return mixed An ES document entity object or document array
+     * @return DocumentInterface|array An ES document entity object or document array
      */
-    abstract protected function getAsDocument($entity);
+    abstract protected function getAsDocument(object|array $entity): DocumentInterface|array;
 
     /**
      * Returns a PHP Generator for iterating over the full dataset of source data that is to be inserted in ES
      * The returned data can be either a document entity or an array ready for direct sending to ES
      *
      * @return \Generator<DocumentInterface|array>
-     *
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      */
-    public function getDocuments()
+    public function getDocuments(): \Generator
     {
         \set_time_limit(3600);
 
@@ -105,12 +95,8 @@ abstract class AbstractDoctrineProvider extends AbstractProvider
     /**
      * Build and return a document entity from the data source
      * The returned data can be either a document entity or an array ready for direct sending to ES
-     *
-     * @param int|string $id
-     *
-     * @return DocumentInterface|array
      */
-    public function getDocument($id)
+    public function getDocument(int|string $id): DocumentInterface|array|null
     {
         $entity = $this->em->getRepository($this->doctrineEntityName)->find($id);
 

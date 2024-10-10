@@ -9,40 +9,24 @@ use Elasticsearch\Common\Exceptions\InvalidArgumentException;
  */
 class BulkQueryItem
 {
-    /**
-     * @var string
-     */
-    private $operation;
-
-    /**
-     * @var string
-     */
-    private $index;
-
-    /**
-     * @var array
-     */
-    private $query;
-
-    /**
-     * @var array
-     */
-    private $metaParams;
+    private readonly array $query;
+    private readonly array $metaParams;
 
     /**
      * @param string $operation  One of: index, update, delete, create.
      * @param string $index      Elasticsearch index name.
      * @param array  $query      Bulk item query (aka optional_source in the ES docs)
-     * @param array  $metaParams Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
+     * @param array  $metaParams Additional params to pass with the metadata in the bulk request (_version, _routing, etc.)
      */
-    public function __construct(string $operation, string $index, array $query, array $metaParams = [])
-    {
-        if (!\in_array($operation, ['index', 'create', 'update', 'delete'])) {
+    public function __construct(
+        private readonly string $operation,
+        private readonly string $index,
+        array $query,
+        array $metaParams = [],
+    ) {
+        if (!\in_array($this->operation, ['index', 'create', 'update', 'delete'])) {
             throw new InvalidArgumentException(\sprintf('Invalid bulk operation "%s" specified', $operation));
         }
-
-        $this->operation = $operation;
-        $this->index = $index;
 
         // in case some meta param is specified as part of the query and not in $metaParams, move it there
         // (this happens when converting a document entity to an array)
@@ -72,7 +56,7 @@ class BulkQueryItem
      *
      * @param string|null $forceIndex If set, that will be the index used for the output bulk request
      */
-    public function getLines($forceIndex = null): array
+    public function getLines(?string $forceIndex = null): array
     {
         $result = [];
 

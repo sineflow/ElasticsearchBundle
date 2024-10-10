@@ -52,7 +52,7 @@ class ScrollAdapterTest extends AbstractElasticsearchTestCase
         ];
     }
 
-    public function testScanScroll()
+    public function testScanScroll(): void
     {
         /** @var Repository $repo */
         $repo = $this->getIndexManager('bar')->getRepository();

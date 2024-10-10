@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Document\Provider;
 
+use Psr\Cache\InvalidArgumentException;
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -11,41 +12,17 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 class ProviderRegistry
 {
-    /**
-     * @var DocumentMetadataCollector
-     */
-    private $documentMetadataCollector;
-
-    /**
-     * @var IndexManagerRegistry
-     */
-    private $indexManagerRegistry;
-
-    /**
-     * @var string
-     */
-    private $selfProviderClass;
-
-    /**
-     * @var ServiceLocator
-     */
-    private $serviceLocator;
-
-    /**
-     * ProviderRegistry constructor.
-     */
     public function __construct(
-        ServiceLocator $serviceLocator,
-        DocumentMetadataCollector $documentMetadataCollector,
-        IndexManagerRegistry $indexManagerRegistry,
-        string $selfProviderClass
+        private readonly ServiceLocator $serviceLocator,
+        private readonly DocumentMetadataCollector $documentMetadataCollector,
+        private readonly IndexManagerRegistry $indexManagerRegistry,
+        private readonly string $selfProviderClass,
     ) {
-        $this->serviceLocator = $serviceLocator;
-        $this->documentMetadataCollector = $documentMetadataCollector;
-        $this->indexManagerRegistry = $indexManagerRegistry;
-        $this->selfProviderClass = $selfProviderClass;
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function getCustomProviderForEntity(string $documentClass): ?ProviderInterface
     {
         $documentMetadata = $this->documentMetadataCollector->getDocumentMetadata($documentClass);

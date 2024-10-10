@@ -22,7 +22,7 @@ class ElasticsearchBundleTest extends TestCase
     /**
      * Check whether all Passes in DependencyInjection/Compiler/ are added to container.
      */
-    public function testPassesRegistered()
+    public function testPassesRegistered(): void
     {
         $container = new ContainerBuilder();
         $bundle = new SineflowElasticsearchBundle();
@@ -33,7 +33,7 @@ class ElasticsearchBundleTest extends TestCase
         /** @var PassConfig $passConfig */
         $passConfig = $container->getCompiler()->getPassConfig();
         foreach ($passConfig->getPasses() as $pass) {
-            $classPath = \explode('\\', \get_class($pass));
+            $classPath = \explode('\\', $pass::class);
             $loadedPasses[] = \end($classPath);
         }
 

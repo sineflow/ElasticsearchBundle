@@ -17,72 +17,42 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class ConnectionManager
 {
-    /**
-     * @var string The unique connection manager name (the key from the index configuration)
-     */
-    protected $connectionName;
-
-    /**
-     * @var Client
-     */
-    protected $client;
-
-    /**
-     * @var array
-     */
-    protected $connectionSettings;
+    protected ?Client $client = null;
 
     /**
      * @var BulkQueryItem[] Container for bulk queries.
      */
-    protected $bulkQueries;
+    protected array $bulkQueries;
 
     /**
-     * @var array Holder for consistency, refresh and replication parameters.
+     * Holder for consistency, refresh and replication parameters.
      */
-    protected $bulkParams;
+    protected array $bulkParams;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected ?LoggerInterface $logger = null;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $tracer;
+    protected ?LoggerInterface $tracer = null;
 
-    /**
-     * @var bool
-     */
-    protected $autocommit;
+    protected bool $autocommit;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
-
-    /**
-     * @var bool
-     */
-    protected $kernelDebug;
+    protected ?EventDispatcherInterface $eventDispatcher = null;
 
     /**
      * @param string $connectionName     The unique connection name
      * @param array  $connectionSettings Settings array
      * @param bool   $kernelDebug        The kernel.debug value
      */
-    public function __construct(string $connectionName, array $connectionSettings, bool $kernelDebug)
-    {
-        $this->connectionName = $connectionName;
-        $this->connectionSettings = $connectionSettings;
+    public function __construct(
+        protected string $connectionName,
+        protected array $connectionSettings,
+        protected bool $kernelDebug,
+    ) {
         $this->bulkQueries = [];
         $this->bulkParams = [];
         $this->autocommit = false;
-        $this->kernelDebug = $kernelDebug;
     }
 
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }
@@ -92,7 +62,7 @@ class ConnectionManager
         return $this->logger;
     }
 
-    public function setTracer(LoggerInterface $tracer)
+    public function setTracer(LoggerInterface $tracer): void
     {
         $this->tracer = $tracer;
     }
@@ -137,7 +107,7 @@ class ConnectionManager
         return $this->autocommit;
     }
 
-    public function setAutocommit(bool $autocommit)
+    public function setAutocommit(bool $autocommit): void
     {
         // If the autocommit mode is being turned on, commit any pending bulk items
         if (!$this->autocommit && $autocommit) {
@@ -152,7 +122,7 @@ class ConnectionManager
         return $this->eventDispatcher;
     }
 
-    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): void
     {
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -163,9 +133,9 @@ class ConnectionManager
      * @param string $operation  One of: index, update, delete, create.
      * @param string $index      Elasticsearch index name.
      * @param array  $query      Bulk item query (aka optional_source in the ES docs)
-     * @param array  $metaParams Additional meta data params for the bulk item
+     * @param array  $metaParams Additional metadata params for the bulk item
      */
-    public function addBulkOperation(string $operation, string $index, array $query, array $metaParams = [])
+    public function addBulkOperation(string $operation, string $index, array $query, array $metaParams = []): void
     {
         $this->bulkQueries[] = new BulkQueryItem($operation, $index, $query, $metaParams);
     }
@@ -186,7 +156,7 @@ class ConnectionManager
      *                      ['refresh']     = (boolean) Refresh the index after performing the operation.
      *                      ['replication'] = (enum) Explicitly set the replication type.
      */
-    public function setBulkParams(array $params)
+    public function setBulkParams(array $params): void
     {
         $this->bulkParams = $params;
     }
@@ -201,7 +171,7 @@ class ConnectionManager
      *
      * @throws BulkRequestException
      */
-    public function commit(bool $forceRefresh = true)
+    public function commit(bool $forceRefresh = true): void
     {
         if (empty($this->bulkQueries)) {
             return;
@@ -216,9 +186,7 @@ class ConnectionManager
 
         $this->bulkQueries = [];
 
-        if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(new PostCommitEvent($response, $this), Events::POST_COMMIT);
-        }
+        $this->eventDispatcher?->dispatch(new PostCommitEvent($response, $this), Events::POST_COMMIT);
 
         if ($response['errors']) {
             $errorCount = $this->logBulkRequestErrors($response['items']);
@@ -285,7 +253,7 @@ class ConnectionManager
     /**
      * Refresh all indices, making any newly indexed documents immediately available for search
      */
-    public function refresh()
+    public function refresh(): void
     {
         // Use an index wildcard to avoid deprecation warnings about accessing system indices
         // Passing this 'index' argument should not be necessary in ES8
@@ -298,7 +266,7 @@ class ConnectionManager
      * Causes a Lucene commit to happen
      * In most cases refresh() should be used instead, as this is a very expensive operation
      */
-    public function flush()
+    public function flush(): void
     {
         $this->getClient()->indices()->flush();
     }
@@ -343,7 +311,7 @@ class ConnectionManager
             throw new InvalidArgumentException('Required parameter "index" missing');
         }
 
-        $indicesAndAliasesToCheck = \array_flip(\explode(',', $params['index']));
+        $indicesAndAliasesToCheck = \array_flip(\explode(',', (string) $params['index']));
 
         // Get all available indices (exc. dot-prefixed indices) with their aliases
         // Passing this 'index' argument should not be necessary in ES8
@@ -385,12 +353,12 @@ class ConnectionManager
             throw new InvalidArgumentException('Required parameter "name" missing');
         }
 
-        $aliasesToCheck = \explode(',', $params['name']);
+        $aliasesToCheck = \explode(',', (string) $params['name']);
 
         // Get all available indices (exc. dot-prefixed indices) with their aliases
         // Passing this 'index' argument should not be necessary in ES8
         $allAliases = $this->getClient()->indices()->getAlias(['index' => '*,-.*']);
-        foreach ($allAliases as $index => $data) {
+        foreach ($allAliases as $data) {
             foreach ($aliasesToCheck as $aliasToCheck) {
                 if (isset($data['aliases'][$aliasToCheck])) {
                     return true;

@@ -10,7 +10,7 @@ class IndexCreateCommandTest extends AbstractCommandTestCase
     /**
      * Tests creating index
      */
-    public function testExecute()
+    public function testExecute(): void
     {
         $manager = $this->getIndexManager('customer');
 
@@ -43,7 +43,7 @@ class IndexCreateCommandTest extends AbstractCommandTestCase
     /**
      * Tests creating index in case of existing this index.
      */
-    public function testExecuteWithExistingIndex()
+    public function testExecuteWithExistingIndex(): void
     {
         $manager = $this->getIndexManager('customer');
 

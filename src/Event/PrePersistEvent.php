@@ -6,53 +6,28 @@ use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class PrePersistEvent
- */
 class PrePersistEvent extends Event
 {
-    /**
-     * @var DocumentInterface
-     */
-    private $document;
+    private readonly string $connectionName;
+    private readonly int $bulkOperationIndex;
 
-    /**
-     * @var string
-     */
-    private $connectionName;
-
-    /**
-     * @var int
-     */
-    private $bulkOperationIndex;
-
-    public function __construct(DocumentInterface $document, ConnectionManager $connectionManager)
+    public function __construct(private readonly DocumentInterface $document, ConnectionManager $connectionManager)
     {
-        $this->document = $document;
         $this->connectionName = $connectionManager->getConnectionName();
         $this->bulkOperationIndex = $connectionManager->getBulkOperationsCount();
     }
 
-    /**
-     * @return DocumentInterface
-     */
-    public function getDocument()
+    public function getDocument(): DocumentInterface
     {
         return $this->document;
     }
 
-    /**
-     * @return string
-     */
-    public function getConnectionName()
+    public function getConnectionName(): string
     {
         return $this->connectionName;
     }
 
-    /**
-     * @return int
-     */
-    public function getBulkOperationIndex()
+    public function getBulkOperationIndex(): int
     {
         return $this->bulkOperationIndex;
     }

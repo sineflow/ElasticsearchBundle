@@ -16,17 +16,13 @@ interface ProviderInterface
      *
      * @return \Generator<DocumentInterface|array>
      */
-    public function getDocuments();
+    public function getDocuments(): \Generator;
 
     /**
      * Build and return a document entity from the data source
      * The returned data can be either a document entity or an array ready for direct sending to ES
-     *
-     * @param int|string $id
-     *
-     * @return DocumentInterface|array
      */
-    public function getDocument($id);
+    public function getDocument(int|string $id): DocumentInterface|array|null;
 
     /**
      * Returns the number of Elasticsearch documents to persist in a single bulk request

@@ -9,43 +9,19 @@ use Sineflow\ElasticsearchBundle\Document\ObjectInterface;
  */
 class ObjectIterator implements \Countable, \Iterator
 {
-    /**
-     * @var array property metadata information.
-     */
-    private $propertyMetadata;
-
-    /**
-     * @var DocumentConverter
-     */
-    private $documentConverter;
-
-    /**
-     * @var array
-     */
-    private $objects;
-
-    /**
-     * Constructor.
-     */
-    public function __construct(DocumentConverter $documentConverter, array $rawData, array $propertyMetadata)
-    {
-        $this->documentConverter = $documentConverter;
-        $this->propertyMetadata = $propertyMetadata;
-        $this->objects = $rawData;
+    public function __construct(
+        private readonly DocumentConverter $documentConverter,
+        private array $objects,
+        private readonly array $propertyMetadata,
+    ) {
     }
 
-    /**
-     * @return int
-     */
-    public function count()
+    public function count(): int
     {
         return \count($this->objects);
     }
 
-    /**
-     * @return ObjectInterface
-     */
-    public function current()
+    public function current(): ?ObjectInterface
     {
         return isset($this->objects[$this->key()]) ? $this->convertToObject($this->objects[$this->key()]) : null;
     }
@@ -53,7 +29,7 @@ class ObjectIterator implements \Countable, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         \next($this->objects);
     }
@@ -61,7 +37,7 @@ class ObjectIterator implements \Countable, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): int|string|null
     {
         return \key($this->objects);
     }
@@ -69,7 +45,7 @@ class ObjectIterator implements \Countable, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return null !== $this->key();
     }
@@ -77,15 +53,12 @@ class ObjectIterator implements \Countable, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         \reset($this->objects);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    private function convertToObject($rawData)
+    private function convertToObject($rawData): ObjectInterface
     {
         return $this->documentConverter->assignArrayToObject(
             $rawData,

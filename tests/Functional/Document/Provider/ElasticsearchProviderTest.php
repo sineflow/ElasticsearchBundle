@@ -31,7 +31,7 @@ class ElasticsearchProviderTest extends AbstractElasticsearchTestCase
         ];
     }
 
-    public function testGetDocument()
+    public function testGetDocument(): void
     {
         $esProvider = $this->getProvider();
 
@@ -43,7 +43,7 @@ class ElasticsearchProviderTest extends AbstractElasticsearchTestCase
         ], $doc);
     }
 
-    public function testGetDocuments()
+    public function testGetDocuments(): void
     {
         $esProvider = $this->getProvider();
 

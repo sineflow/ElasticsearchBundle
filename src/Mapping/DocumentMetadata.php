@@ -12,10 +12,7 @@ class DocumentMetadata
     public const PROPERTY_ACCESS_PUBLIC = 1;
     public const PROPERTY_ACCESS_PRIVATE = 2;
 
-    /**
-     * @var array
-     */
-    private $metadata;
+    private array $metadata;
 
     /**
      * Resolves metadata.
@@ -31,7 +28,7 @@ class DocumentMetadata
     /**
      * Configures options resolver.
      */
-    protected function configureOptions(OptionsResolver $optionsResolver)
+    protected function configureOptions(OptionsResolver $optionsResolver): void
     {
         $optionsResolver->setRequired(['properties', 'fields', 'propertiesMetadata', 'repositoryClass', 'providerClass', 'className']);
     }
@@ -46,10 +43,8 @@ class DocumentMetadata
                 ['properties' => $this->getProperties()],
                 $this->getFields()
             ),
-            static function ($value) {
-                // Remove all empty non-boolean values from the mapping array
-                return (bool) $value || \is_bool($value);
-            }
+            static fn ($value): bool => // Remove all empty non-boolean values from the mapping array
+                (bool) $value || \is_bool($value)
         );
 
         return $mapping;

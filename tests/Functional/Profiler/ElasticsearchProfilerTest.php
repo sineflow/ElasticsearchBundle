@@ -41,7 +41,7 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
     /**
      * Tests if right amount of queries are caught
      */
-    public function testGetQueryCount()
+    public function testGetQueryCount(): void
     {
         $imWithoutAliases = $this->getIndexManager('bar');
         $imWithoutAliases->getConnection()->setAutocommit(false);
@@ -67,7 +67,7 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
     /**
      * Tests if correct time is being returned.
      */
-    public function testGetTime()
+    public function testGetTime(): void
     {
         $imWithoutAliases = $this->getIndexManager('bar');
         $imWithoutAliases->getConnection()->setAutocommit(true);
@@ -80,7 +80,7 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
     /**
      * Tests if logged data seems correct
      */
-    public function testCorrectDataLogged()
+    public function testCorrectDataLogged(): void
     {
         $imWithoutAliases = $this->getIndexManager('bar');
         $imWithoutAliases->getConnection()->setAutocommit(true);
@@ -91,12 +91,12 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
         $lastQuery = \end($queries[ElasticsearchProfiler::UNDEFINED_ROUTE]);
         $this->checkQueryParameters($lastQuery);
 
-        $esHostAndPort = \explode(':', $imWithoutAliases->getConnection()->getConnectionSettings()['hosts'][0]);
+        $esHostAndPort = \explode(':', (string) $imWithoutAliases->getConnection()->getConnectionSettings()['hosts'][0]);
 
         $this->assertArraySubset(
             [
-                'curlRequest'  => "curl -XPOST 'http://".\implode(':', $esHostAndPort)."/sineflow-esb-test-bar/_search?pretty=true' -d '{\"query\":{\"ids\":{\"values\":[\"3\"]}},\"version\":true}'",
-                'senseRequest' => "POST /sineflow-esb-test-bar/_search\n{\"query\":{\"ids\":{\"values\":[\"3\"]}},\"version\":true}",
+                'curlRequest'  => "curl -XPOST 'http://".\implode(':', $esHostAndPort)."/sineflow-esb-test-bar/_search?pretty=true' -d '{\"query\":{\"ids\":{\"values\":[3]}},\"version\":true}'",
+                'senseRequest' => "POST /sineflow-esb-test-bar/_search\n{\"query\":{\"ids\":{\"values\":[3]}},\"version\":true}",
                 'backtrace'    => null,
                 'scheme'       => 'http',
                 'host'         => $esHostAndPort[0],

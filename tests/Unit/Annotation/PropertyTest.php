@@ -13,7 +13,7 @@ class PropertyTest extends TestCase
     /**
      * Tests if values are dumped correctly for mapping.
      */
-    public function testDump()
+    public function testDump(): void
     {
         $type = new Property();
 
@@ -21,7 +21,7 @@ class PropertyTest extends TestCase
         $type->type = 'mytype';
         $type->multilanguage = false;
         $type->objectName = 'foo/bar';
-        $type->multiple = null;
+        $type->multiple = false;
         $type->options = [
             'type'     => 'this should not be set here',
             'analyzer' => 'standard',
@@ -43,7 +43,7 @@ class PropertyTest extends TestCase
     /**
      * Test if language placeholders are correctly replaced
      */
-    public function testDumpML()
+    public function testDumpML(): void
     {
         $type = new Property();
 
@@ -51,7 +51,7 @@ class PropertyTest extends TestCase
         $type->type = 'mytype';
         $type->multilanguage = true;
         $type->objectName = 'foo/bar';
-        $type->multiple = null;
+        $type->multiple = false;
         $type->options = [
             'copy_to'  => '{lang}_all',
             'analyzer' => '{lang}_analyzer',
@@ -79,10 +79,10 @@ class PropertyTest extends TestCase
                 'copy_to'  => 'en_all',
                 'analyzer' => 'en_analyzer',
                 'fields'   => [
-                        'ngram' => [
-                                'analyzer' => 'en_analyzer',
-                            ],
+                    'ngram' => [
+                        'analyzer' => 'en_analyzer',
                     ],
+                ],
                 'type' => 'mytype',
             ],
             $type->dump($settings),
@@ -93,7 +93,7 @@ class PropertyTest extends TestCase
     /**
      * Test that exception is thrown when language is specified but there are no index analyzers set
      */
-    public function testDumpNoAnalyzersException()
+    public function testDumpNoAnalyzersException(): void
     {
         $type = new Property();
 
@@ -101,7 +101,7 @@ class PropertyTest extends TestCase
         $type->type = 'mytype';
         $type->multilanguage = false;
         $type->objectName = 'foo/bar';
-        $type->multiple = null;
+        $type->multiple = false;
         $type->options = [
             'analyzer' => '{lang}_analyzer',
         ];
@@ -117,7 +117,7 @@ class PropertyTest extends TestCase
     /**
      * Test that exception is thrown when no default language analyzer is set
      */
-    public function testDumpNoDefaultException()
+    public function testDumpNoDefaultException(): void
     {
         $type = new Property();
 
@@ -125,7 +125,7 @@ class PropertyTest extends TestCase
         $type->type = 'mytype';
         $type->multilanguage = false;
         $type->objectName = 'foo/bar';
-        $type->multiple = null;
+        $type->multiple = false;
         $type->options = [
             'analyzer' => '{lang}_analyzer',
         ];

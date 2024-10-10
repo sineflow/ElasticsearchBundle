@@ -13,7 +13,7 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Produ
  */
 class IndexManagerRegistryTest extends AbstractContainerAwareTestCase
 {
-    public function testGet()
+    public function testGet(): void
     {
         /** @var IndexManagerRegistry $registry */
         $registry = $this->getContainer()->get(IndexManagerRegistry::class);
@@ -28,17 +28,17 @@ class IndexManagerRegistryTest extends AbstractContainerAwareTestCase
         $im = $registry->get('nonexisting');
     }
 
-    public function testGetByClass()
+    public function testGetByClass(): void
     {
         $registry = $this->getContainer()->get(IndexManagerRegistry::class);
 
         $product = new Product();
-        $im = $registry->getByClass(get_class($product));
+        $im = $registry->getByClass($product::class);
         $this->assertInstanceOf(IndexManager::class, $im);
         $this->assertEquals('bar', $im->getManagerName());
     }
 
-    public function testGetByEntity()
+    public function testGetByEntity(): void
     {
         $registry = $this->getContainer()->get(IndexManagerRegistry::class);
 

@@ -4,6 +4,7 @@ namespace Sineflow\ElasticsearchBundle\Manager;
 
 use Elasticsearch\Common\Exceptions\ElasticsearchException;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Psr\Cache\InvalidArgumentException;
 use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\Document\Provider\ProviderInterface;
 use Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry;
@@ -27,93 +28,40 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class IndexManager
 {
-    /**
-     * @var string The unique manager name (the key from the index configuration)
-     */
-    protected $managerName;
+    protected ?array $indexMapping = null;
+    private array $indexSettings;
+    protected Repository $repository;
 
     /**
-     * @var ConnectionManager Elasticsearch connection.
+     * Whether to use index aliases
      */
-    protected $connection;
+    protected bool $useAliases = true;
 
     /**
-     * @var DocumentMetadataCollector
+     * The alias where data should be read from
      */
-    protected $metadataCollector;
+    protected string $readAlias;
 
     /**
-     * @var ProviderRegistry
+     * The alias where data should be written to
      */
-    protected $providerRegistry;
+    protected string $writeAlias;
 
-    /**
-     * @var Finder
-     */
-    protected $finder;
-
-    /**
-     * @var DocumentConverter
-     */
-    protected $documentConverter;
-
-    /**
-     * @var RepositoryFactory
-     */
-    protected $repositoryFactory;
-
-    /**
-     * @var array
-     */
-    protected $indexMapping;
-
-    /**
-     * @var array
-     */
-    private $indexSettings;
-
-    /**
-     * @var Repository
-     */
-    protected $repository;
-
-    /**
-     * @var bool Whether to use index aliases
-     */
-    protected $useAliases = true;
-
-    /**
-     * @var string The alias where data should be read from
-     */
-    protected $readAlias;
-
-    /**
-     * @var string The alias where data should be written to
-     */
-    protected $writeAlias;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
+    protected ?EventDispatcherInterface $eventDispatcher = null;
 
     public function __construct(
-        string $managerName,
+        /**
+         * The unique manager name (the key from the index configuration)
+         */
+        protected string $managerName,
         array $indexSettings,
-        ConnectionManager $connection,
-        DocumentMetadataCollector $metadataCollector,
-        ProviderRegistry $providerRegistry,
-        Finder $finder,
-        DocumentConverter $documentConverter,
-        RepositoryFactory $repositoryFactory
+        protected ConnectionManager $connection,
+        protected DocumentMetadataCollector $metadataCollector,
+        protected ProviderRegistry $providerRegistry,
+        protected Finder $finder,
+        protected DocumentConverter $documentConverter,
+        protected RepositoryFactory $repositoryFactory,
     ) {
-        $this->managerName = $managerName;
-        $this->connection = $connection;
-        $this->metadataCollector = $metadataCollector;
-        $this->providerRegistry = $providerRegistry;
-        $this->finder = $finder;
-        $this->documentConverter = $documentConverter;
-        $this->repositoryFactory = $repositoryFactory;
         $this->useAliases = $indexSettings['use_aliases'];
         $this->indexSettings = $indexSettings;
 
@@ -130,7 +78,7 @@ class IndexManager
         return $this->eventDispatcher;
     }
 
-    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): void
     {
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -339,7 +287,7 @@ class IndexManager
      *
      * @throws Exception
      */
-    public function createIndex()
+    public function createIndex(): void
     {
         if (true === $this->getUseAliases()) {
             // Make sure the read and write aliases do not exist already as aliases or physical indices
@@ -376,7 +324,7 @@ class IndexManager
     /**
      * Drops elasticsearch index(es).
      */
-    public function dropIndex()
+    public function dropIndex(): void
     {
         try {
             if (true === $this->getUseAliases()) {
@@ -387,7 +335,7 @@ class IndexManager
             } else {
                 $this->getConnection()->getClient()->indices()->delete(['index' => $this->getBaseIndexName()]);
             }
-        } catch (Missing404Exception $e) {
+        } catch (Missing404Exception) {
             // No physical indices exist for the index manager's aliases, or the physical index did not exist
         }
     }
@@ -401,7 +349,7 @@ class IndexManager
      *
      * @throws ElasticsearchException
      */
-    public function rebuildIndex($deleteOld = false, $cancelExistingRebuild = false)
+    public function rebuildIndex(bool $deleteOld = false, bool $cancelExistingRebuild = false): void
     {
         try {
             if (false === $this->getUseAliases()) {
@@ -462,9 +410,9 @@ class IndexManager
      * Rebuilds the data of a document and adds it to a bulk request for the next commit.
      * Depending on the connection autocommit mode, the change may be committed right away.
      *
-     * @param string|int $id
+     * @throws InvalidArgumentException
      */
-    public function reindex(string $id)
+    public function reindex(string|int $id): void
     {
         $documentClass = $this->getDocumentClass();
 
@@ -473,8 +421,8 @@ class IndexManager
 
         switch (true) {
             case $document instanceof DocumentInterface:
-                if (\get_class($document) !== $documentClass) {
-                    throw new Exception(\sprintf('Document must be [%s], but [%s] was returned from data provider', $documentClass, \get_class($document)));
+                if ($document::class !== $documentClass) {
+                    throw new Exception(\sprintf('Document must be [%s], but [%s] was returned from data provider', $documentClass, $document::class));
                 }
                 $this->persist($document);
                 break;
@@ -501,16 +449,14 @@ class IndexManager
     /**
      * Adds document removal to a bulk request for the next commit.
      * Depending on the connection autocommit mode, the removal may be committed right away.
-     *
-     * @param string $id Document ID to remove.
      */
-    public function delete(string $id)
+    public function delete(string|int $id): void
     {
         $this->getConnection()->addBulkOperation(
             'delete',
             $this->writeAlias,
             [],
-            ['_id' => $id]
+            ['_id' => $id],
         );
 
         if ($this->getConnection()->isAutocommit()) {
@@ -521,20 +467,20 @@ class IndexManager
     /**
      * Adds a document update to a bulk request for the next commit.
      *
-     * @param string $id          Document id to update.
-     * @param array  $fields      Fields array to update (ignored if script is specified).
-     * @param null   $script      Script to update fields.
-     * @param array  $queryParams Additional params to pass with the payload (upsert, doc_as_upsert, _source, etc.)
-     * @param array  $metaParams  Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
+     * @param string|int $id          Document id to update.
+     * @param array      $fields      Fields array to update (ignored if script is specified).
+     * @param null       $script      Script to update fields.
+     * @param array      $queryParams Additional params to pass with the payload (upsert, doc_as_upsert, _source, etc.)
+     * @param array      $metaParams  Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
      */
-    public function update(string $id, array $fields = [], $script = null, array $queryParams = [], array $metaParams = [])
+    public function update(string|int $id, array $fields = [], $script = null, array $queryParams = [], array $metaParams = []): void
     {
         // Add the id of the updated document to the meta params for the bulk request
         $metaParams = \array_merge(
             $metaParams,
             [
                 '_id' => $id,
-            ]
+            ],
         );
 
         $query = \array_filter(\array_merge(
@@ -542,14 +488,14 @@ class IndexManager
             [
                 'doc'    => $fields,
                 'script' => $script,
-            ]
+            ],
         ));
 
         $this->getConnection()->addBulkOperation(
             'update',
             $this->writeAlias,
             $query,
-            $metaParams
+            $metaParams,
         );
 
         if ($this->getConnection()->isAutocommit()) {
@@ -562,13 +508,11 @@ class IndexManager
      * Depending on the connection autocommit mode, the update may be committed right away.
      *
      * @param DocumentInterface $document   The document entity to index in ES
-     * @param array             $metaParams Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
+     * @param array             $metaParams Additional params to pass with the metadata in the bulk request (_version, _routing, etc.)
      */
-    public function persist(DocumentInterface $document, array $metaParams = [])
+    public function persist(DocumentInterface $document, array $metaParams = []): void
     {
-        if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(new PrePersistEvent($document, $this->getConnection()), Events::PRE_PERSIST);
-        }
+        $this->eventDispatcher?->dispatch(new PrePersistEvent($document, $this->getConnection()), Events::PRE_PERSIST);
 
         $documentArray = $this->documentConverter->convertToArray($document);
         $this->persistRaw($documentArray, $metaParams);
@@ -581,7 +525,7 @@ class IndexManager
      * @param array $documentArray The document to index in ES
      * @param array $metaParams    Additional params to pass with the meta data in the bulk request (_version, _routing, etc.)
      */
-    public function persistRaw(array $documentArray, array $metaParams = [])
+    public function persistRaw(array $documentArray, array $metaParams = []): void
     {
         // Remove any read-only meta fields from array to be persisted
         unset($documentArray['_score']);
@@ -590,7 +534,7 @@ class IndexManager
             'index',
             $this->writeAlias,
             $documentArray,
-            $metaParams
+            $metaParams,
         );
 
         if ($this->getConnection()->isAutocommit()) {
@@ -601,7 +545,7 @@ class IndexManager
     /**
      * Created a new index with a unique name
      */
-    protected function createNewIndexWithUniqueName(string $suffix = null): string
+    protected function createNewIndexWithUniqueName(?string $suffix = null): string
     {
         $settings = $this->getIndexMapping();
         $newIndex = $this->getUniqueIndexName($suffix);
@@ -616,7 +560,7 @@ class IndexManager
      *
      * @param string $oldIndex This is not used here but passed in case an overriding class may need it
      */
-    protected function copyDataToNewIndex(string $newIndex, string $oldIndex)
+    protected function copyDataToNewIndex(string $newIndex, string $oldIndex): void
     {
         // Make sure we don't autocommit on every item in the bulk request
         $autocommit = $this->getConnection()->isAutocommit();
@@ -657,11 +601,11 @@ class IndexManager
     /**
      * Verify index and aliases state and try to recover if state is not ok
      *
-     * @param null $retryForException (internal) Set on recursive calls to the exception class thrown
+     * @param string|null $retryForException (internal) Set on recursive calls to the exception class thrown
      *
      * @return string The live (aka "hot") index name
      */
-    protected function getLiveIndexPreparedForRebuilding(bool $cancelExistingRebuild, $retryForException = null): string
+    protected function getLiveIndexPreparedForRebuilding(bool $cancelExistingRebuild, ?string $retryForException = null): string
     {
         try {
             // Make sure the index and both aliases are properly set
@@ -674,7 +618,7 @@ class IndexManager
             }
         } catch (IndexOrAliasNotFoundException $e) {
             // If this is a second attempt with the same exception, then we can't do anything more
-            if (\get_class($e) === $retryForException) {
+            if ($e::class === $retryForException) {
                 throw $e;
             }
 
@@ -682,11 +626,11 @@ class IndexManager
             $this->createIndex();
 
             // Now try again
-            $liveIndex = $this->getLiveIndexPreparedForRebuilding($cancelExistingRebuild, \get_class($e));
+            $liveIndex = $this->getLiveIndexPreparedForRebuilding($cancelExistingRebuild, $e::class);
         } catch (IndexRebuildingException $e) {
             // If we don't want to cancel the current rebuild or this is a second attempt with the same exception,
             // then we can't do anything more
-            if (!$cancelExistingRebuild || (\get_class($e) === $retryForException)) {
+            if (!$cancelExistingRebuild || ($e::class === $retryForException)) {
                 throw $e;
             }
 
@@ -696,7 +640,7 @@ class IndexManager
             }
 
             // Now try again
-            $liveIndex = $this->getLiveIndexPreparedForRebuilding($cancelExistingRebuild, \get_class($e));
+            $liveIndex = $this->getLiveIndexPreparedForRebuilding($cancelExistingRebuild, $e::class);
         }
 
         return $liveIndex;
@@ -705,7 +649,7 @@ class IndexManager
     /**
      * Get document metadata
      *
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getDocumentMetadata(): DocumentMetadata
     {
@@ -715,7 +659,7 @@ class IndexManager
     /**
      * Get FQN of document class managed by this index manager
      *
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getDocumentClass(): string
     {

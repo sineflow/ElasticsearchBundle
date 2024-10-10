@@ -9,10 +9,8 @@ class IndicesToDocumentClasses
 {
     /**
      * <physical_index_name|*> => <document_class>
-     *
-     * @var array
      */
-    private $documentClasses = [];
+    private array $documentClasses = [];
 
     /**
      * Set the document class for the physical index name
@@ -21,7 +19,7 @@ class IndicesToDocumentClasses
      *                                   `null` to be passed if there's only one index and we don't need the actual index name
      * @param string      $documentClass The document class in short notation
      */
-    public function set(?string $index, string $documentClass)
+    public function set(?string $index, string $documentClass): void
     {
         if (!$index) {
             if (!empty($this->documentClasses)) {
@@ -40,10 +38,8 @@ class IndicesToDocumentClasses
      * Get the document class for the physical index name
      *
      * @param string $index The name of the physical index in Elasticsearch
-     *
-     * @return string
      */
-    public function get($index)
+    public function get(string $index): string
     {
         if (isset($this->documentClasses[$index])) {
             return $this->documentClasses[$index];

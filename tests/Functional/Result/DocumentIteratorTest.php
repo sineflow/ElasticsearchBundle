@@ -74,7 +74,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
     /**
      * Iteration test.
      */
-    public function testIteration()
+    public function testIteration(): void
     {
         /** @var Repository $repo */
         $repo = $this->getIndexManager('bar')->getRepository();
@@ -116,7 +116,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
     /**
      * Manual iteration test.
      */
-    public function testManualIteration()
+    public function testManualIteration(): void
     {
         /** @var Repository $repo */
         $repo = $this->getIndexManager('bar')->getRepository();
@@ -146,7 +146,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
     /**
      * Tests if current() returns null when data doesn't exist.
      */
-    public function testCurrentWithEmptyIterator()
+    public function testCurrentWithEmptyIterator(): void
     {
         /** @var Repository $repo */
         $repo = $this->getIndexManager('customer')->getRepository();
@@ -159,7 +159,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
     /**
      * Make sure null is returned when field doesn't exist or is empty and ObjectIterator otherwise
      */
-    public function testNestedObjectIterator()
+    public function testNestedObjectIterator(): void
     {
         /** @var Repository $repo */
         $repo = $this->getIndexManager('bar')->getRepository();
@@ -189,7 +189,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
     /**
      * Test that aggregations are returned
      */
-    public function testAggregations()
+    public function testAggregations(): void
     {
         /** @var Repository $repo */
         $repo = $this->getIndexManager('bar')->getRepository();
@@ -214,7 +214,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
     /**
      * Test that suggestions are returned
      */
-    public function testSuggestions()
+    public function testSuggestions(): void
     {
         /** @var Repository $repo */
         $repo = $this->getIndexManager('bar')->getRepository();

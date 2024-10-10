@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Subscriber;
 
+use Psr\Cache\InvalidArgumentException;
 use Sineflow\ElasticsearchBundle\Event\Events;
 use Sineflow\ElasticsearchBundle\Event\PostCommitEvent;
 use Sineflow\ElasticsearchBundle\Event\PrePersistEvent;
@@ -16,25 +17,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class EntityTrackerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var array
-     */
-    private $entitiesData = [];
+    private array $entitiesData = [];
 
-    /**
-     * @var DocumentMetadataCollector
-     */
-    private $documentMetadataCollector;
-
-    public function __construct(DocumentMetadataCollector $documentMetadataCollector)
+    public function __construct(private readonly DocumentMetadataCollector $documentMetadataCollector)
     {
-        $this->documentMetadataCollector = $documentMetadataCollector;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             Events::PRE_PERSIST => 'onPrePersist',
@@ -43,13 +32,13 @@ class EntityTrackerSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @throws \ReflectionException
+     * @throws InvalidArgumentException
      */
-    public function onPrePersist(PrePersistEvent $prePersistEvent)
+    public function onPrePersist(PrePersistEvent $prePersistEvent): void
     {
         // Track entity only if it has an @Id field
         $propertiesMetadata = $this->documentMetadataCollector->getObjectPropertiesMetadata(
-            \get_class($prePersistEvent->getDocument())
+            $prePersistEvent->getDocument()::class
         );
         if (isset($propertiesMetadata['_id'])) {
             $bulkOperationIndex = $prePersistEvent->getBulkOperationIndex();
@@ -58,7 +47,7 @@ class EntityTrackerSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onPostCommit(PostCommitEvent $postCommitEvent)
+    public function onPostCommit(PostCommitEvent $postCommitEvent): void
     {
         // No need to do anything if there are no persisted entities for that connection
         if (empty($this->entitiesData[$postCommitEvent->getConnectionName()])) {

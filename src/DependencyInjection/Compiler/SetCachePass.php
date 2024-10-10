@@ -15,7 +15,7 @@ class SetCachePass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $customCachePool = $container->resolveEnvPlaceholders($container->getParameter('sfes.cache_pool'), true);
 

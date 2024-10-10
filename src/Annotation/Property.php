@@ -5,74 +5,67 @@ namespace Sineflow\ElasticsearchBundle\Annotation;
 use Sineflow\ElasticsearchBundle\Mapping\DumperInterface;
 
 /**
- * Annotation used to check mapping type during the parsing process.
+ * Annotation used for all properties of the document, apart from the special ones (like _id and _score)
  *
  * @Annotation
  *
  * @Target("PROPERTY")
  */
-final class Property implements DumperInterface
+final class Property implements PropertyAnnotationInterface, DumperInterface
 {
     public const LANGUAGE_PLACEHOLDER = '{lang}';
 
     public const DEFAULT_LANG_SUFFIX = 'default';
 
     /**
-     * @var string
-     *
      * @Required
      */
-    public $name;
+    public string $name;
 
     /**
-     * @var string
-     *
      * @Required
      */
-    public $type;
+    public string $type;
 
-    /**
-     * @var bool
-     */
-    public $multilanguage;
+    public bool $multilanguage = false;
 
     /**
      * Override mapping for the 'default' language field of multilanguage properties
-     *
-     * @var array
      */
-    public $multilanguageDefaultOptions;
+    public array $multilanguageDefaultOptions = [];
 
     /**
      * The object name must be defined, if type is 'object' or 'nested'
-     *
-     * @var string Object name to map.
      */
-    public $objectName;
+    public string $objectName;
 
     /**
      * Defines if related object will have one or multiple values.
      * If this value is set to true, ObjectIterator will be provided in the result, as opposed to an ObjectInterface object
-     *
-     * @var bool
      */
-    public $multiple;
+    public bool $multiple = false;
 
     /**
      * Settings directly passed to Elasticsearch client as-is
-     *
-     * @var array
      */
-    public $options;
+    public array $options = [];
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
 
     /**
      * Dumps property fields as array for index mapping
-     *
-     * @return array
      */
-    public function dump(array $settings = [])
+    public function dump(array $settings = []): array
     {
-        $result = (array) $this->options;
+        $result = $this->options;
 
         // Although it is completely valid syntax to explicitly define objects as such in the mapping definition, ES does not do that by default.
         // So, in order to ensure that the mapping for index creation would exactly match the mapping returned from the ES _mapping endpoint, we don't explicitly set 'object' data types
@@ -86,7 +79,7 @@ final class Property implements DumperInterface
             }
 
             // Recursively replace {lang} in any string option with the respective language
-            \array_walk_recursive($result, static function (&$value, $key, $settings) {
+            \array_walk_recursive($result, static function (&$value, $key, $settings): void {
                 if (\is_string($value) && \str_contains($value, self::LANGUAGE_PLACEHOLDER)) {
                     if (\in_array($key, ['analyzer', 'index_analyzer', 'search_analyzer'])) {
                         // Replace {lang} in any analyzers with the respective language

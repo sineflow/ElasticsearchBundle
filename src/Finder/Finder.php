@@ -2,6 +2,8 @@
 
 namespace Sineflow\ElasticsearchBundle\Finder;
 
+use Psr\Cache\InvalidArgumentException;
+use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\DTO\IndicesToDocumentClasses;
 use Sineflow\ElasticsearchBundle\Finder\Adapter\KnpPaginatorAdapter;
 use Sineflow\ElasticsearchBundle\Finder\Adapter\ScrollAdapter;
@@ -27,42 +29,21 @@ class Finder
 
     public const SCROLL_TIME = '1m';
 
-    /**
-     * @var DocumentMetadataCollector
-     */
-    private $documentMetadataCollector;
-
-    /**
-     * @var IndexManagerRegistry
-     */
-    private $indexManagerRegistry;
-
-    /**
-     * @var DocumentConverter
-     */
-    private $documentConverter;
-
-    /**
-     * Finder constructor.
-     */
     public function __construct(
-        DocumentMetadataCollector $documentMetadataCollector,
-        IndexManagerRegistry $indexManagerRegistry,
-        DocumentConverter $documentConverter
+        private readonly DocumentMetadataCollector $documentMetadataCollector,
+        private readonly IndexManagerRegistry $indexManagerRegistry,
+        private readonly DocumentConverter $documentConverter,
     ) {
-        $this->documentMetadataCollector = $documentMetadataCollector;
-        $this->indexManagerRegistry = $indexManagerRegistry;
-        $this->documentConverter = $documentConverter;
     }
 
     /**
      * Returns a document by identifier
      *
-     * @param string $documentClass FQN or short notation (i.e App:Product)
+     * @param string $documentClass FQN or short notation (i.e. App:Product)
      *
-     * @return mixed
+     * @throws InvalidArgumentException
      */
-    public function get(string $documentClass, string $id, int $resultType = self::RESULTS_OBJECT)
+    public function get(string $documentClass, string|int $id, int $resultType = self::RESULTS_OBJECT): DocumentInterface|array|null
     {
         $indexManagerName = $this->documentMetadataCollector->getDocumentClassIndex($documentClass);
 
@@ -80,16 +61,12 @@ class Finder
             return null;
         }
 
-        switch ($resultType & self::BITMASK_RESULT_TYPES) {
-            case self::RESULTS_OBJECT:
-                return $this->documentConverter->convertToDocument($rawDoc, $documentClass);
-            case self::RESULTS_ARRAY:
-                return $this->convertToNormalizedArray($rawDoc);
-            case self::RESULTS_RAW:
-                return $rawDoc;
-            default:
-                throw new \InvalidArgumentException('Wrong result type selected');
-        }
+        return match ($resultType & self::BITMASK_RESULT_TYPES) {
+            self::RESULTS_OBJECT => $this->documentConverter->convertToDocument($rawDoc, $documentClass),
+            self::RESULTS_ARRAY  => $this->convertToNormalizedArray($rawDoc),
+            self::RESULTS_RAW    => $rawDoc,
+            default              => throw new \InvalidArgumentException('Wrong result type selected'),
+        };
     }
 
     /**
@@ -99,11 +76,9 @@ class Finder
      * @param array    $searchBody              The body of the search request
      * @param int      $resultsType             Bitmask value determining how the results are returned
      * @param array    $additionalRequestParams Additional params to pass to the ES client's search() method
-     * @param int      $totalHits               (out param) The total hits of the query response
-     *
-     * @return mixed
+     * @param int|null $totalHits               (out param) The total hits of the query response
      */
-    public function find(array $documentClasses, array $searchBody, $resultsType = self::RESULTS_OBJECT, array $additionalRequestParams = [], &$totalHits = null)
+    public function find(array $documentClasses, array $searchBody, int $resultsType = self::RESULTS_OBJECT, array $additionalRequestParams = [], ?int &$totalHits = null): array|KnpPaginatorAdapter|ScrollAdapter|DocumentIterator
     {
         if (($resultsType & self::BITMASK_RESULT_ADAPTERS) === self::ADAPTER_KNP) {
             return new KnpPaginatorAdapter($this, $documentClasses, $searchBody, $resultsType, $additionalRequestParams);
@@ -151,10 +126,8 @@ class Finder
      * @param string   $scrollTime      The time to keep the scroll window open
      * @param int      $resultsType     Bitmask value determining how the results are returned
      * @param int|null $totalHits       (out param) The total hits of the query response
-     *
-     * @return mixed
      */
-    public function scroll(array $documentClasses, string &$scrollId, string $scrollTime = self::SCROLL_TIME, int $resultsType = self::RESULTS_OBJECT, int &$totalHits = null)
+    public function scroll(array $documentClasses, string &$scrollId, string $scrollTime = self::SCROLL_TIME, int $resultsType = self::RESULTS_OBJECT, ?int &$totalHits = null): array|bool|DocumentIterator
     {
         $client = $this->getConnection($documentClasses)->getClient();
 
@@ -232,10 +205,8 @@ class Finder
      * @param array    $raw             The raw results as received from Elasticsearch
      * @param int      $resultsType     Bitmask value determining how the results are returned
      * @param string[] $documentClasses The ES entity classes that may be returned from the search
-     *
-     * @return array|DocumentIterator
      */
-    public function parseResult(array $raw, int $resultsType, array $documentClasses = null)
+    public function parseResult(array $raw, int $resultsType, ?array $documentClasses = null): array|DocumentIterator
     {
         switch ($resultsType & self::BITMASK_RESULT_TYPES) {
             case self::RESULTS_OBJECT:

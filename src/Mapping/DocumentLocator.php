@@ -8,16 +8,10 @@ namespace Sineflow\ElasticsearchBundle\Mapping;
 class DocumentLocator
 {
     /**
-     * @var array All locations of Elasticsearch entities available in the application
-     */
-    private $entityLocations = [];
-
-    /**
      * @param array $entityLocations Parameter sfes.entity_locations
      */
-    public function __construct(array $entityLocations)
+    public function __construct(private array $entityLocations)
     {
-        $this->entityLocations = $entityLocations;
     }
 
     /**
@@ -46,7 +40,7 @@ class DocumentLocator
             if (!\array_key_exists($locationAlias, $this->entityLocations)) {
                 throw new \UnexpectedValueException(\sprintf('Location "%s" does not exist.', $locationAlias));
             }
-            $fullClassName = \rtrim($this->entityLocations[$locationAlias]['namespace'], '\\').'\\'.$className;
+            $fullClassName = \rtrim((string) $this->entityLocations[$locationAlias]['namespace'], '\\').'\\'.$className;
         }
 
         return $fullClassName;

@@ -8,6 +8,12 @@ use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadata;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentParser;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\ObjCategory;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\ObjTag;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Repository\ProductRepository;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Customer;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Provider\CustomerProvider;
 use Symfony\Contracts\Cache\CacheInterface;
 
 /**
@@ -17,337 +23,314 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
 {
     use AssertThrows;
 
-    /**
-     * @var DocumentMetadataCollector
-     */
-    private $metadataCollector;
-
-    /**
-     * @var array
-     */
-    private $indexManagers;
-
-    /**
-     * @var DocumentLocator
-     */
-    private $docLocator;
-
-    /**
-     * @var DocumentParser
-     */
-    private $docParser;
-
-    /**
-     * @var CacheInterface
-     */
-    private $cache;
-
-    /**
-     * @var CacheInterface
-     */
-    private $nullCache;
+    private DocumentMetadataCollector $metadataCollector;
+    private array $indexManagers;
+    private DocumentLocator $docLocator;
+    private DocumentParser $docParser;
+    private CacheInterface $cache;
+    private CacheInterface $nullCache;
 
     /**
      * @var array Expected metadata for customer index
      */
-    private $expectedCustomerMetadata = [
+    private array $expectedCustomerMetadata = [
         'properties' => [
-                'name' => [
-                        'type' => 'keyword',
-                    ],
-                'active' => [
-                        'type' => 'boolean',
-                    ],
+            'name' => [
+                'type' => 'keyword',
             ],
+            'active' => [
+                'type' => 'boolean',
+            ],
+        ],
         'fields' => [
-            ],
+        ],
         'propertiesMetadata' => [
-                'name' => [
-                        'propertyName'   => 'name',
-                        'type'           => 'keyword',
-                        'multilanguage'  => null,
-                        'propertyAccess' => 1,
-                    ],
-                'active' => [
-                        'propertyName'  => 'active',
-                        'type'          => 'boolean',
-                        'multilanguage' => null,
-                        'methods'       => [
-                                'getter' => 'isActive',
-                                'setter' => 'setActive',
-                            ],
-                        'propertyAccess' => 2,
-                    ],
-                '_id' => [
-                        'propertyName'   => 'id',
-                        'type'           => 'keyword',
-                        'propertyAccess' => 1,
-                    ],
-                '_score' => [
-                        'propertyName'   => 'score',
-                        'type'           => 'float',
-                        'propertyAccess' => 1,
-                    ],
+            'name' => [
+                'propertyName'   => 'name',
+                'type'           => 'keyword',
+                'multilanguage'  => null,
+                'propertyAccess' => 1,
             ],
+            'active' => [
+                'propertyName'  => 'active',
+                'type'          => 'boolean',
+                'multilanguage' => null,
+                'methods'       => [
+                    'getter' => 'isActive',
+                    'setter' => 'setActive',
+                ],
+                'propertyAccess' => 2,
+            ],
+            '_id' => [
+                'propertyName'   => 'id',
+                'type'           => 'keyword',
+                'propertyAccess' => 1,
+            ],
+            '_score' => [
+                'propertyName'   => 'score',
+                'type'           => 'float',
+                'propertyAccess' => 1,
+            ],
+        ],
         'repositoryClass' => null,
-        'providerClass'   => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\Fixture\\Acme\\FooBundle\\Document\\Provider\\CustomerProvider',
-        'className'       => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\Fixture\\Acme\\FooBundle\\Document\\Customer',
+        'providerClass'   => CustomerProvider::class,
+        'className'       => Customer::class,
     ];
 
-    private $expectedProductMetadata = [
+    private array $expectedProductMetadata = [
         'properties' => [
-                'title' => [
-                        'fields' => [
-                                'raw' => [
-                                        'type' => 'keyword',
-                                    ],
-                                'title' => [
-                                        'type' => 'text',
-                                    ],
-                            ],
+            'title' => [
+                'fields' => [
+                    'raw' => [
+                        'type' => 'keyword',
+                    ],
+                    'title' => [
                         'type' => 'text',
                     ],
-                'description' => [
-                        'type' => 'text',
+                ],
+                'type' => 'text',
+            ],
+            'description' => [
+                'type' => 'text',
+            ],
+            'category' => [
+                'properties' => [
+                    'id' => [
+                        'type' => 'integer',
                     ],
-                'category' => [
+                    'title' => [
+                        'type' => 'keyword',
+                    ],
+                    'tags' => [
                         'properties' => [
-                                'id' => [
-                                        'type' => 'integer',
-                                    ],
-                                'title' => [
-                                        'type' => 'keyword',
-                                    ],
-                                'tags' => [
-                                        'properties' => [
-                                                'tagname' => [
-                                                        'type' => 'text',
-                                                    ],
-                                            ],
-                                    ],
+                            'tagname' => [
+                                'type' => 'text',
                             ],
+                        ],
                     ],
-                'related_categories' => [
+                ],
+            ],
+            'related_categories' => [
+                'properties' => [
+                    'id' => [
+                        'type' => 'integer',
+                    ],
+                    'title' => [
+                        'type' => 'keyword',
+                    ],
+                    'tags' => [
                         'properties' => [
-                                'id' => [
-                                        'type' => 'integer',
-                                    ],
-                                'title' => [
-                                        'type' => 'keyword',
-                                    ],
-                                'tags' => [
-                                        'properties' => [
-                                                'tagname' => [
-                                                        'type' => 'text',
-                                                    ],
-                                            ],
-                                    ],
+                            'tagname' => [
+                                'type' => 'text',
                             ],
+                        ],
                     ],
-                'price' => [
-                        'type' => 'float',
-                    ],
-                'location' => [
-                        'type' => 'geo_point',
-                    ],
-                'limited' => [
-                        'type' => 'boolean',
-                    ],
-                'released' => [
-                        'type' => 'date',
-                    ],
-                'ml_info-en' => [
+                ],
+            ],
+            'price' => [
+                'type' => 'float',
+            ],
+            'location' => [
+                'type' => 'geo_point',
+            ],
+            'limited' => [
+                'type' => 'boolean',
+            ],
+            'released' => [
+                'type' => 'date',
+            ],
+            'ml_info-en' => [
+                'analyzer' => 'en_analyzer',
+                'fields'   => [
+                    'ngram' => [
+                        'type'     => 'text',
                         'analyzer' => 'en_analyzer',
-                        'fields'   => [
-                                'ngram' => [
-                                        'type'     => 'text',
-                                        'analyzer' => 'en_analyzer',
-                                    ],
-                            ],
-                        'type' => 'text',
                     ],
-                'ml_info-fr' => [
+                ],
+                'type' => 'text',
+            ],
+            'ml_info-fr' => [
+                'analyzer' => 'default_analyzer',
+                'fields'   => [
+                    'ngram' => [
+                        'type'     => 'text',
                         'analyzer' => 'default_analyzer',
-                        'fields'   => [
-                                'ngram' => [
-                                        'type'     => 'text',
-                                        'analyzer' => 'default_analyzer',
-                                    ],
-                            ],
-                        'type' => 'text',
                     ],
-                'ml_info-default' => [
-                        'type'         => 'keyword',
-                        'ignore_above' => 256,
-                    ],
-                'ml_more_info-en' => [
-                        'type' => 'text',
-                    ],
-                'ml_more_info-fr' => [
-                        'type' => 'text',
-                    ],
-                'ml_more_info-default' => [
-                        'type'  => 'text',
-                        'index' => false,
-                    ],
-                'pieces_count' => [
-                        'fields' => [
-                                'count' => [
-                                        'type'     => 'token_count',
-                                        'analyzer' => 'whitespace',
-                                    ],
-                            ],
-                        'type' => 'text',
-                    ],
+                ],
+                'type' => 'text',
             ],
+            'ml_info-default' => [
+                'type'         => 'keyword',
+                'ignore_above' => 256,
+            ],
+            'ml_more_info-en' => [
+                'type' => 'text',
+            ],
+            'ml_more_info-fr' => [
+                'type' => 'text',
+            ],
+            'ml_more_info-default' => [
+                'type'  => 'text',
+                'index' => false,
+            ],
+            'pieces_count' => [
+                'fields' => [
+                    'count' => [
+                        'type'     => 'token_count',
+                        'analyzer' => 'whitespace',
+                    ],
+                ],
+                'type' => 'text',
+            ],
+        ],
         'fields' => [
-                'dynamic' => 'strict',
-            ],
+            'dynamic' => 'strict',
+        ],
         'propertiesMetadata' => [
-                'title' => [
+            'title' => [
+                'propertyName'   => 'title',
+                'type'           => 'text',
+                'multilanguage'  => null,
+                'propertyAccess' => 1,
+            ],
+            'description' => [
+                'propertyName'   => 'description',
+                'type'           => 'text',
+                'multilanguage'  => null,
+                'propertyAccess' => 1,
+            ],
+            'category' => [
+                'propertyName'       => 'category',
+                'type'               => 'object',
+                'multilanguage'      => null,
+                'multiple'           => null,
+                'propertiesMetadata' => [
+                    'id' => [
+                        'propertyName'   => 'id',
+                        'type'           => 'integer',
+                        'multilanguage'  => null,
+                        'propertyAccess' => 1,
+                    ],
+                    'title' => [
                         'propertyName'   => 'title',
-                        'type'           => 'text',
+                        'type'           => 'keyword',
                         'multilanguage'  => null,
                         'propertyAccess' => 1,
                     ],
-                'description' => [
-                        'propertyName'   => 'description',
-                        'type'           => 'text',
-                        'multilanguage'  => null,
-                        'propertyAccess' => 1,
-                    ],
-                'category' => [
-                        'propertyName'       => 'category',
-                        'type'               => 'object',
-                        'multilanguage'      => null,
-                        'multiple'           => null,
-                        'propertiesMetadata' => [
-                                'id' => [
-                                        'propertyName'   => 'id',
-                                        'type'           => 'integer',
-                                        'multilanguage'  => null,
-                                        'propertyAccess' => 1,
-                                    ],
-                                'title' => [
-                                        'propertyName'   => 'title',
-                                        'type'           => 'keyword',
-                                        'multilanguage'  => null,
-                                        'propertyAccess' => 1,
-                                    ],
-                                'tags' => [
-                                        'propertyName'       => 'tags',
-                                        'type'               => 'object',
-                                        'multilanguage'      => null,
-                                        'multiple'           => true,
-                                        'propertiesMetadata' => [
-                                                'tagname' => [
-                                                        'propertyName'   => 'tagName',
-                                                        'type'           => 'text',
-                                                        'multilanguage'  => null,
-                                                        'propertyAccess' => 1,
-                                                    ],
-                                            ],
-                                        'className'      => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\Fixture\\Acme\\BarBundle\\Document\\ObjTag',
-                                        'propertyAccess' => 1,
-                                    ],
-                            ],
-                        'className'      => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\Fixture\\Acme\\BarBundle\\Document\\ObjCategory',
-                        'propertyAccess' => 1,
-                    ],
-                'related_categories' => [
-                        'propertyName'       => 'relatedCategories',
+                    'tags' => [
+                        'propertyName'       => 'tags',
                         'type'               => 'object',
                         'multilanguage'      => null,
                         'multiple'           => true,
                         'propertiesMetadata' => [
-                                'id' => [
-                                        'propertyName'   => 'id',
-                                        'type'           => 'integer',
-                                        'multilanguage'  => null,
-                                        'propertyAccess' => 1,
-                                    ],
-                                'title' => [
-                                        'propertyName'   => 'title',
-                                        'type'           => 'keyword',
-                                        'multilanguage'  => null,
-                                        'propertyAccess' => 1,
-                                    ],
-                                'tags' => [
-                                        'propertyName'       => 'tags',
-                                        'type'               => 'object',
-                                        'multilanguage'      => null,
-                                        'multiple'           => true,
-                                        'propertiesMetadata' => [
-                                                'tagname' => [
-                                                        'propertyName'   => 'tagName',
-                                                        'type'           => 'text',
-                                                        'multilanguage'  => null,
-                                                        'propertyAccess' => 1,
-                                                    ],
-                                            ],
-                                        'className'      => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\Fixture\\Acme\\BarBundle\\Document\\ObjTag',
-                                        'propertyAccess' => 1,
-                                    ],
+                            'tagname' => [
+                                'propertyName'   => 'tagName',
+                                'type'           => 'text',
+                                'multilanguage'  => null,
+                                'propertyAccess' => 1,
                             ],
-                        'className'      => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\Fixture\\Acme\\BarBundle\\Document\\ObjCategory',
+                        ],
+                        'className'      => ObjTag::class,
                         'propertyAccess' => 1,
                     ],
-                'price' => [
-                        'propertyName'   => 'price',
-                        'type'           => 'float',
-                        'multilanguage'  => null,
-                        'propertyAccess' => 1,
-                    ],
-                'location' => [
-                        'propertyName'   => 'location',
-                        'type'           => 'geo_point',
-                        'multilanguage'  => null,
-                        'propertyAccess' => 1,
-                    ],
-                'limited' => [
-                        'propertyName'   => 'limited',
-                        'type'           => 'boolean',
-                        'multilanguage'  => null,
-                        'propertyAccess' => 1,
-                    ],
-                'released' => [
-                        'propertyName'   => 'released',
-                        'type'           => 'date',
-                        'multilanguage'  => null,
-                        'propertyAccess' => 1,
-                    ],
-                'ml_info' => [
-                        'propertyName'   => 'mlInfo',
-                        'type'           => 'text',
-                        'multilanguage'  => true,
-                        'propertyAccess' => 1,
-                    ],
-                'ml_more_info' => [
-                        'propertyName'   => 'mlMoreInfo',
-                        'type'           => 'text',
-                        'multilanguage'  => true,
-                        'propertyAccess' => 1,
-                    ],
-                'pieces_count' => [
-                        'propertyName'   => 'tokenPiecesCount',
-                        'type'           => 'text',
-                        'multilanguage'  => null,
-                        'propertyAccess' => 1,
-                    ],
-                '_id' => [
-                        'propertyName'   => 'id',
-                        'type'           => 'keyword',
-                        'propertyAccess' => 1,
-                    ],
-                '_score' => [
-                        'propertyName'   => 'score',
-                        'type'           => 'float',
-                        'propertyAccess' => 1,
-                    ],
+                ],
+                'className'      => ObjCategory::class,
+                'propertyAccess' => 1,
             ],
-        'repositoryClass' => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\Fixture\\Acme\\BarBundle\\Document\\Repository\\ProductRepository',
+            'related_categories' => [
+                'propertyName'       => 'relatedCategories',
+                'type'               => 'object',
+                'multilanguage'      => null,
+                'multiple'           => true,
+                'propertiesMetadata' => [
+                    'id' => [
+                        'propertyName'   => 'id',
+                        'type'           => 'integer',
+                        'multilanguage'  => null,
+                        'propertyAccess' => 1,
+                    ],
+                    'title' => [
+                        'propertyName'   => 'title',
+                        'type'           => 'keyword',
+                        'multilanguage'  => null,
+                        'propertyAccess' => 1,
+                    ],
+                    'tags' => [
+                        'propertyName'       => 'tags',
+                        'type'               => 'object',
+                        'multilanguage'      => null,
+                        'multiple'           => true,
+                        'propertiesMetadata' => [
+                            'tagname' => [
+                                'propertyName'   => 'tagName',
+                                'type'           => 'text',
+                                'multilanguage'  => null,
+                                'propertyAccess' => 1,
+                            ],
+                        ],
+                        'className'      => ObjTag::class,
+                        'propertyAccess' => 1,
+                    ],
+                ],
+                'className'      => ObjCategory::class,
+                'propertyAccess' => 1,
+            ],
+            'price' => [
+                'propertyName'   => 'price',
+                'type'           => 'float',
+                'multilanguage'  => null,
+                'propertyAccess' => 1,
+            ],
+            'location' => [
+                'propertyName'   => 'location',
+                'type'           => 'geo_point',
+                'multilanguage'  => null,
+                'propertyAccess' => 1,
+            ],
+            'limited' => [
+                'propertyName'   => 'limited',
+                'type'           => 'boolean',
+                'multilanguage'  => null,
+                'propertyAccess' => 1,
+            ],
+            'released' => [
+                'propertyName'   => 'released',
+                'type'           => 'date',
+                'multilanguage'  => null,
+                'propertyAccess' => 1,
+            ],
+            'ml_info' => [
+                'propertyName'   => 'mlInfo',
+                'type'           => 'text',
+                'multilanguage'  => true,
+                'propertyAccess' => 1,
+            ],
+            'ml_more_info' => [
+                'propertyName'   => 'mlMoreInfo',
+                'type'           => 'text',
+                'multilanguage'  => true,
+                'propertyAccess' => 1,
+            ],
+            'pieces_count' => [
+                'propertyName'   => 'tokenPiecesCount',
+                'type'           => 'text',
+                'multilanguage'  => null,
+                'propertyAccess' => 1,
+            ],
+            '_id' => [
+                'propertyName'   => 'id',
+                'type'           => 'keyword',
+                'propertyAccess' => 1,
+            ],
+            '_score' => [
+                'propertyName'   => 'score',
+                'type'           => 'float',
+                'propertyAccess' => 1,
+            ],
+        ],
+        'repositoryClass' => ProductRepository::class,
         'providerClass'   => null,
-        'className'       => 'Sineflow\\ElasticsearchBundle\\Tests\\App\\Fixture\\Acme\\BarBundle\\Document\\Product',
+        'className'       => Product::class,
     ];
 
     protected function setUp(): void
@@ -361,10 +344,10 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
         $this->metadataCollector = new DocumentMetadataCollector($this->indexManagers, $this->docLocator, $this->docParser, $this->cache);
     }
 
-    public function testGetDocumentMetadata()
+    public function testGetDocumentMetadata(): void
     {
         $indexMetadataForAlias = $this->metadataCollector->getDocumentMetadata('AcmeFooBundle:Customer');
-        $indexMetadata = $this->metadataCollector->getDocumentMetadata('Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Customer');
+        $indexMetadata = $this->metadataCollector->getDocumentMetadata(Customer::class);
 
         // Make sure alias and FQN name work the same
         $this->assertEquals($indexMetadata, $indexMetadataForAlias);
@@ -379,21 +362,21 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
         );
     }
 
-    public function testMetadataWithCacheVsNoCache()
+    public function testMetadataWithCacheVsNoCache(): void
     {
         $metadataCollectorWithCacheDisabled = new DocumentMetadataCollector($this->indexManagers, $this->docLocator, $this->docParser, $this->nullCache);
         $this->assertEquals($this->metadataCollector->getDocumentMetadata('AcmeFooBundle:Customer'), $metadataCollectorWithCacheDisabled->getDocumentMetadata('AcmeFooBundle:Customer'));
         $this->assertEquals($this->metadataCollector->getObjectPropertiesMetadata('AcmeFooBundle:Customer'), $metadataCollectorWithCacheDisabled->getObjectPropertiesMetadata('AcmeFooBundle:Customer'));
     }
 
-    public function testGetObjectPropertiesMetadataWithValidClasses()
+    public function testGetObjectPropertiesMetadataWithValidClasses(): void
     {
         // Test document's metadata
         $metadata = $this->metadataCollector->getObjectPropertiesMetadata('AcmeFooBundle:Customer');
         $this->assertEquals($this->expectedCustomerMetadata['propertiesMetadata'], $metadata);
 
         // Test nested object's metadata
-        $metadata = $this->metadataCollector->getObjectPropertiesMetadata('Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\ObjTag');
+        $metadata = $this->metadataCollector->getObjectPropertiesMetadata(ObjTag::class);
         $this->assertEquals($this->expectedProductMetadata['propertiesMetadata']['category']['propertiesMetadata']['tags']['propertiesMetadata'], $metadata);
 
         // Test nested object in short notation metadata
@@ -401,25 +384,25 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
         $this->assertEquals($this->expectedProductMetadata['propertiesMetadata']['category']['propertiesMetadata']['tags']['propertiesMetadata'], $metadata);
 
         // Test non-existing bundle
-        $this->assertThrows(\UnexpectedValueException::class, function () {
+        $this->assertThrows(\UnexpectedValueException::class, function (): void {
             $this->metadataCollector->getObjectPropertiesMetadata('NonExistingBundle:Test');
         });
 
         // Test non-existing class
-        $this->assertThrows(\ReflectionException::class, function () {
+        $this->assertThrows(\ReflectionException::class, function (): void {
             $this->metadataCollector->getObjectPropertiesMetadata('Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\NonExisting');
         });
     }
 
-    public function testGetDocumentClassIndex()
+    public function testGetDocumentClassIndex(): void
     {
         $docClassIndex = $this->metadataCollector->getDocumentClassIndex('AcmeBarBundle:Product');
         $this->assertEquals('bar', $docClassIndex);
 
-        $docClassIndex = $this->metadataCollector->getDocumentClassIndex('Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product');
+        $docClassIndex = $this->metadataCollector->getDocumentClassIndex(Product::class);
         $this->assertEquals('bar', $docClassIndex);
 
-        $this->assertThrows(\InvalidArgumentException::class, function () {
+        $this->assertThrows(\InvalidArgumentException::class, function (): void {
             $this->metadataCollector->getDocumentClassIndex('Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\NonExistingClass');
         });
     }

@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Mapping;
 
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -22,44 +23,21 @@ class DocumentMetadataCollector implements WarmableInterface
     public const OBJECTS_CACHE_KEY_PREFIX = 'sfes.object_properties_metadata.';
 
     /**
-     * @var array
-     *
      * <document_class_FQN> => <index_manager_name>
      */
-    private $documentClassToIndexManagerNames = [];
-
-    /**
-     * @var array
-     */
-    private $indexManagers;
-
-    /**
-     * @var DocumentLocator
-     */
-    private $documentLocator;
-
-    /**
-     * @var DocumentParser
-     */
-    private $parser;
-
-    /**
-     * @var CacheInterface
-     */
-    private $cache;
+    private array $documentClassToIndexManagerNames = [];
 
     /**
      * @param array          $indexManagers The list of index managers defined
      * @param DocumentParser $parser        For reading entity annotations
      * @param CacheInterface $cache         For caching entity metadata
      */
-    public function __construct(array $indexManagers, DocumentLocator $documentLocator, DocumentParser $parser, CacheInterface $cache)
-    {
-        $this->indexManagers = $indexManagers;
-        $this->documentLocator = $documentLocator;
-        $this->parser = $parser;
-        $this->cache = $cache;
-
+    public function __construct(
+        private array $indexManagers,
+        private readonly DocumentLocator $documentLocator,
+        private readonly DocumentParser $parser,
+        private readonly CacheInterface $cache,
+    ) {
         // Build an internal array with map of document class to index manager name
         foreach ($this->indexManagers as $indexManagerName => $indexSettings) {
             $documentClass = $this->documentLocator->resolveClassName($indexSettings['class']);
@@ -75,13 +53,11 @@ class DocumentMetadataCollector implements WarmableInterface
     /**
      * Warms up the cache.
      *
-     * @param string $cacheDir
-     *
      * @return string[]
      *
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function warmUp($cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         // force cache generation
         foreach ($this->documentClassToIndexManagerNames as $documentClass => $indexManagerName) {
@@ -102,7 +78,7 @@ class DocumentMetadataCollector implements WarmableInterface
      * Returns metadata for the specified document class name.
      * Class can also be specified in short notation (e.g App:Product)
      *
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getDocumentMetadata(string $documentClass): DocumentMetadata
     {
@@ -110,16 +86,14 @@ class DocumentMetadataCollector implements WarmableInterface
 
         $cacheKey = self::DOCUMENTS_CACHE_KEY_PREFIX.\strtr($documentClass, '\\', '.');
 
-        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($documentClass) {
-            return $this->fetchDocumentMetadata($documentClass);
-        }, 0);
+        return $this->cache->get($cacheKey, fn (ItemInterface $item): DocumentMetadata => $this->fetchDocumentMetadata($documentClass), 0);
     }
 
     /**
      * Returns metadata for the specified object class name
      * Class can also be specified in short notation (e.g App:ObjCategory)
      *
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getObjectPropertiesMetadata(string $objectClass): array
     {
@@ -127,9 +101,7 @@ class DocumentMetadataCollector implements WarmableInterface
 
         $cacheKey = self::OBJECTS_CACHE_KEY_PREFIX.\strtr($objectClass, '\\', '.');
 
-        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($objectClass) {
-            return $this->parser->getPropertiesMetadata(new \ReflectionClass($objectClass));
-        }, 0);
+        return $this->cache->get($cacheKey, fn (ItemInterface $item): array => $this->parser->getPropertiesMetadata(new \ReflectionClass($objectClass)), 0);
     }
 
     /**

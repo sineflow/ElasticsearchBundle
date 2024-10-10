@@ -70,18 +70,20 @@ class RepositoryTest extends AbstractElasticsearchTestCase
         $this->getIndexManager('bar', !$this->hasCreatedIndexManager('bar'));
     }
 
-    public function testGetIndexManager()
+    public function testGetIndexManager(): void
     {
         $this->assertInstanceOf(IndexManager::class, $this->repository->getIndexManager());
     }
 
-    public function testGetById()
+    public function testGetById(): void
     {
         $doc = $this->repository->getById('doc1');
         $this->assertEquals('aaa', $doc->title);
+        $doc = $this->repository->getById(2);
+        $this->assertEquals('ccc', $doc->title);
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $searchBody = [
             'query' => [
@@ -94,7 +96,7 @@ class RepositoryTest extends AbstractElasticsearchTestCase
         $this->assertEquals(2, $this->repository->count($searchBody));
     }
 
-    public function testReindex()
+    public function testReindex(): void
     {
         $this->assertEquals(1, $this->repository->getById('doc1', Finder::RESULTS_RAW)['_version']);
 

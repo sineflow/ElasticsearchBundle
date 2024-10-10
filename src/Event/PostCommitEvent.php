@@ -10,34 +10,19 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class PostCommitEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $bulkResponse;
+    private readonly string $connectionName;
 
-    /**
-     * @var string
-     */
-    private $connectionName;
-
-    public function __construct(array $bulkResponse, ConnectionManager $connectionManager)
+    public function __construct(private readonly array $bulkResponse, ConnectionManager $connectionManager)
     {
-        $this->bulkResponse = $bulkResponse;
         $this->connectionName = $connectionManager->getConnectionName();
     }
 
-    /**
-     * @return array
-     */
-    public function getBulkResponse()
+    public function getBulkResponse(): array
     {
         return $this->bulkResponse;
     }
 
-    /**
-     * @return string
-     */
-    public function getConnectionName()
+    public function getConnectionName(): string
     {
         return $this->connectionName;
     }

@@ -15,17 +15,13 @@ abstract class AbstractProvider implements ProviderInterface
      *
      * @return \Generator<DocumentInterface|array>
      */
-    abstract public function getDocuments();
+    abstract public function getDocuments(): \Generator;
 
     /**
      * Build and return a document entity from the data source
      * The returned data can be either a document entity or an array ready for direct sending to ES
-     *
-     * @param int|string $id
-     *
-     * @return DocumentInterface|array
      */
-    abstract public function getDocument($id);
+    abstract public function getDocument(int|string $id): DocumentInterface|array|null;
 
     /**
      * Returns the number of Elasticsearch documents to persist in a single bulk request

@@ -13,7 +13,7 @@ class DocumentTest extends TestCase
     /**
      * Tests if values are dumped correctly
      */
-    public function testDump()
+    public function testDump(): void
     {
         $doc = new Document();
 

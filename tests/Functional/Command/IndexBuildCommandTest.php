@@ -13,7 +13,7 @@ class IndexBuildCommandTest extends AbstractCommandTestCase
     /**
      * Tests building index
      */
-    public function testExecute()
+    public function testExecute(): void
     {
         $manager = $this->getIndexManager('customer');
 

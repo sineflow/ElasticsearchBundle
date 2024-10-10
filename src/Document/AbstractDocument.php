@@ -10,16 +10,12 @@ use Sineflow\ElasticsearchBundle\Annotation as ES;
 abstract class AbstractDocument implements DocumentInterface
 {
     /**
-     * @var string
-     *
      * @ES\Id
      */
-    public $id;
+    public string|int|null $id = null;
 
     /**
-     * @var float
-     *
      * @ES\Score
      */
-    public $score;
+    public ?float $score = null;
 }

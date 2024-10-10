@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Document\Repository;
 
+use Psr\Cache\InvalidArgumentException;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadata;
@@ -13,29 +14,17 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 class RepositoryFactory
 {
     /**
-     * @var ServiceLocator
-     */
-    private $container;
-
-    /**
-     * @var Finder
-     */
-    private $finder;
-
-    /**
      * @var Repository[]
      */
-    private $knownRepositories = [];
+    private array $knownRepositories = [];
 
-    /**
-     * RepositoryFactory constructor.
-     */
-    public function __construct(ServiceLocator $container, Finder $finder)
+    public function __construct(private readonly ServiceLocator $container, private readonly Finder $finder)
     {
-        $this->container = $container;
-        $this->finder = $finder;
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function getRepository(IndexManager $indexManager): Repository
     {
         $documentMetadata = $indexManager->getDocumentMetadata();
@@ -68,19 +57,15 @@ class RepositoryFactory
 
         // if we already have the repository instance for this IndexManager from before, return it straight away
         $repositoryHash = $documentMetadata->getClassName().\spl_object_hash($indexManager);
-        if (isset($this->knownRepositories[$repositoryHash])) {
-            return $this->knownRepositories[$repositoryHash];
-        }
 
         // create a new Repository instance
-        return $this->knownRepositories[$repositoryHash] = $this->createRepository($indexManager, $documentMetadata);
+        return $this->knownRepositories[$repositoryHash] ?? ($this->knownRepositories[$repositoryHash] = $this->createRepository($indexManager, $documentMetadata));
     }
 
     private function createRepository(IndexManager $indexManager, DocumentMetadata $documentMetadata): Repository
     {
         $repositoryClass = $documentMetadata->getRepositoryClass() ?: Repository::class;
-        $repository = new $repositoryClass($indexManager, $this->finder);
 
-        return $repository;
+        return new $repositoryClass($indexManager, $this->finder);
     }
 }

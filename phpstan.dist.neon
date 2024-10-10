@@ -1,0 +1,18 @@
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-symfony/rules.neon
+#    - vendor/phpstan/phpstan-phpunit/extension.neon
+#    - vendor/phpstan/phpstan-phpunit/rules.neon
+
+parameters:
+    level: 5
+    tmpDir: .phpstan-cache
+    treatPhpDocTypesAsCertain: false
+
+    symfony:
+        containerXmlPath: var/cache/test/Sineflow_ElasticsearchBundle_Tests_App_AppKernelTestDebugContainer.xml
+
+    paths:
+        - config
+        - src
+        #- tests

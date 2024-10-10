@@ -3,6 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Profiler\Handler;
 
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\LogRecord;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -11,34 +12,18 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class CollectionHandler extends AbstractProcessingHandler
 {
-    /**
-     * @var array
-     */
-    private $records = [];
+    private array $records = [];
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var bool
-     */
-    private $backtraceEnabled;
-
-    /**
-     * @param bool $backtraceEnabled
-     */
-    public function __construct(RequestStack $requestStack, $backtraceEnabled = false)
+    public function __construct(private readonly RequestStack $requestStack, private readonly bool $backtraceEnabled = false)
     {
-        $this->requestStack = $requestStack;
-        $this->backtraceEnabled = $backtraceEnabled;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * NOTE: The array typehint of $record is only for BC with Monolog 2.*
      */
-    protected function write(array $record): void
+    protected function write(LogRecord|array $record): void
     {
         $request = $this->requestStack->getCurrentRequest();
         if ($request instanceof Request) {
@@ -57,9 +42,9 @@ class CollectionHandler extends AbstractProcessingHandler
     /**
      * Returns recorded data.
      *
-     * @return array
+     * @return LogRecord[]
      */
-    public function getRecords()
+    public function getRecords(): array
     {
         return $this->records;
     }
@@ -67,7 +52,7 @@ class CollectionHandler extends AbstractProcessingHandler
     /**
      * Clears recorded data.
      */
-    public function clearRecords()
+    public function clearRecords(): void
     {
         $this->records = [];
     }

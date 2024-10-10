@@ -167,7 +167,7 @@ class ElasticsearchExtensionTest extends TestCase
      *
      * @dataProvider getData
      */
-    public function testLoad($parameters, $expectedEntityLocations, $expectedConnections, $expectedManagers)
+    public function testLoad($parameters, $expectedEntityLocations, $expectedConnections, $expectedManagers): void
     {
         $container = new ContainerBuilder();
         \class_exists('testClass') ?: eval('class testClass {}');

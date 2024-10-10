@@ -13,7 +13,7 @@ class MLPropertyTest extends TestCase
     /**
      * Tests if value is set and returned correctly
      */
-    public function testGetSetValue()
+    public function testGetSetValue(): void
     {
         $mlProperty = new MLProperty();
         $mlProperty->setValue('test en', 'en');
@@ -47,7 +47,7 @@ class MLPropertyTest extends TestCase
     /**
      * Tests if returns all values
      */
-    public function testGetValues()
+    public function testGetValues(): void
     {
         $mlProperty = new MLProperty();
         $mlProperty->setValue('test default', 'default');
@@ -68,7 +68,7 @@ class MLPropertyTest extends TestCase
     /**
      * Tests if construct set all values properly
      */
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $mlProperty = new MLProperty([
             'default' => 'test default',

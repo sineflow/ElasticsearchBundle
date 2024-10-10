@@ -10,9 +10,6 @@ use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
-/**
- * AppKernel class.
- */
 class AppKernel extends Kernel
 {
     /**
@@ -20,7 +17,7 @@ class AppKernel extends Kernel
      *
      * @return array
      */
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         $bundles = [
             new FrameworkBundle(),
@@ -41,7 +38,7 @@ class AppKernel extends Kernel
      *
      * @throws \Exception
      */
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
     }

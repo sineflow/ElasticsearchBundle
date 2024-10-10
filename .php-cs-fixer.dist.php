@@ -17,6 +17,7 @@ return (new PhpCsFixer\Config())
         // Indent '=>' operator
         'binary_operator_spaces' => ['operators' => ['=>' => 'align_single_space_minimal']],
         // PSR12 imports order
-        'ordered_imports' => ['imports_order' => ['class', 'function', 'const']],
+        'ordered_imports'   => ['imports_order' => ['class', 'function', 'const']],
+        'phpdoc_separation' => true,
     ])
 ;

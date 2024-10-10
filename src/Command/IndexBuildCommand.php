@@ -16,22 +16,15 @@ class IndexBuildCommand extends Command
 {
     protected static $defaultName = 'sineflow:es:index:build';
 
-    /**
-     * @var IndexManagerRegistry
-     */
-    private $indexManagerRegistry;
-
-    public function __construct(IndexManagerRegistry $indexManagerRegistry)
+    public function __construct(private readonly IndexManagerRegistry $indexManagerRegistry)
     {
-        $this->indexManagerRegistry = $indexManagerRegistry;
-
         parent::__construct();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
@@ -59,7 +52,7 @@ class IndexBuildCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $indexManagerName = $input->getArgument('index');
         $indexManager = $this->indexManagerRegistry->get($indexManagerName);

@@ -61,7 +61,7 @@ class FinderTest extends AbstractElasticsearchTestCase
             // Delete the read-only index we manually created
             $im = $this->getIndexManager('customer', false);
             $im->getConnection()->getClient()->indices()->delete(['index' => $this->readOnlyIndexName]);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // Do nothing.
         }
     }
@@ -109,7 +109,7 @@ class FinderTest extends AbstractElasticsearchTestCase
         ]);
     }
 
-    public function testGetById()
+    public function testGetById(): void
     {
         /** @var Finder $finder */
         $finder = $this->getContainer()->get(Finder::class);
@@ -133,7 +133,7 @@ class FinderTest extends AbstractElasticsearchTestCase
         $this->assertInstanceOf(Product::class, $docAsObjectKNP);
     }
 
-    public function testGetByIdWhenHavingAnotherReadOnlyIndex()
+    public function testGetByIdWhenHavingAnotherReadOnlyIndex(): void
     {
         $finder = $this->getContainer()->get(Finder::class);
 
@@ -143,7 +143,7 @@ class FinderTest extends AbstractElasticsearchTestCase
         $this->assertInstanceOf(Customer::class, $doc);
     }
 
-    public function testFindInMultipleTypesAndIndices()
+    public function testFindInMultipleTypesAndIndices(): void
     {
         $finder = $this->getContainer()->get(Finder::class);
 
@@ -180,7 +180,7 @@ class FinderTest extends AbstractElasticsearchTestCase
         $this->assertArrayHasKey('hits', $res['hits']);
     }
 
-    public function testFindForKNPPaginator()
+    public function testFindForKNPPaginator(): void
     {
         $finder = $this->getContainer()->get(Finder::class);
 
@@ -202,7 +202,7 @@ class FinderTest extends AbstractElasticsearchTestCase
         $this->assertInstanceOf(KnpPaginatorAdapter::class, $res);
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $finder = $this->getContainer()->get(Finder::class);
 
@@ -218,7 +218,7 @@ class FinderTest extends AbstractElasticsearchTestCase
         $this->assertEquals(2, $finder->count(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer'], $searchBody));
     }
 
-    public function testGetTargetIndices()
+    public function testGetTargetIndices(): void
     {
         $finder = $this->getContainer()->get(Finder::class);
 

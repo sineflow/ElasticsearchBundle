@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Result;
 
+use Psr\Cache\InvalidArgumentException;
 use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\Document\MLProperty;
 use Sineflow\ElasticsearchBundle\Document\ObjectInterface;
@@ -15,22 +16,12 @@ use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 class DocumentConverter
 {
     /**
-     * @var DocumentMetadataCollector
-     */
-    protected $metadataCollector;
-
-    /**
-     * @var string
-     */
-    protected $languageSeparator;
-
-    /**
      * Constructor.
      */
-    public function __construct(DocumentMetadataCollector $metadataCollector, string $languageSeparator)
-    {
-        $this->metadataCollector = $metadataCollector;
-        $this->languageSeparator = $languageSeparator;
+    public function __construct(
+        protected DocumentMetadataCollector $metadataCollector,
+        protected string $languageSeparator,
+    ) {
     }
 
     /**
@@ -38,9 +29,9 @@ class DocumentConverter
      *
      * @param string $documentClass Document class FQN or in short notation (e.g. App:Product)
      *
-     * @return DocumentInterface
+     * @throws InvalidArgumentException
      */
-    public function convertToDocument(array $rawData, string $documentClass)
+    public function convertToDocument(array $rawData, string $documentClass): DocumentInterface
     {
         // Get document metadata
         $metadata = $this->metadataCollector->getDocumentMetadata($documentClass);
@@ -73,8 +64,8 @@ class DocumentConverter
             }
         }
 
-        /** @var DocumentInterface $document */
         $className = $metadata->getClassName();
+        /** @var DocumentInterface $document */
         $document = $this->assignArrayToObject($data, new $className(), $metadata->getPropertiesMetadata());
 
         return $document;
@@ -148,15 +139,14 @@ class DocumentConverter
     /**
      * Converts document or (nested) object to an array.
      *
-     * @param ObjectInterface $object             A document or a (nested) object
-     * @param array           $propertiesMetadata
+     * @param ObjectInterface $object A document or a (nested) object
      *
-     * @throws \ReflectionException
+     * @throws \ReflectionException|InvalidArgumentException
      */
-    public function convertToArray(ObjectInterface $object, $propertiesMetadata = []): array
+    public function convertToArray(ObjectInterface $object, array $propertiesMetadata = []): array
     {
         if (empty($propertiesMetadata)) {
-            $propertiesMetadata = $this->metadataCollector->getObjectPropertiesMetadata(\get_class($object));
+            $propertiesMetadata = $this->metadataCollector->getObjectPropertiesMetadata($object::class);
         }
 
         $array = [];
@@ -205,10 +195,10 @@ class DocumentConverter
      *
      * @throws \InvalidArgumentException
      */
-    private function checkObjectType(ObjectInterface $object, string $expectedClass)
+    private function checkObjectType(ObjectInterface $object, string $expectedClass): void
     {
-        if (\get_class($object) !== $expectedClass) {
-            throw new \InvalidArgumentException(\sprintf('Expected object of "%s", got "%s"', $expectedClass, \get_class($object)));
+        if ($object::class !== $expectedClass) {
+            throw new \InvalidArgumentException(\sprintf('Expected object of "%s", got "%s"', $expectedClass, $object::class));
         }
     }
 }

@@ -65,10 +65,10 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
     {
         parent::tearDown();
 
-        foreach ($this->indexManagers as $name => $indexManager) {
+        foreach ($this->indexManagers as $indexManager) {
             try {
                 $indexManager->dropIndex();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // Do nothing.
             }
         }

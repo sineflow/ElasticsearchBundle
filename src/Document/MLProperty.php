@@ -14,7 +14,7 @@ class MLProperty
     /**
      * @var string[]
      */
-    private $values = [];
+    private array $values = [];
 
     public function __construct(array $values = [])
     {
@@ -25,11 +25,8 @@ class MLProperty
 
     /**
      * Set value of property in given language
-     *
-     * @param string $value
-     * @param string $language
      */
-    public function setValue($value, $language)
+    public function setValue(?string $value, string $language): void
     {
         $this->values[$language] = $value;
     }
@@ -37,12 +34,9 @@ class MLProperty
     /**
      * Gets value based on passed language, falling back on the default language, by default
      *
-     * @param string $language
-     * @param bool   $fallbackToDefault If set and value for the requested language is missing, return default language value
-     *
-     * @return string|null
+     * @param bool $fallbackToDefault If set and value for the requested language is missing, return default language value
      */
-    public function getValue($language, $fallbackToDefault = true)
+    public function getValue(string $language, bool $fallbackToDefault = true): ?string
     {
         if (isset($this->values[$language])) {
             return $this->values[$language];
@@ -56,7 +50,7 @@ class MLProperty
     /**
      * @return string[]
      */
-    public function getValues()
+    public function getValues(): array
     {
         return $this->values;
     }

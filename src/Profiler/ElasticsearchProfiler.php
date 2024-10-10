@@ -3,6 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Profiler;
 
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Sineflow\ElasticsearchBundle\Profiler\Handler\CollectionHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,12 +19,12 @@ class ElasticsearchProfiler extends DataCollector
     /**
      * @var Logger[] Watched loggers.
      */
-    private $loggers = [];
+    private array $loggers = [];
 
     /**
      * @var array Registered index managers.
      */
-    private $indexManagers = [];
+    private array $indexManagers = [];
 
     /**
      * ElasticsearchProfiler constructor.
@@ -36,7 +37,7 @@ class ElasticsearchProfiler extends DataCollector
     /**
      * Adds logger to look for collector handler.
      */
-    public function addLogger(Logger $logger)
+    public function addLogger(Logger $logger): void
     {
         $this->loggers[] = $logger;
     }
@@ -44,7 +45,7 @@ class ElasticsearchProfiler extends DataCollector
     /**
      * {@inheritDoc}
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         $this->data['indexManagers'] = $this->cloneVar($this->indexManagers);
 
@@ -61,7 +62,7 @@ class ElasticsearchProfiler extends DataCollector
     /**
      * {@inheritDoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->data = [
             'indexManagers' => [], // The list of all defined index managers
@@ -106,7 +107,7 @@ class ElasticsearchProfiler extends DataCollector
         return $this->data['indexManagers']->getValue();
     }
 
-    public function setIndexManagers(array $indexManagers)
+    public function setIndexManagers(array $indexManagers): void
     {
         foreach ($indexManagers as $name => $manager) {
             $this->indexManagers[$name] = \sprintf('sfes.index.%s', $name);
@@ -123,8 +124,13 @@ class ElasticsearchProfiler extends DataCollector
 
     /**
      * Handles passed records.
+     *
+     * NOTE: Monolog 3.* passes an array of LogRecord objects instead of arrays,
+     * but for now we keep compatibility with 2.* as well
+     *
+     * @param LogRecord[]|array[] $records
      */
-    private function handleRecords(array $records)
+    private function handleRecords(array $records): void
     {
         $this->data['queryCount'] += \count($records) / 2;
         $queryBody = '';
@@ -136,14 +142,17 @@ class ElasticsearchProfiler extends DataCollector
                 $route = !empty($record['extra']['route']) ? $record['extra']['route'] : self::UNDEFINED_ROUTE;
                 $this->addQuery($route, $record, $queryBody, $rawRequest);
             } else {
-                $position = \strpos($record['message'], ' -d');
-                $queryBody = false !== $position ? \substr($record['message'], $position + 3) : '';
+                $position = \strpos((string) $record['message'], ' -d');
+                $queryBody = false !== $position ? \substr((string) $record['message'], $position + 3) : '';
                 $rawRequest = $record['message'];
             }
         }
     }
 
-    private function addQuery(string $route, array $record, string $queryBody, string $rawRequest)
+    /**
+     * NOTE: The array typehint of $record is only for BC with Monolog 2.*
+     */
+    private function addQuery(string $route, LogRecord|array $record, string $queryBody, string $rawRequest): void
     {
         $parsedUrl = \array_merge(
             [
@@ -153,7 +162,7 @@ class ElasticsearchProfiler extends DataCollector
                 'path'   => '',
                 'query'  => '',
             ],
-            \parse_url($record['context']['uri'])
+            \parse_url((string) $record['context']['uri'])
         );
         $senseRequest = $record['context']['method'].' '.$parsedUrl['path'];
         if ($parsedUrl['query']) {
@@ -170,7 +179,7 @@ class ElasticsearchProfiler extends DataCollector
                 'senseRequest' => $senseRequest,
                 'backtrace'    => $record['extra']['backtrace'],
             ],
-            \array_diff_key(\parse_url($record['context']['uri']), \array_flip(['query']))
+            \array_diff_key(\parse_url((string) $record['context']['uri']), \array_flip(['query']))
         );
     }
 }

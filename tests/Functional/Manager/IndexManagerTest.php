@@ -60,7 +60,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         ];
     }
 
-    public function testGetReadAliasAndGetWriteAlias()
+    public function testGetReadAliasAndGetWriteAlias(): void
     {
         $imWithAliases = $this->getIndexManager('customer', false);
         $this->assertEquals('sineflow-esb-test-customer', $imWithAliases->getReadAlias());
@@ -71,7 +71,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('sineflow-esb-test-bar', $imWithoutAliases->getWriteAlias());
     }
 
-    public function testCreateIndexWithAliases()
+    public function testCreateIndexWithAliases(): void
     {
         $imWithAliases = $this->getIndexManager('customer', false);
         $imWithAliases->createIndex();
@@ -83,7 +83,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertCount(1, $indicesPointedByAliases, 'Read and Write aliases must point to one and the same index');
     }
 
-    public function testCreateIndexWithoutAliases()
+    public function testCreateIndexWithoutAliases(): void
     {
         $imWithoutAliases = $this->getIndexManager('bar', false);
         $imWithoutAliases->createIndex();
@@ -93,7 +93,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertCount(0, \current($index)['aliases'], 'Index should not have any aliases pointing to it');
     }
 
-    public function testDropIndexWithAliases()
+    public function testDropIndexWithAliases(): void
     {
         $imWithAliases = $this->getIndexManager('customer', false);
         $imWithAliases->createIndex();
@@ -101,7 +101,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         // Simulate state during rebuilding when write alias points to more than 1 index
         try {
             $imWithAliases->getConnection()->getClient()->indices()->delete(['index' => 'sineflow-esb-test-temp']);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
         $imWithAliases->getConnection()->getClient()->indices()->create(['index' => 'sineflow-esb-test-temp']);
         $setAliasParams = [
@@ -124,7 +124,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases->getConnection()->getClient()->indices()->getAlias(['name' => 'sineflow-esb-test-customer,sineflow-esb-test-customer_write']);
     }
 
-    public function testGetLiveIndexWhenNoIndexExists()
+    public function testGetLiveIndexWhenNoIndexExists(): void
     {
         /** @var IndexManager $imWithAliases */
         $imWithAliases = $this->getIndexManager('customer', false);
@@ -133,7 +133,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases->getLiveIndex();
     }
 
-    public function testGetLiveIndex()
+    public function testGetLiveIndex(): void
     {
         /** @var IndexManager $imWithAliases */
         $imWithAliases = $this->getIndexManager('customer');
@@ -146,14 +146,14 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('sineflow-esb-test-bar', $liveIndex);
     }
 
-    public function testRebuildIndexWithoutAliases()
+    public function testRebuildIndexWithoutAliases(): void
     {
         $imWithoutAliases = $this->getIndexManager('bar');
         $this->expectException(Exception::class);
         $imWithoutAliases->rebuildIndex();
     }
 
-    public function testRebuildIndexWithoutDeletingOld()
+    public function testRebuildIndexWithoutDeletingOld(): void
     {
         $imWithAliases = $this->getIndexManager('customer');
         $liveIndex = $imWithAliases->getLiveIndex();
@@ -167,7 +167,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertNotEquals($liveIndex, $newLiveIndex);
     }
 
-    public function testRebuildIndexAndDeleteOld()
+    public function testRebuildIndexAndDeleteOld(): void
     {
         $imWithAliases = $this->getIndexManager('customer');
         $liveIndex = $imWithAliases->getLiveIndex();
@@ -180,7 +180,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertNotEquals($liveIndex, $newLiveIndex);
     }
 
-    public function testPersistForManagerWithoutAliasesWithoutAutocommit()
+    public function testPersistForManagerWithoutAliasesWithoutAutocommit(): void
     {
         $imWithoutAliases = $this->getIndexManager('bar');
         $imWithoutAliases->getConnection()->setAutocommit(false);
@@ -206,7 +206,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertNull($doc->title, 'Null property value was not persisted');
     }
 
-    public function testPersistForManagerWithAliasesWithoutAutocommit()
+    public function testPersistForManagerWithAliasesWithoutAutocommit(): void
     {
         $imWithAliases = $this->getIndexManager('customer');
         $imWithAliases->getConnection()->setAutocommit(false);
@@ -246,7 +246,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $imWithAliases->getConnection()->getClient()->indices()->delete(['index' => 'sineflow-esb-test-temp']);
     }
 
-    public function testPersistRawWithAutocommit()
+    public function testPersistRawWithAutocommit(): void
     {
         $imWithAliases = $this->getIndexManager('customer');
         $imWithAliases->getConnection()->setAutocommit(true);
@@ -261,7 +261,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('Jane', $doc->name);
     }
 
-    public function testPersistStrictMappingDocRetrievedById()
+    public function testPersistStrictMappingDocRetrievedById(): void
     {
         $im = $this->getIndexManager('bar');
         $im->getConnection()->setAutocommit(true);
@@ -275,7 +275,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('NewName', $doc->title);
     }
 
-    public function testUpdateWithCorrectParams()
+    public function testUpdateWithCorrectParams(): void
     {
         $imWithAliases = $this->getIndexManager('customer');
         $imWithAliases->getConnection()->setAutocommit(true);
@@ -288,7 +288,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('Alicia', $doc->name);
     }
 
-    public function testUpdateInexistingDoc()
+    public function testUpdateInexistingDoc(): void
     {
         $imWithAliases = $this->getIndexManager('customer');
         $imWithAliases->getConnection()->setAutocommit(true);
@@ -299,7 +299,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         ]);
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $imWithAliases = $this->getIndexManager('customer');
         $imWithAliases->getConnection()->setAutocommit(true);
@@ -334,7 +334,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         ]);
     }
 
-    public function testReindexWithElasticsearchSelfProvider()
+    public function testReindexWithElasticsearchSelfProvider(): void
     {
         $im = $this->getIndexManager('backup');
         $im->getConnection()->setAutocommit(false);
@@ -354,21 +354,21 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('log entry', $rawDoc['_source']['entry']);
     }
 
-    public function testGetDataProvider()
+    public function testGetDataProvider(): void
     {
         $imWithAliases = $this->getIndexManager('customer', false);
         $dataProvider = $imWithAliases->getDataProvider();
         $this->assertInstanceOf(CustomerProvider::class, $dataProvider);
     }
 
-    public function testGetDataProviderWhenNoCustomProviderIsSet()
+    public function testGetDataProviderWhenNoCustomProviderIsSet(): void
     {
         $imWithAliases = $this->getIndexManager('bar', false);
         $dataProvider = $imWithAliases->getDataProvider();
         $this->assertInstanceOf(ElasticsearchProvider::class, $dataProvider);
     }
 
-    public function testGetRepository()
+    public function testGetRepository(): void
     {
         $imWithoutAliases = $this->getIndexManager('bar', false);
         $this->assertInstanceOf(ProductRepository::class, $imWithoutAliases->getRepository());
@@ -377,7 +377,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertInstanceOf(Repository::class, $imWithAliases->getRepository());
     }
 
-    public function testGetters()
+    public function testGetters(): void
     {
         $imWithAliases = $this->getIndexManager('customer', false);
         $imWithoutAliases = $this->getIndexManager('bar', false);
@@ -391,7 +391,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('bar', $imWithoutAliases->getManagerName());
     }
 
-    public function testGetDocumentMetadata()
+    public function testGetDocumentMetadata(): void
     {
         /** @var IndexManager $imWithAliases */
         $imWithAliases = $this->getIndexManager('customer', false);

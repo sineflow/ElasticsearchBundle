@@ -53,7 +53,7 @@ class ProviderRegistryTest extends AbstractElasticsearchTestCase
         $this->providerRegistry = $this->getContainer()->get(ProviderRegistry::class);
     }
 
-    public function testGetProviderForEntity()
+    public function testGetProviderForEntity(): void
     {
         $this->assertInstanceOf(CustomerProvider::class, $this->providerRegistry->getCustomProviderForEntity(Customer::class));
         $this->assertInstanceOf(OrderProvider::class, $this->providerRegistry->getCustomProviderForEntity(Order::class));
@@ -61,7 +61,7 @@ class ProviderRegistryTest extends AbstractElasticsearchTestCase
         $this->assertNull($this->providerRegistry->getCustomProviderForEntity(Product::class));
     }
 
-    public function testGetSelfProviderForEntity()
+    public function testGetSelfProviderForEntity(): void
     {
         // Get the index managers to trigger the creation of the mock indices
         $this->getIndexManager('customer');

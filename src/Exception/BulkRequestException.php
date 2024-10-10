@@ -7,31 +7,21 @@ namespace Sineflow\ElasticsearchBundle\Exception;
  */
 class BulkRequestException extends Exception
 {
-    private $bulkResponseItems = [];
+    private array $bulkResponseItems = [];
+    private array $bulkRequest = [];
 
-    private $bulkRequest = [];
-
-    /**
-     * @param string $bulkResponseItems
-     */
-    public function setBulkResponseItems($bulkResponseItems, array $bulkRequest)
+    public function setBulkResponseItems(array $bulkResponseItems, array $bulkRequest): void
     {
         $this->bulkResponseItems = $bulkResponseItems;
         $this->bulkRequest = $bulkRequest;
     }
 
-    /**
-     * @return array
-     */
-    public function getBulkResponseItems()
+    public function getBulkResponseItems(): array
     {
         return $this->bulkResponseItems;
     }
 
-    /**
-     * @return array
-     */
-    public function getBulkRequest()
+    public function getBulkRequest(): array
     {
         return $this->bulkRequest;
     }

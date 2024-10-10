@@ -16,7 +16,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
 {
     use ArraySubsetAsserts;
 
-    private $fullDocArray = [
+    private array $fullDocArray = [
         '_id'      => 'doc1',
         'title'    => 'Foo Product',
         'category' => [
@@ -33,9 +33,9 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         'nonexisting' => 'should be skipped',
     ];
 
-    public function testAssignArrayToObjectWithNestedSingleValueInsteadOfArray()
+    public function testAssignArrayToObjectWithNestedSingleValueInsteadOfArray(): void
     {
-        $converter = $this->getContainer()->get('Sineflow\ElasticsearchBundle\Result\DocumentConverter');
+        $converter = $this->getContainer()->get(DocumentConverter::class);
         $metadataCollector = $this->getContainer()->get(DocumentMetadataCollector::class);
 
         // Raw doc with a single object value where an array of objects is expected according to metadata def
@@ -58,7 +58,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         $this->assertEquals($category->id, 123);
     }
 
-    public function testAssignArrayToObjectWithNestedSingleValueArrayInsteadOfSingleValue()
+    public function testAssignArrayToObjectWithNestedSingleValueArrayInsteadOfSingleValue(): void
     {
         $converter = $this->getContainer()->get(DocumentConverter::class);
         $metadataCollector = $this->getContainer()->get(DocumentMetadataCollector::class);
@@ -84,7 +84,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         $this->assertEquals($result->category->id, 123);
     }
 
-    public function testAssignArrayToObjectWithNestedMultiValueArrayInsteadOfSingleValue()
+    public function testAssignArrayToObjectWithNestedMultiValueArrayInsteadOfSingleValue(): void
     {
         $converter = $this->getContainer()->get(DocumentConverter::class);
         $metadataCollector = $this->getContainer()->get(DocumentMetadataCollector::class);
@@ -143,7 +143,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         return $product;
     }
 
-    public function testAssignArrayToObjectWithEmptyFields()
+    public function testAssignArrayToObjectWithEmptyFields(): void
     {
         $converter = $this->getContainer()->get(DocumentConverter::class);
         $metadataCollector = $this->getContainer()->get(DocumentMetadataCollector::class);
@@ -162,7 +162,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         $this->assertNull($product->mlInfo);
     }
 
-    public function testAssignArrayToObjectWithEmptyMultipleNestedField()
+    public function testAssignArrayToObjectWithEmptyMultipleNestedField(): void
     {
         $converter = $this->getContainer()->get(DocumentConverter::class);
         $metadataCollector = $this->getContainer()->get(DocumentMetadataCollector::class);
@@ -184,9 +184,9 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
     /**
      * @depends testAssignArrayToObjectWithAllFieldsCorrectlySet
      */
-    public function testConvertToArray(Product $product)
+    public function testConvertToArray(Product $product): void
     {
-        $converter = $this->getContainer()->get('Sineflow\ElasticsearchBundle\Result\DocumentConverter');
+        $converter = $this->getContainer()->get(DocumentConverter::class);
 
         $arr = $converter->convertToArray($product);
 
@@ -194,7 +194,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         $this->assertArraySubset($arr, $this->fullDocArray);
     }
 
-    public function testConvertToDocumentWithSource()
+    public function testConvertToDocumentWithSource(): void
     {
         $rawFromEs = [
             '_index'   => 'sineflow-esb-test-bar',
@@ -202,21 +202,21 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
             '_version' => 1,
             'found'    => true,
             '_source'  => [
-                    'title'    => 'Foo Product',
-                    'category' => [
-                            'title' => 'Bar',
-                        ],
-                        'related_categories' => [
-                        0 => [
-                                'title' => 'Acme',
-                            ],
-                        ],
-                        'ml_info-en' => 'info in English',
-                        'ml_info-fr' => 'info in French',
+                'title'    => 'Foo Product',
+                'category' => [
+                    'title' => 'Bar',
                 ],
+                'related_categories' => [
+                    0 => [
+                        'title' => 'Acme',
+                    ],
+                ],
+                'ml_info-en' => 'info in English',
+                'ml_info-fr' => 'info in French',
+            ],
         ];
 
-        $converter = $this->getContainer()->get('Sineflow\ElasticsearchBundle\Result\DocumentConverter');
+        $converter = $this->getContainer()->get(DocumentConverter::class);
 
         /** @var Product $product */
         $product = $converter->convertToDocument($rawFromEs, 'AcmeBarBundle:Product');
@@ -230,27 +230,27 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         $this->assertEquals('info in French', $product->mlInfo->getValue('fr'));
     }
 
-    public function testConvertToDocumentWithFields()
+    public function testConvertToDocumentWithFields(): void
     {
         $rawFromEs = [
             '_index' => 'sineflow-esb-test-bar',
             '_id'    => 'doc1',
             '_score' => 1,
             'fields' => [
-                    'title' => [
-                            0 => 'Foo Product',
-                        ],
-                        'related_categories.title' => [
-                            0 => 'Acme',
-                            1 => 'Bar',
-                        ],
-                        'category.title' => [
-                            0 => 'Bar',
-                        ],
-                        'ml_info-en' => [
-                            0 => 'info in English',
-                        ],
+                'title' => [
+                    0 => 'Foo Product',
                 ],
+                'related_categories.title' => [
+                    0 => 'Acme',
+                    1 => 'Bar',
+                ],
+                'category.title' => [
+                    0 => 'Bar',
+                ],
+                'ml_info-en' => [
+                    0 => 'info in English',
+                ],
+            ],
         ];
 
         /** @var DocumentConverter $converter */

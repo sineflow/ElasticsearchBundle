@@ -7,7 +7,7 @@ use Sineflow\ElasticsearchBundle\Mapping\Caser;
 
 class CaserTest extends TestCase
 {
-    public function providerForCamel()
+    public function providerForCamel(): array
     {
         $out = [
             ['foo_bar', 'fooBar'],
@@ -20,7 +20,7 @@ class CaserTest extends TestCase
         return $out;
     }
 
-    public function providerForSnake()
+    public function providerForSnake(): array
     {
         $out = [
             ['FooBar', 'foo_bar'],
@@ -38,7 +38,7 @@ class CaserTest extends TestCase
      *
      * @dataProvider providerForCamel
      */
-    public function testCamel($input, $expected)
+    public function testCamel($input, $expected): void
     {
         $this->assertEquals($expected, Caser::camel($input));
     }
@@ -49,7 +49,7 @@ class CaserTest extends TestCase
      *
      * @dataProvider providerForSnake
      */
-    public function testSnake($input, $expected)
+    public function testSnake($input, $expected): void
     {
         $this->assertEquals($expected, Caser::snake($input));
     }

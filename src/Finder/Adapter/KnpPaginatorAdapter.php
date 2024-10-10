@@ -3,74 +3,33 @@
 namespace Sineflow\ElasticsearchBundle\Finder\Adapter;
 
 use Sineflow\ElasticsearchBundle\Finder\Finder;
+use Sineflow\ElasticsearchBundle\Result\DocumentIterator;
 
-/**
- * Class KnpPaginatorAdapter
- */
 class KnpPaginatorAdapter
 {
-    /**
-     * @var Finder
-     */
-    private $finder;
+    private readonly int $resultsType;
+    private int $totalHits = 0;
 
-    /**
-     * @var array
-     */
-    private $documentClasses;
-
-    /**
-     * @var array
-     */
-    private $searchBody;
-
-    /**
-     * @var int
-     */
-    private $resultsType;
-
-    /**
-     * @var array
-     */
-    private $additionalRequestParams;
-
-    /**
-     * @var int
-     */
-    private $totalHits;
-
-    /**
-     * @param int $resultsType
-     */
-    public function __construct(Finder $finder, array $documentClasses, array $searchBody, $resultsType, array $additionalRequestParams = [])
-    {
-        $this->finder = $finder;
-        $this->documentClasses = $documentClasses;
-        $this->searchBody = $searchBody;
+    public function __construct(
+        private readonly Finder $finder,
+        private readonly array $documentClasses,
+        private readonly array $searchBody,
+        int $resultsType,
+        private readonly array $additionalRequestParams = [],
+    ) {
         // Make sure we don't get an adapter returned again when we recursively execute the paginated find()
         $this->resultsType = $resultsType & ~Finder::BITMASK_RESULT_ADAPTERS;
-        $this->additionalRequestParams = $additionalRequestParams;
     }
 
-    /**
-     * @return int
-     */
-    public function getResultsType()
+    public function getResultsType(): int
     {
         return $this->resultsType;
     }
 
     /**
      * Return results for this page only
-     *
-     * @param int    $offset
-     * @param int    $count
-     * @param string $sortField
-     * @param string $sortDir
-     *
-     * @return mixed
      */
-    public function getResults($offset, $count, $sortField = null, $sortDir = 'asc')
+    public function getResults(int $offset, int $count, ?string $sortField = null, string $sortDir = 'asc'): array|DocumentIterator
     {
         $searchBody = $this->searchBody;
         $searchBody['from'] = $offset;
@@ -93,10 +52,8 @@ class KnpPaginatorAdapter
 
     /**
      * Return the total hits from the executed getResults()
-     *
-     * @return int
      */
-    public function getTotalHits()
+    public function getTotalHits(): int
     {
         return $this->totalHits;
     }

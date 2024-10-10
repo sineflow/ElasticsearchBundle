@@ -8,6 +8,7 @@ use Sineflow\ElasticsearchBundle\Annotation\DocObject;
 use Sineflow\ElasticsearchBundle\Annotation\Document;
 use Sineflow\ElasticsearchBundle\Annotation\Id;
 use Sineflow\ElasticsearchBundle\Annotation\Property;
+use Sineflow\ElasticsearchBundle\Annotation\PropertyAnnotationInterface;
 use Sineflow\ElasticsearchBundle\Annotation\Score;
 
 /**
@@ -16,39 +17,19 @@ use Sineflow\ElasticsearchBundle\Annotation\Score;
 class DocumentParser
 {
     /**
-     * @var Reader Used to read document annotations.
+     * Contains gathered objects which later adds to documents.
      */
-    private $reader;
+    private array $objects = [];
 
     /**
-     * @var DocumentLocator Used to find documents.
+     * Document properties metadata.
      */
-    private $documentLocator;
+    private array $propertiesMetadata = [];
 
     /**
-     * @var array Contains gathered objects which later adds to documents.
+     * Local cache for document properties.
      */
-    private $objects = [];
-
-    /**
-     * @var array Document properties metadata.
-     */
-    private $propertiesMetadata = [];
-
-    /**
-     * @var array Local cache for document properties.
-     */
-    private $properties = [];
-
-    /**
-     * @var string
-     */
-    private $languageSeparator;
-
-    /**
-     * @var array
-     */
-    private $languages;
+    private array $properties = [];
 
     /**
      * @param Reader          $reader            Used for reading annotations
@@ -56,23 +37,21 @@ class DocumentParser
      * @param string          $languageSeparator String separating the language code from the ML property name
      * @param array           $languages         List of all supported languages
      */
-    public function __construct(Reader $reader, DocumentLocator $documentLocator, string $languageSeparator, array $languages = [])
-    {
-        $this->reader = $reader;
-        $this->documentLocator = $documentLocator;
-        $this->languageSeparator = $languageSeparator;
-        $this->languages = $languages;
+    public function __construct(
+        private readonly Reader $reader,
+        private readonly DocumentLocator $documentLocator,
+        private readonly string $languageSeparator,
+        private readonly array $languages = [],
+    ) {
         $this->registerAnnotations();
     }
 
     /**
      * Parses document by used annotations and returns mapping for elasticsearch with some extra metadata.
      *
-     * @return array
-     *
      * @throws \ReflectionException
      */
-    public function parse(\ReflectionClass $documentReflection, array $indexAnalyzers)
+    public function parse(\ReflectionClass $documentReflection, array $indexAnalyzers): array
     {
         $metadata = [];
 
@@ -98,11 +77,9 @@ class DocumentParser
     /**
      * Finds properties' metadata for every property used in document or inner/nested object
      *
-     * @return array
-     *
      * @throws \ReflectionException
      */
-    public function getPropertiesMetadata(\ReflectionClass $documentReflection)
+    public function getPropertiesMetadata(\ReflectionClass $documentReflection): array
     {
         $className = $documentReflection->getName();
         if (\array_key_exists($className, $this->propertiesMetadata)) {
@@ -113,6 +90,7 @@ class DocumentParser
 
         /** @var \ReflectionProperty $property */
         foreach ($this->getDocumentPropertiesReflection($documentReflection) as $propertyName => $property) {
+            /** @var PropertyAnnotationInterface $propertyAnnotation */
             $propertyAnnotation = $this->getPropertyAnnotationData($property);
             $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, Id::class);
             $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, Score::class);
@@ -122,7 +100,7 @@ class DocumentParser
                 continue;
             }
 
-            switch (\get_class($propertyAnnotation)) {
+            switch ($propertyAnnotation::class) {
                 case Property::class:
                     $propertyMetadata[$propertyAnnotation->name] = [
                         'propertyName'  => $propertyName,
@@ -148,20 +126,16 @@ class DocumentParser
                     break;
 
                 case Id::class:
-                    $propertyAnnotation->name = '_id';
-                    $propertyAnnotation->type = 'keyword';
-                    $propertyMetadata[$propertyAnnotation->name] = [
+                    $propertyMetadata[$propertyAnnotation->getName()] = [
                         'propertyName' => $propertyName,
-                        'type'         => $propertyAnnotation->type,
+                        'type'         => $propertyAnnotation->getType(),
                     ];
                     break;
 
                 case Score::class:
-                    $propertyAnnotation->name = '_score';
-                    $propertyAnnotation->type = 'float';
-                    $propertyMetadata[$propertyAnnotation->name] = [
+                    $propertyMetadata[$propertyAnnotation->getName()] = [
                         'propertyName' => $propertyName,
-                        'type'         => $propertyAnnotation->type,
+                        'type'         => $propertyAnnotation->getType(),
                     ];
                     break;
             }
@@ -174,11 +148,11 @@ class DocumentParser
                 $setterMethod = 'set'.$camelCaseName;
                 $getterMethod = 'get'.$camelCaseName;
                 // Allow issers as getters for boolean properties
-                if ('boolean' === $propertyAnnotation->type && !$documentReflection->hasMethod($getterMethod)) {
+                if ('boolean' === $propertyAnnotation->getType() && !$documentReflection->hasMethod($getterMethod)) {
                     $getterMethod = 'is'.$camelCaseName;
                 }
                 if ($documentReflection->hasMethod($getterMethod) && $documentReflection->hasMethod($setterMethod)) {
-                    $propertyMetadata[$propertyAnnotation->name]['methods'] = [
+                    $propertyMetadata[$propertyAnnotation->getName()]['methods'] = [
                         'getter' => $getterMethod,
                         'setter' => $setterMethod,
                     ];
@@ -188,7 +162,7 @@ class DocumentParser
                 }
             }
 
-            $propertyMetadata[$propertyAnnotation->name]['propertyAccess'] = $propertyAccess;
+            $propertyMetadata[$propertyAnnotation->getName()]['propertyAccess'] = $propertyAccess;
         }
 
         $this->propertiesMetadata[$className] = $propertyMetadata;
@@ -198,23 +172,16 @@ class DocumentParser
 
     /**
      * Returns property annotation data from reader.
-     *
-     * @param \ReflectionProperty $property
-     *
-     * @return Property|null
      */
-    private function getPropertyAnnotationData($property)
+    private function getPropertyAnnotationData(\ReflectionProperty $property): ?Property
     {
-        /** @var Property $annotation */
-        $annotation = $this->reader->getPropertyAnnotation($property, Property::class);
-
-        return $annotation;
+        return $this->reader->getPropertyAnnotation($property, Property::class);
     }
 
     /**
      * Registers annotations to registry so that it could be used by reader.
      */
-    private function registerAnnotations()
+    private function registerAnnotations(): void
     {
         $annotations = [
             'Document',
@@ -231,10 +198,8 @@ class DocumentParser
 
     /**
      * Returns all defined properties including private from parents.
-     *
-     * @return array
      */
-    private function getDocumentPropertiesReflection(\ReflectionClass $documentReflection)
+    private function getDocumentPropertiesReflection(\ReflectionClass $documentReflection): array
     {
         if (\in_array($documentReflection->getName(), $this->properties)) {
             return $this->properties[$documentReflection->getName()];
@@ -266,15 +231,13 @@ class DocumentParser
      *
      * @param \ReflectionClass $documentReflection Class to read properties from.
      *
-     * @return array
-     *
      * @throws \ReflectionException
      */
-    private function getProperties(\ReflectionClass $documentReflection, array $indexAnalyzers = [])
+    private function getProperties(\ReflectionClass $documentReflection, array $indexAnalyzers = []): array
     {
         $mapping = [];
         /** @var \ReflectionProperty $property */
-        foreach ($this->getDocumentPropertiesReflection($documentReflection) as $propertyName => $property) {
+        foreach ($this->getDocumentPropertiesReflection($documentReflection) as $property) {
             $propertyAnnotation = $this->getPropertyAnnotationData($property);
 
             if (empty($propertyAnnotation)) {
@@ -283,23 +246,23 @@ class DocumentParser
 
             // If it is a multi-language property
             if (true === $propertyAnnotation->multilanguage) {
-                if (!\in_array($propertyAnnotation->type, ['string', 'keyword', 'text'])) {
-                    throw new \InvalidArgumentException(\sprintf('"%s" property in %s is declared as multilanguage, so can only be of type "keyword", "text" or the deprecated "string"', $propertyAnnotation->name, $documentReflection->getName()));
+                if (!\in_array($propertyAnnotation->getType(), ['string', 'keyword', 'text'])) {
+                    throw new \InvalidArgumentException(\sprintf('"%s" property in %s is declared as multilanguage, so can only be of type "keyword", "text" or the deprecated "string"', $propertyAnnotation->getName(), $documentReflection->getName()));
                 }
                 if (!$this->languages) {
                     throw new \InvalidArgumentException('There must be at least one language specified in sineflow_elasticsearch.languages in order to use multilanguage properties');
                 }
                 foreach ($this->languages as $language) {
-                    $mapping[$propertyAnnotation->name.$this->languageSeparator.$language] = $this->getPropertyMapping($propertyAnnotation, $language, $indexAnalyzers);
+                    $mapping[$propertyAnnotation->getName().$this->languageSeparator.$language] = $this->getPropertyMapping($propertyAnnotation, $language, $indexAnalyzers);
                 }
                 // TODO: The application should decide whether it wants to use a default field at all and set its mapping on a global base
                 // The custom mapping from the application should be set here, using perhaps some kind of decorator
-                $mapping[$propertyAnnotation->name.$this->languageSeparator.Property::DEFAULT_LANG_SUFFIX] = $propertyAnnotation->multilanguageDefaultOptions ?: [
+                $mapping[$propertyAnnotation->getName().$this->languageSeparator.Property::DEFAULT_LANG_SUFFIX] = $propertyAnnotation->multilanguageDefaultOptions ?: [
                     'type'         => 'keyword',
                     'ignore_above' => 256,
                 ];
             } else {
-                $mapping[$propertyAnnotation->name] = $this->getPropertyMapping($propertyAnnotation, null, $indexAnalyzers);
+                $mapping[$propertyAnnotation->getName()] = $this->getPropertyMapping($propertyAnnotation, null, $indexAnalyzers);
             }
         }
 
@@ -307,11 +270,9 @@ class DocumentParser
     }
 
     /**
-     * @return array
-     *
      * @throws \ReflectionException
      */
-    private function getPropertyMapping(Property $propertyAnnotation, string $language = null, array $indexAnalyzers = [])
+    private function getPropertyMapping(Property $propertyAnnotation, ?string $language = null, array $indexAnalyzers = []): array
     {
         $propertyMapping = $propertyAnnotation->dump([
             'language'       => $language,
@@ -331,13 +292,9 @@ class DocumentParser
      *
      * Loads from cache if it's already loaded.
      *
-     * @param string $objectName
-     *
-     * @return array
-     *
      * @throws \ReflectionException
      */
-    private function getObjectMapping($objectName, array $indexAnalyzers = [])
+    private function getObjectMapping(string $objectName, array $indexAnalyzers = []): ?array
     {
         $className = $this->documentLocator->resolveClassName($objectName);
 
@@ -353,13 +310,9 @@ class DocumentParser
     /**
      * Returns relation mapping by its reflection.
      *
-     * @param array $indexAnalyzers
-     *
-     * @return array|null
-     *
      * @throws \ReflectionException
      */
-    private function getRelationMapping(\ReflectionClass $documentReflection, $indexAnalyzers = [])
+    private function getRelationMapping(\ReflectionClass $documentReflection, array $indexAnalyzers = []): ?array
     {
         if ($this->reader->getClassAnnotation($documentReflection, DocObject::class)) {
             return ['properties' => $this->getProperties($documentReflection, $indexAnalyzers)];

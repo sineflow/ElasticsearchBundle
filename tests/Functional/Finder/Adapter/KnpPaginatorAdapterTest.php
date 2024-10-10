@@ -71,7 +71,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         ];
     }
 
-    public function testPagination()
+    public function testPagination(): void
     {
         /** @var Repository $repo */
         $repo = $this->getIndexManager('bar')->getRepository();
@@ -121,7 +121,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $this->assertIsArray($pagination->getCustomParameter('suggestions'));
     }
 
-    public function testPaginationSorting()
+    public function testPaginationSorting(): void
     {
         // Create an empty request to get around a bug in KNP paginator that assumes there is always a Request
         // https://github.com/KnpLabs/knp-components/issues/239
@@ -149,7 +149,7 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         $this->assertEquals(54321, $pagination->current()->id);
     }
 
-    public function testInvalidResultsType()
+    public function testInvalidResultsType(): void
     {
         /** @var Repository $repo */
         $repo = $this->getIndexManager('bar')->getRepository();

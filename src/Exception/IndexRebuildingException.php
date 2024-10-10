@@ -7,26 +7,19 @@ namespace Sineflow\ElasticsearchBundle\Exception;
  */
 class IndexRebuildingException extends Exception
 {
-    /**
-     * @var array
-     */
-    private $indicesInProgress;
+    private readonly array $indicesInProgress;
 
     /**
      * @param array $indicesInProgress The physical indices, which are in the process of being built
-     * @param int   $code
      */
-    public function __construct(array $indicesInProgress, $code = 0, Exception $previous = null)
+    public function __construct(array $indicesInProgress, int $code = 0, ?Exception $previous = null)
     {
         parent::__construct(\sprintf('Index is currently being rebuilt as "%s"', \implode(', ', $indicesInProgress)), $code, $previous);
 
         $this->indicesInProgress = $indicesInProgress;
     }
 
-    /**
-     * @return array
-     */
-    public function getIndices()
+    public function getIndices(): array
     {
         return $this->indicesInProgress;
     }

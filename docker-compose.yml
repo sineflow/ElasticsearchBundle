@@ -1,6 +1,6 @@
 services:
   elasticsearch:
-    image: "docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION:-7.17.13}"
+    image: "docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION:-8.15.2}"
     container_name: sfes_elasticsearch
     environment:
       - discovery.type=single-node

@@ -12,23 +12,10 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 class IndexManagerRegistry
 {
-    /**
-     * @var DocumentMetadataCollector
-     */
-    private $metadataCollector;
-
-    /**
-     * @var ServiceLocator
-     */
-    private $serviceLocator;
-
-    /**
-     * Constructor
-     */
-    public function __construct(DocumentMetadataCollector $metadataCollector, ServiceLocator $serviceLocator)
-    {
-        $this->metadataCollector = $metadataCollector;
-        $this->serviceLocator = $serviceLocator;
+    public function __construct(
+        private readonly DocumentMetadataCollector $metadataCollector,
+        private readonly ServiceLocator $serviceLocator,
+    ) {
     }
 
     /**
@@ -58,7 +45,7 @@ class IndexManagerRegistry
      */
     public function getByEntity(DocumentInterface $entity): IndexManager
     {
-        return $this->getByClass(get_class($entity));
+        return $this->getByClass($entity::class);
     }
 
     /**

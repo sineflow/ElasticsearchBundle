@@ -21,7 +21,8 @@ Installation instructions and documentation of the bundle can be found [here](do
 ## Version matrix
 
 | ElasticsearchBundle | Elasticsearch  | Symfony     | PHP         |
-| ------------------- | -------------- | ----------- | ----------- |
+|---------------------| -------------- |-------------|-------------|
+| ~7.2                | >= 7.0         | 5.0+        | 8.1+        |
 | ~7.0                | >= 7.0         | 4.4+ / 5.0+ | 7.3+ / 8.0+ |
 | ~6.2                | >= 6.2, < 7.0  | 3.4+ / 4.0+ | 7.3+        |
 | ~6.1.0              | >= 6.0, < 6.2  |             |             |

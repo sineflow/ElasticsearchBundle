@@ -13,28 +13,19 @@ use Sineflow\ElasticsearchBundle\Mapping\DumperInterface;
  */
 final class Document implements DumperInterface
 {
-    /**
-     * @var string
-     */
-    public $repositoryClass;
-
-    /**
-     * @var string
-     */
-    public $providerClass;
+    public ?string $repositoryClass = null;
+    public ?string $providerClass = null;
 
     /**
      * Settings directly passed to Elasticsearch client as-is
-     *
-     * @var array
      */
-    public $options;
+    public array $options = [];
 
     /**
      * {@inheritdoc}
      */
-    public function dump(array $settings = [])
+    public function dump(array $settings = []): array
     {
-        return (array) $this->options;
+        return $this->options;
     }
 }

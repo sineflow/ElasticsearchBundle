@@ -4,61 +4,35 @@ namespace Sineflow\ElasticsearchBundle\Finder\Adapter;
 
 use Sineflow\ElasticsearchBundle\Exception\Exception;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
+use Sineflow\ElasticsearchBundle\Result\DocumentIterator;
 
 /**
  * Class ScrollAdapter
  */
 class ScrollAdapter
 {
-    /**
-     * @var Finder
-     */
-    private $finder;
-
-    /**
-     * @var array
-     */
-    private $documentClasses;
-
-    /**
-     * @var string
-     */
-    private $scrollId;
-
-    /**
-     * @var string
-     */
-    private $scrollTime;
-
-    /**
-     * @var int
-     */
-    private $resultsType;
-
-    /**
-     * @var int|null
-     */
-    private $totalHits;
+    private string $scrollId;
+    private readonly int $resultsType;
+    private ?int $totalHits = null;
 
     /**
      * When a search query with a 'scroll' param is performed, not only the scroll id is returned, but also the
      * initial batch of results, so we'll cache those here to be returned on the first call to getNextScrollResults()
-     *
-     * @var array
      */
-    private $initialResults;
+    private ?array $initialResults;
 
     /**
-     * @param array  $rawResults  The raw results from the initial search call
-     * @param int    $resultsType
-     * @param string $scrollTime  The value for the 'scroll' param in a scroll request
+     * @param array  $rawResults The raw results from the initial search call
+     * @param string $scrollTime The value for the 'scroll' param in a scroll request
      */
-    public function __construct(Finder $finder, array $documentClasses, $rawResults, $resultsType, $scrollTime)
-    {
-        $this->finder = $finder;
-        $this->documentClasses = $documentClasses;
+    public function __construct(
+        private readonly Finder $finder,
+        private readonly array $documentClasses,
+        array $rawResults,
+        int $resultsType,
+        private readonly string $scrollTime,
+    ) {
         $this->scrollId = $rawResults['_scroll_id'];
-        $this->scrollTime = $scrollTime;
         $this->initialResults = $rawResults;
         // Make sure we don't get an adapter returned again when we recursively execute the paginated find()
         $this->resultsType = $resultsType & ~Finder::BITMASK_RESULT_ADAPTERS;
@@ -66,10 +40,8 @@ class ScrollAdapter
 
     /**
      * Returns results from a scroll request
-     *
-     * @return mixed
      */
-    public function getNextScrollResults()
+    public function getNextScrollResults(): array|DocumentIterator|false
     {
         // If this is the first call to this method, return the cached initial results from the search request
         if (null !== $this->initialResults) {

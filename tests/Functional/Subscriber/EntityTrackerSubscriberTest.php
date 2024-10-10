@@ -18,7 +18,7 @@ class EntityTrackerSubscriberTest extends AbstractElasticsearchTestCase
      * Test executing 2 separate bulk requests, where there's an error in the first one,
      * to make sure the subscriber properly keeps track of bulk request items.
      */
-    public function testTwoBulkRequestWithErrorInFirstOne()
+    public function testTwoBulkRequestWithErrorInFirstOne(): void
     {
         $imWithAliases = $this->getIndexManager('customer');
         $customer1 = new Customer();
@@ -30,7 +30,7 @@ class EntityTrackerSubscriberTest extends AbstractElasticsearchTestCase
         $imWithAliases->persist($customer2);
         try {
             $imWithAliases->getConnection()->commit();
-        } catch (BulkRequestException $e) {
+        } catch (BulkRequestException) {
             // ignore the exception
         }
 
@@ -61,7 +61,7 @@ class EntityTrackerSubscriberTest extends AbstractElasticsearchTestCase
     /**
      * Test populating persisted entity ids after a bulk operation with several operations
      */
-    public function testPersistWithSeveralBulkOps()
+    public function testPersistWithSeveralBulkOps(): void
     {
         $converter = $this->getContainer()->get(DocumentConverter::class);
 

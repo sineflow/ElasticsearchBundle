@@ -8,3 +8,5 @@
 .phpunit.result.cache
 .idea
 /.php-cs-fixer.cache
+/.phpstan-cache
+/.rector-cache/

@@ -15,14 +15,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class KnpPaginateQuerySubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    public function __construct(RequestStack $requestStack)
+    public function __construct(private readonly RequestStack $requestStack)
     {
-        $this->requestStack = $requestStack;
     }
 
     /**
@@ -84,7 +78,7 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
         if ($request instanceof Request) {
             $sortField = isset($event->options['sortFieldParameterName']) ? $request->get($event->options['sortFieldParameterName']) : null;
             $sortDirection = isset($event->options['sortDirectionParameterName']) ? $request->get($event->options['sortDirectionParameterName'], 'desc') : null;
-            $sortDirection = 'desc' === \strtolower($sortDirection) ? 'desc' : 'asc';
+            $sortDirection = 'desc' === \strtolower((string) $sortDirection) ? 'desc' : 'asc';
 
             if ($sortField) {
                 // check if the requested sort field is in the sort whitelist
