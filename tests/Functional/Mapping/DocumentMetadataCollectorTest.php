@@ -14,6 +14,7 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Produ
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Repository\ProductRepository;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Customer;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Provider\CustomerProvider;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Enum\CustomerTypeEnum;
 use Symfony\Contracts\Cache\CacheInterface;
 
 /**
@@ -41,6 +42,9 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
             'active' => [
                 'type' => 'boolean',
             ],
+            'customer_type' => [
+                'type' => 'integer',
+            ],
         ],
         'fields' => [
         ],
@@ -48,14 +52,18 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
             'name' => [
                 'propertyName'   => 'name',
                 'type'           => 'keyword',
-                'multilanguage'  => null,
+                'propertyAccess' => 1,
+            ],
+            'customer_type' => [
+                'propertyName'   => 'customerType',
+                'type'           => 'integer',
+                'enumType'       => CustomerTypeEnum::class,
                 'propertyAccess' => 1,
             ],
             'active' => [
-                'propertyName'  => 'active',
-                'type'          => 'boolean',
-                'multilanguage' => null,
-                'methods'       => [
+                'propertyName' => 'active',
+                'type'         => 'boolean',
+                'methods'      => [
                     'getter' => 'isActive',
                     'setter' => 'setActive',
                 ],
@@ -190,43 +198,36 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
             'title' => [
                 'propertyName'   => 'title',
                 'type'           => 'text',
-                'multilanguage'  => null,
                 'propertyAccess' => 1,
             ],
             'description' => [
                 'propertyName'   => 'description',
                 'type'           => 'text',
-                'multilanguage'  => null,
                 'propertyAccess' => 1,
             ],
             'category' => [
                 'propertyName'       => 'category',
                 'type'               => 'object',
-                'multilanguage'      => null,
                 'multiple'           => null,
                 'propertiesMetadata' => [
                     'id' => [
                         'propertyName'   => 'id',
                         'type'           => 'integer',
-                        'multilanguage'  => null,
                         'propertyAccess' => 1,
                     ],
                     'title' => [
                         'propertyName'   => 'title',
                         'type'           => 'keyword',
-                        'multilanguage'  => null,
                         'propertyAccess' => 1,
                     ],
                     'tags' => [
                         'propertyName'       => 'tags',
                         'type'               => 'object',
-                        'multilanguage'      => null,
                         'multiple'           => true,
                         'propertiesMetadata' => [
                             'tagname' => [
                                 'propertyName'   => 'tagName',
                                 'type'           => 'text',
-                                'multilanguage'  => null,
                                 'propertyAccess' => 1,
                             ],
                         ],
@@ -240,31 +241,26 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
             'related_categories' => [
                 'propertyName'       => 'relatedCategories',
                 'type'               => 'object',
-                'multilanguage'      => null,
                 'multiple'           => true,
                 'propertiesMetadata' => [
                     'id' => [
                         'propertyName'   => 'id',
                         'type'           => 'integer',
-                        'multilanguage'  => null,
                         'propertyAccess' => 1,
                     ],
                     'title' => [
                         'propertyName'   => 'title',
                         'type'           => 'keyword',
-                        'multilanguage'  => null,
                         'propertyAccess' => 1,
                     ],
                     'tags' => [
                         'propertyName'       => 'tags',
                         'type'               => 'object',
-                        'multilanguage'      => null,
                         'multiple'           => true,
                         'propertiesMetadata' => [
                             'tagname' => [
                                 'propertyName'   => 'tagName',
                                 'type'           => 'text',
-                                'multilanguage'  => null,
                                 'propertyAccess' => 1,
                             ],
                         ],
@@ -278,25 +274,21 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
             'price' => [
                 'propertyName'   => 'price',
                 'type'           => 'float',
-                'multilanguage'  => null,
                 'propertyAccess' => 1,
             ],
             'location' => [
                 'propertyName'   => 'location',
                 'type'           => 'geo_point',
-                'multilanguage'  => null,
                 'propertyAccess' => 1,
             ],
             'limited' => [
                 'propertyName'   => 'limited',
                 'type'           => 'boolean',
-                'multilanguage'  => null,
                 'propertyAccess' => 1,
             ],
             'released' => [
                 'propertyName'   => 'released',
                 'type'           => 'date',
-                'multilanguage'  => null,
                 'propertyAccess' => 1,
             ],
             'ml_info' => [
@@ -314,7 +306,6 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
             'pieces_count' => [
                 'propertyName'   => 'tokenPiecesCount',
                 'type'           => 'text',
-                'multilanguage'  => null,
                 'propertyAccess' => 1,
             ],
             '_id' => [

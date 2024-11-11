@@ -5,6 +5,7 @@ namespace Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document
 use Sineflow\ElasticsearchBundle\Annotation as ES;
 use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Provider\CustomerProvider;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Enum\CustomerTypeEnum;
 
 /**
  * @ES\Document(
@@ -16,15 +17,22 @@ class Customer extends AbstractDocument
     /**
      * Test adding raw mapping.
      *
-     * @var string
-     *
      * @ES\Property(name="name", type="keyword")
      */
-    public $name;
+    public string $name;
 
     /**
-     * @var bool
+     * Test adding raw mapping.
      *
+     * @ES\Property(
+     *  name="customer_type",
+     *  type="integer",
+     *  enumType=Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Enum\CustomerTypeEnum::class
+     * )
+     */
+    public ?CustomerTypeEnum $customerType = null;
+
+    /**
      * @ES\Property(name="active", type="boolean")
      */
     private $active;

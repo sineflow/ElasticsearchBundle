@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Mapping;
 
+use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentParser;
@@ -10,6 +11,7 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\ObjCa
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\ObjTag;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Repository\ProductRepository;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\EntityWithInvalidEnum;
 
 class DocumentParserTest extends AbstractContainerAwareTestCase
 {
@@ -30,6 +32,13 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
         $res = $this->documentParser->parse($reflection, []);
 
         $this->assertEquals([], $res);
+    }
+
+    public function testParseDocumentWithInvalidEnumFieldProperty()
+    {
+        $this->expectException(AnnotationException::class);
+        $reflection = new \ReflectionClass(EntityWithInvalidEnum::class);
+        $this->documentParser->parse($reflection, []);
     }
 
     public function testParse(): void
@@ -159,43 +168,36 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                 'title' => [
                     'propertyName'   => 'title',
                     'type'           => 'text',
-                    'multilanguage'  => null,
                     'propertyAccess' => 1,
                 ],
                 'description' => [
                     'propertyName'   => 'description',
                     'type'           => 'text',
-                    'multilanguage'  => null,
                     'propertyAccess' => 1,
                 ],
                 'category' => [
                     'propertyName'       => 'category',
                     'type'               => 'object',
-                    'multilanguage'      => null,
                     'multiple'           => null,
                     'propertiesMetadata' => [
                         'id' => [
                             'propertyName'   => 'id',
                             'type'           => 'integer',
-                            'multilanguage'  => null,
                             'propertyAccess' => 1,
                         ],
                         'title' => [
                             'propertyName'   => 'title',
                             'type'           => 'keyword',
-                            'multilanguage'  => null,
                             'propertyAccess' => 1,
                         ],
                         'tags' => [
                             'propertyName'       => 'tags',
                             'type'               => 'object',
-                            'multilanguage'      => null,
                             'multiple'           => true,
                             'propertiesMetadata' => [
                                 'tagname' => [
                                     'propertyName'   => 'tagName',
                                     'type'           => 'text',
-                                    'multilanguage'  => null,
                                     'propertyAccess' => 1,
                                 ],
                             ],
@@ -209,31 +211,26 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                 'related_categories' => [
                     'propertyName'       => 'relatedCategories',
                     'type'               => 'object',
-                    'multilanguage'      => null,
                     'multiple'           => true,
                     'propertiesMetadata' => [
                         'id' => [
                             'propertyName'   => 'id',
                             'type'           => 'integer',
-                            'multilanguage'  => null,
                             'propertyAccess' => 1,
                         ],
                         'title' => [
                             'propertyName'   => 'title',
                             'type'           => 'keyword',
-                            'multilanguage'  => null,
                             'propertyAccess' => 1,
                         ],
                         'tags' => [
                             'propertyName'       => 'tags',
                             'type'               => 'object',
-                            'multilanguage'      => null,
                             'multiple'           => true,
                             'propertiesMetadata' => [
                                 'tagname' => [
                                     'propertyName'   => 'tagName',
                                     'type'           => 'text',
-                                    'multilanguage'  => null,
                                     'propertyAccess' => 1,
                                 ],
                             ],
@@ -247,25 +244,21 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                 'price' => [
                     'propertyName'   => 'price',
                     'type'           => 'float',
-                    'multilanguage'  => null,
                     'propertyAccess' => 1,
                 ],
                 'location' => [
                     'propertyName'   => 'location',
                     'type'           => 'geo_point',
-                    'multilanguage'  => null,
                     'propertyAccess' => 1,
                 ],
                 'limited' => [
                     'propertyName'   => 'limited',
                     'type'           => 'boolean',
-                    'multilanguage'  => null,
                     'propertyAccess' => 1,
                 ],
                 'released' => [
                     'propertyName'   => 'released',
                     'type'           => 'date',
-                    'multilanguage'  => null,
                     'propertyAccess' => 1,
                 ],
                 'ml_info' => [
@@ -283,7 +276,6 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
                 'pieces_count' => [
                     'propertyName'   => 'tokenPiecesCount',
                     'type'           => 'text',
-                    'multilanguage'  => null,
                     'propertyAccess' => 1,
                 ],
                 '_id' => [

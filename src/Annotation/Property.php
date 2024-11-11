@@ -27,6 +27,8 @@ final class Property implements PropertyAnnotationInterface, DumperInterface
      */
     public string $type;
 
+    public ?string $enumType = null;
+
     public bool $multilanguage = false;
 
     /**
@@ -37,7 +39,7 @@ final class Property implements PropertyAnnotationInterface, DumperInterface
     /**
      * The object name must be defined, if type is 'object' or 'nested'
      */
-    public string $objectName;
+    public ?string $objectName = null;
 
     /**
      * Defines if related object will have one or multiple values.

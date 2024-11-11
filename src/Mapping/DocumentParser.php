@@ -103,10 +103,12 @@ class DocumentParser
             switch ($propertyAnnotation::class) {
                 case Property::class:
                     $propertyMetadata[$propertyAnnotation->name] = [
-                        'propertyName'  => $propertyName,
-                        'type'          => $propertyAnnotation->type,
-                        'multilanguage' => $propertyAnnotation->multilanguage,
+                        'propertyName' => $propertyName,
+                        'type'         => $propertyAnnotation->type,
                     ];
+                    if ($propertyAnnotation->multilanguage) {
+                        $propertyMetadata[$propertyAnnotation->name]['multilanguage'] = true;
+                    }
 
                     // If property is a (nested) object
                     if (\in_array($propertyAnnotation->type, ['object', 'nested'])) {
@@ -122,6 +124,10 @@ class DocumentParser
                                 'className'          => $child->getName(),
                             ]
                         );
+                    } else {
+                        if (null !== $propertyAnnotation->enumType) {
+                            $propertyMetadata[$propertyAnnotation->name]['enumType'] = $propertyAnnotation->enumType;
+                        }
                     }
                     break;
 

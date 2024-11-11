@@ -9,6 +9,7 @@ use Sineflow\ElasticsearchBundle\Result\DocumentIterator;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Customer;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Enum\CustomerTypeEnum;
 
 /**
  * Class FinderTest
@@ -39,10 +40,17 @@ class FinderTest extends AbstractElasticsearchTestCase
             ],
             'customer' => [
                 [
-                    '_id'    => 111,
-                    'name'   => 'Jane Doe',
-                    'title'  => 'aaa bbb',
-                    'active' => true,
+                    '_id'           => 111,
+                    'name'          => 'Jane Doe',
+                    'title'         => 'aaa bbb',
+                    'active'        => true,
+                    'customer_type' => CustomerTypeEnum::COMPANY, // When php-elasticsearch serializes the request, json_encode will convert this to a scalar value
+                ],
+                [
+                    '_id'           => 222,
+                    'name'          => 'John Doe',
+                    'title'         => 'bbb',
+                    'customer_type' => 1,
                 ],
             ],
         ];
@@ -153,12 +161,31 @@ class FinderTest extends AbstractElasticsearchTestCase
                     'title' => 'bbb',
                 ],
             ],
+            'sort' => [
+                '_id' => 'asc',
+            ],
         ];
 
         $res = $finder->find(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer'], $searchBody, Finder::RESULTS_OBJECT, [], $totalHits);
         $this->assertInstanceOf(DocumentIterator::class, $res);
-        $this->assertCount(2, $res);
-        $this->assertEquals(2, $totalHits);
+        $this->assertCount(3, $res);
+        $this->assertEquals(3, $totalHits);
+        $resAsArray = iterator_to_array($res);
+
+        $this->assertInstanceOf(Customer::class, $resAsArray[0]);
+        $this->assertInstanceOf(Customer::class, $resAsArray[1]);
+        $this->assertInstanceOf(Product::class, $resAsArray[2]);
+
+        $this->assertEquals(111, $resAsArray[0]->id);
+        $this->assertSame('Jane Doe', $resAsArray[0]->name);
+        $this->assertSame(CustomerTypeEnum::COMPANY, $resAsArray[0]->customerType);
+
+        $this->assertEquals(222, $resAsArray[1]->id);
+        $this->assertSame('John Doe', $resAsArray[1]->name);
+        $this->assertSame(CustomerTypeEnum::INDIVIDUAL, $resAsArray[1]->customerType);
+
+        $this->assertSame('doc2', $resAsArray[2]->id);
+        $this->assertSame('bbb', $resAsArray[2]->title);
 
         $res = $finder->find(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer'], $searchBody, Finder::RESULTS_ARRAY);
         $this->assertArraySubset([
@@ -166,9 +193,15 @@ class FinderTest extends AbstractElasticsearchTestCase
                 'title' => 'bbb',
             ],
             111 => [
-                'name'   => 'Jane Doe',
-                'title'  => 'aaa bbb',
-                'active' => true,
+                'name'          => 'Jane Doe',
+                'title'         => 'aaa bbb',
+                'active'        => true,
+                'customer_type' => 2,
+            ],
+            222 => [
+                'name'          => 'John Doe',
+                'title'         => 'bbb',
+                'customer_type' => 1,
             ],
         ], $res);
 
@@ -214,8 +247,8 @@ class FinderTest extends AbstractElasticsearchTestCase
             ],
         ];
 
-        $this->assertEquals(1, $finder->count(['AcmeFooBundle:Customer'], $searchBody));
-        $this->assertEquals(2, $finder->count(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer'], $searchBody));
+        $this->assertEquals(2, $finder->count(['AcmeFooBundle:Customer'], $searchBody));
+        $this->assertEquals(3, $finder->count(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer'], $searchBody));
     }
 
     public function testGetTargetIndices(): void
