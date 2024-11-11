@@ -22,10 +22,7 @@ if (\method_exists(KernelTestCase::class, 'getContainer')) {
  */
 abstract class AbstractContainerAwareTestCase extends KernelTestCase
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $cachedContainer;
+    private ?ContainerInterface $cachedContainer;
 
     /**
      * {@inheritDoc}

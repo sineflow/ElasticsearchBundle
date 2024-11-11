@@ -14,15 +14,12 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Provi
 
 class ProviderRegistryTest extends AbstractElasticsearchTestCase
 {
-    /**
-     * @var ProviderRegistry
-     */
-    private $providerRegistry;
+    private ProviderRegistry $providerRegistry;
 
     /**
      * {@inheritdoc}
      */
-    protected function getDataArray()
+    protected function getDataArray(): array
     {
         return [
             'bar' => [

@@ -32,10 +32,8 @@ abstract class AbstractElasticsearchTestCase extends AbstractContainerAwareTestC
      *              ]
      *          ]
      *      ]
-     *
-     * @return array
      */
-    protected function getDataArray()
+    protected function getDataArray(): array
     {
         return [];
     }

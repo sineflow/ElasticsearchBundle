@@ -18,7 +18,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getDataArray()
+    protected function getDataArray(): array
     {
         return [
             'bar' => [

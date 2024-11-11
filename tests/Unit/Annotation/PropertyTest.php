@@ -27,7 +27,7 @@ class PropertyTest extends TestCase
             'analyzer' => 'standard',
             'foo'      => 'bar',
         ];
-        $type->foo = 'bar';
+        $type->enumType = 'bar';
 
         $this->assertEquals(
             [

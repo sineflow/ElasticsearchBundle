@@ -57,7 +57,7 @@ class DocumentMetadataCollector implements WarmableInterface
      *
      * @throws InvalidArgumentException
      */
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         // force cache generation
         foreach ($this->documentClassToIndexManagerNames as $documentClass => $indexManagerName) {

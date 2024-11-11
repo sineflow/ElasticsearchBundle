@@ -3,6 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Command;
 
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,10 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Command for (re)building elasticsearch index.
  */
+#[AsCommand('sineflow:es:index:build', '(Re)builds elasticsearch index.')]
 class IndexBuildCommand extends Command
 {
-    protected static $defaultName = 'sineflow:es:index:build';
-
     public function __construct(private readonly IndexManagerRegistry $indexManagerRegistry)
     {
         parent::__construct();
@@ -29,7 +29,6 @@ class IndexBuildCommand extends Command
         parent::configure();
 
         $this
-            ->setDescription('(Re)builds elasticsearch index.')
             ->addArgument(
                 'index',
                 InputArgument::REQUIRED,

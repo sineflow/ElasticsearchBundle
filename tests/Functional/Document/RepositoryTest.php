@@ -13,30 +13,18 @@ class RepositoryTest extends AbstractElasticsearchTestCase
 {
     use AssertThrows;
 
-    /**
-     * @var Repository
-     */
-    private $repository;
+    private Repository $repository;
 
-    /**
-     * @var IndexManager
-     */
-    private $indexManager;
+    private IndexManager $indexManager;
 
-    /**
-     * @var Finder
-     */
-    private $finder;
+    private Finder $finder;
 
-    /**
-     * @var DocumentMetadataCollector
-     */
-    private $metadataCollector;
+    private DocumentMetadataCollector $metadataCollector;
 
     /**
      * {@inheritdoc}
      */
-    protected function getDataArray()
+    protected function getDataArray(): array
     {
         return [
             'bar' => [

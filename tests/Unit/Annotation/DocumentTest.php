@@ -17,7 +17,7 @@ class DocumentTest extends TestCase
     {
         $doc = new Document();
 
-        $doc->type = 'product';
+        $doc->repositoryClass = 'some class name';
         $doc->options = [
             'dynamic' => 'strict',
             'foo'     => 'bar',

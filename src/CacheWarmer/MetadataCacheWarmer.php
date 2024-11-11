@@ -16,8 +16,8 @@ class MetadataCacheWarmer implements CacheWarmerInterface
         return true;
     }
 
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
-        return $this->metadataCollector->warmUp($cacheDir);
+        return $this->metadataCollector->warmUp($cacheDir, $buildDir);
     }
 }
