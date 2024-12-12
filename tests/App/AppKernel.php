@@ -20,7 +20,7 @@ class AppKernel extends Kernel
      *
      * @return array
      */
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         $bundles = [
             new FrameworkBundle(),

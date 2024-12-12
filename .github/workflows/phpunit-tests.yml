@@ -48,39 +48,39 @@ jobs:
                     - 'highest'
                 php:
                     - '8.1'
-                    - '8.2'
+                    - '8.3'
                 elasticsearch:
-                    - '7.17.13'
+                    - '7.17.24'
                 symfony:
-                    - '~5.0'
+                    - '~6.0'
                 include:
-                    - php: '8.1'
-                      symfony: '~5.0'
+                    - php: '8.3'
+                      symfony: '~6.0'
                       elasticsearch: '8.0.1'
                       experimental: false
-                    - php: '8.1'
-                      symfony: '~5.0'
+                    - php: '8.3'
+                      symfony: '~6.0'
                       elasticsearch: '8.1.3' # there are some bc in minor version https://www.elastic.co/guide/en/elasticsearch/reference/current/migrating-8.1.html#breaking-changes-8.1
                       experimental: false
-                    - php: '8.1'
-                      symfony: '~5.0'
+                    - php: '8.3'
+                      symfony: '~6.0'
                       elasticsearch: '8.5.3' # there are some bc in minor version https://www.elastic.co/guide/en/elasticsearch/reference/current/migrating-8.5.html
                       experimental: false
-                    - php: '8.1'
-                      symfony: '~5.0'
+                    - php: '8.3'
+                      symfony: '~6.0'
                       elasticsearch: '8.6.2' # there are no bc in minor version https://www.elastic.co/guide/en/elasticsearch/reference/current/migrating-8.6.html
                       experimental: false
-                    - php: '8.1'
-                      symfony: '~5.0'
+                    - php: '8.3'
+                      symfony: '~6.0'
                       elasticsearch: '8.7.1' # there are no bc in minor version https://www.elastic.co/guide/en/elasticsearch/reference/current/migrating-8.7.html
                       experimental: false
-                    - php: '8.1'
-                      symfony: '~5.0'
+                    - php: '8.3'
+                      symfony: '~6.0'
                       elasticsearch: '8.8.0' # there are no bc in minor version https://www.elastic.co/guide/en/elasticsearch/reference/current/migrating-8.8.html
                       experimental: false
                     - php: '8.1'
-                      symfony: '~6.0'
-                      elasticsearch: '8.10.2' # newest version
+                      symfony: '~5.0'
+                      elasticsearch: '8.15.2' # newest version
                       experimental: false
             fail-fast: false
         steps:
@@ -115,7 +115,7 @@ jobs:
 
             - name: 'Run phpunit tests'
               run: |
-                  vendor/bin/simple-phpunit --coverage-clover=tests/App/build/clover.xml 2>/dev/null
+                  vendor/bin/simple-phpunit --coverage-clover=tests/App/build/clover.xml
 
             - name: Upload coverage results to Coveralls
               env:

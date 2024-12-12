@@ -38,7 +38,7 @@ class ProviderRegistry
         ServiceLocator $serviceLocator,
         DocumentMetadataCollector $documentMetadataCollector,
         IndexManagerRegistry $indexManagerRegistry,
-        string $selfProviderClass
+        string $selfProviderClass,
     ) {
         $this->serviceLocator = $serviceLocator;
         $this->documentMetadataCollector = $documentMetadataCollector;

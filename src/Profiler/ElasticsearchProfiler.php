@@ -44,7 +44,7 @@ class ElasticsearchProfiler extends DataCollector
     /**
      * {@inheritDoc}
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
     {
         $this->data['indexManagers'] = $this->cloneVar($this->indexManagers);
 

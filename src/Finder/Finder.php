@@ -48,7 +48,7 @@ class Finder
     public function __construct(
         DocumentMetadataCollector $documentMetadataCollector,
         IndexManagerRegistry $indexManagerRegistry,
-        DocumentConverter $documentConverter
+        DocumentConverter $documentConverter,
     ) {
         $this->documentMetadataCollector = $documentMetadataCollector;
         $this->indexManagerRegistry = $indexManagerRegistry;
@@ -154,7 +154,7 @@ class Finder
      *
      * @return mixed
      */
-    public function scroll(array $documentClasses, string &$scrollId, string $scrollTime = self::SCROLL_TIME, int $resultsType = self::RESULTS_OBJECT, int &$totalHits = null)
+    public function scroll(array $documentClasses, string &$scrollId, string $scrollTime = self::SCROLL_TIME, int $resultsType = self::RESULTS_OBJECT, ?int &$totalHits = null)
     {
         $client = $this->getConnection($documentClasses)->getClient();
 
@@ -235,7 +235,7 @@ class Finder
      *
      * @return array|DocumentIterator
      */
-    public function parseResult(array $raw, int $resultsType, array $documentClasses = null)
+    public function parseResult(array $raw, int $resultsType, ?array $documentClasses = null)
     {
         switch ($resultsType & self::BITMASK_RESULT_TYPES) {
             case self::RESULTS_OBJECT:

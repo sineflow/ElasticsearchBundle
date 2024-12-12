@@ -202,18 +202,18 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
             '_version' => 1,
             'found'    => true,
             '_source'  => [
-                    'title'    => 'Foo Product',
-                    'category' => [
-                            'title' => 'Bar',
-                        ],
-                        'related_categories' => [
-                        0 => [
-                                'title' => 'Acme',
-                            ],
-                        ],
-                        'ml_info-en' => 'info in English',
-                        'ml_info-fr' => 'info in French',
+                'title'    => 'Foo Product',
+                'category' => [
+                    'title' => 'Bar',
                 ],
+                'related_categories' => [
+                    0 => [
+                        'title' => 'Acme',
+                    ],
+                ],
+                'ml_info-en' => 'info in English',
+                'ml_info-fr' => 'info in French',
+            ],
         ];
 
         $converter = $this->getContainer()->get('Sineflow\ElasticsearchBundle\Result\DocumentConverter');
@@ -237,20 +237,20 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
             '_id'    => 'doc1',
             '_score' => 1,
             'fields' => [
-                    'title' => [
-                            0 => 'Foo Product',
-                        ],
-                        'related_categories.title' => [
-                            0 => 'Acme',
-                            1 => 'Bar',
-                        ],
-                        'category.title' => [
-                            0 => 'Bar',
-                        ],
-                        'ml_info-en' => [
-                            0 => 'info in English',
-                        ],
+                'title' => [
+                    0 => 'Foo Product',
                 ],
+                'related_categories.title' => [
+                    0 => 'Acme',
+                    1 => 'Bar',
+                ],
+                'category.title' => [
+                    0 => 'Bar',
+                ],
+                'ml_info-en' => [
+                    0 => 'info in English',
+                ],
+            ],
         ];
 
         /** @var DocumentConverter $converter */

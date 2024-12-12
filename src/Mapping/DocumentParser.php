@@ -311,7 +311,7 @@ class DocumentParser
      *
      * @throws \ReflectionException
      */
-    private function getPropertyMapping(Property $propertyAnnotation, string $language = null, array $indexAnalyzers = [])
+    private function getPropertyMapping(Property $propertyAnnotation, ?string $language = null, array $indexAnalyzers = [])
     {
         $propertyMapping = $propertyAnnotation->dump([
             'language'       => $language,

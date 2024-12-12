@@ -105,7 +105,7 @@ class IndexManager
         ProviderRegistry $providerRegistry,
         Finder $finder,
         DocumentConverter $documentConverter,
-        RepositoryFactory $repositoryFactory
+        RepositoryFactory $repositoryFactory,
     ) {
         $this->managerName = $managerName;
         $this->connection = $connection;
@@ -601,7 +601,7 @@ class IndexManager
     /**
      * Created a new index with a unique name
      */
-    protected function createNewIndexWithUniqueName(string $suffix = null): string
+    protected function createNewIndexWithUniqueName(?string $suffix = null): string
     {
         $settings = $this->getIndexMapping();
         $newIndex = $this->getUniqueIndexName($suffix);

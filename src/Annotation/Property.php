@@ -8,7 +8,6 @@ use Sineflow\ElasticsearchBundle\Mapping\DumperInterface;
  * Annotation used to check mapping type during the parsing process.
  *
  * @Annotation
- *
  * @Target("PROPERTY")
  */
 final class Property implements DumperInterface

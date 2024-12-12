@@ -79,10 +79,10 @@ class PropertyTest extends TestCase
                 'copy_to'  => 'en_all',
                 'analyzer' => 'en_analyzer',
                 'fields'   => [
-                        'ngram' => [
-                                'analyzer' => 'en_analyzer',
-                            ],
+                    'ngram' => [
+                        'analyzer' => 'en_analyzer',
                     ],
+                ],
                 'type' => 'mytype',
             ],
             $type->dump($settings),

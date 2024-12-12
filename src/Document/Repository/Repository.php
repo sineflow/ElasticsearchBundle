@@ -65,7 +65,7 @@ class Repository
      *
      * @return mixed
      */
-    public function find(array $searchBody, int $resultsType = Finder::RESULTS_OBJECT, array $additionalRequestParams = [], int &$totalHits = null)
+    public function find(array $searchBody, int $resultsType = Finder::RESULTS_OBJECT, array $additionalRequestParams = [], ?int &$totalHits = null)
     {
         return $this->finder->find([$this->documentClass], $searchBody, $resultsType, $additionalRequestParams, $totalHits);
     }

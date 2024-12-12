@@ -45,7 +45,7 @@ class ElasticsearchProvider extends AbstractProvider
     public function __construct(
         DocumentMetadataCollector $metadataCollector,
         IndexManager $sourceIndexManager,
-        string $sourceDocumentClass
+        string $sourceDocumentClass,
     ) {
         $this->metadataCollector = $metadataCollector;
         $this->sourceIndexManager = $sourceIndexManager;
