@@ -7,7 +7,7 @@ concurrency:
 on: ['push', 'pull_request', 'workflow_dispatch']
 
 env:
-    ELASTICSEARCH_PORT: 9201
+    ELASTICSEARCH_PORT: 9205
 
 jobs:
     static_code_analysis:
@@ -26,7 +26,7 @@ jobs:
               run: composer validate
 
             - name: 'Install dependencies with Composer'
-              uses: 'ramsey/composer-install@v2'
+              uses: ramsey/composer-install@v3
               with:
                   dependency-versions: 'highest'
                   composer-options: '--prefer-dist'
@@ -105,7 +105,7 @@ jobs:
               run: composer require --no-update symfony/framework-bundle:${{ matrix.symfony }}
 
             - name: 'Install dependencies with Composer'
-              uses: 'ramsey/composer-install@v2'
+              uses: ramsey/composer-install@v3
               with:
                   dependency-versions: '${{ matrix.dependencies }}'
                   composer-options: '--prefer-dist'
@@ -123,13 +123,25 @@ jobs:
                   vendor/bin/simple-phpunit --coverage-clover=tests/App/build/clover.xml
 
             - name: Upload coverage results to Coveralls
-              env:
-                  COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-              run: |
-                  vendor/bin/php-coveralls --coverage_clover=tests/App/build/clover.xml --json_path=tests/App/build/coveralls.json -v
+              uses: coverallsapp/github-action@v2
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  file: tests/App/build/clover.xml
+                  parallel: true
 
             # Enable tmate debugging on failure for 15 minutes
             - name: Setup tmate session
               if: ${{ !env.ACT && failure() }}
               uses: mxschmitt/action-tmate@v3
               timeout-minutes: 15
+
+    finalize:
+        needs: [phpunit]
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Finalize Coveralls Parallel Build
+              uses: coverallsapp/github-action@v2
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  parallel-finished: true
+

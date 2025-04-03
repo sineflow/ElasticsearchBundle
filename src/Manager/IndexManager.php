@@ -351,6 +351,7 @@ class IndexManager
      */
     public function rebuildIndex(bool $deleteOld = false, bool $cancelExistingRebuild = false): void
     {
+        $newIndex = null;
         try {
             if (false === $this->getUseAliases()) {
                 throw new Exception(\sprintf('Index rebuilding is not supported for "%s", unless you use aliases', $this->getBaseIndexName()));
@@ -386,19 +387,19 @@ class IndexManager
             // Delete the old index
             if ($deleteOld) {
                 $this->getConnection()->getClient()->indices()->delete(['index' => $oldIndex]);
-                $this->getConnection()->getLogger()->notice(\sprintf('Deleted old index %s', $oldIndex));
+                $this->getConnection()->getLogger()?->notice(\sprintf('Deleted old index %s', $oldIndex));
             }
         } catch (\Exception $e) {
             // Do not log BulkRequestException here as they are logged in the connection manager
             // Do not log ElasticsearchException either, as they are logged inside the elasticsearch bundle
             if (!($e instanceof BulkRequestException) && !($e instanceof ElasticsearchException)) {
-                $this->getConnection()->getLogger()->error($e->getMessage());
+                $this->getConnection()->getLogger()?->error($e->getMessage());
             }
 
             // Try to delete the new incomplete index
-            if (isset($newIndex)) {
+            if (null !== $newIndex) {
                 $this->getConnection()->getClient()->indices()->delete(['index' => $newIndex]);
-                $this->getConnection()->getLogger()->notice(\sprintf('Deleted incomplete index "%s"', $newIndex));
+                $this->getConnection()->getLogger()?->notice(\sprintf('Deleted incomplete index "%s"', $newIndex));
             }
 
             // Rethrow exception to be further handled

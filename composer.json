@@ -38,7 +38,6 @@
         "knplabs/knp-paginator-bundle": "^4.0 || ^5.0",
         "friendsofphp/php-cs-fixer": "^3.34",
         "php-coveralls/php-coveralls": "^2.1",
-        "escapestudios/symfony2-coding-standard": "^3.0",
         "jchook/phpunit-assert-throws": "^1.0",
         "dms/phpunit-arraysubset-asserts": "^0.2.1",
         "phpstan/phpstan": "^1.12",
@@ -64,5 +63,20 @@
     },
     "config": {
         "prepend-autoloader": false
+    },
+    "scripts": {
+        "run-tests": [
+            "XDEBUG_MODE=coverage vendor/bin/simple-phpunit --coverage-text"
+        ],
+        "check-code": [
+            "vendor/bin/phpstan",
+            "vendor/bin/rector --dry-run",
+            "vendor/bin/php-cs-fixer check"
+        ],
+        "fix-code": [
+            "vendor/bin/phpstan",
+            "vendor/bin/rector",
+            "vendor/bin/php-cs-fixer fix"
+        ]
     }
 }
