@@ -2,13 +2,12 @@
 
 namespace Sineflow\ElasticsearchBundle\Finder\Adapter;
 
-use Sineflow\ElasticsearchBundle\Exception\Exception;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Elasticsearch\Exception\ServerResponseException;
+use Sineflow\ElasticsearchBundle\Exception\ScrollHitsUnavailableException;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Result\DocumentIterator;
 
-/**
- * Class ScrollAdapter
- */
 class ScrollAdapter
 {
     private string $scrollId;
@@ -40,6 +39,9 @@ class ScrollAdapter
 
     /**
      * Returns results from a scroll request
+     *
+     * @throws ClientResponseException
+     * @throws ServerResponseException
      */
     public function getNextScrollResults(): array|DocumentIterator|false
     {
@@ -69,12 +71,12 @@ class ScrollAdapter
      * Returns the total hits by the query, which the scroll is for
      * or throws an exception, if no scrolls have been retrieved yet
      *
-     * @throws Exception
+     * @throws ScrollHitsUnavailableException
      */
     public function getTotalHits(): int
     {
         if (null === $this->totalHits) {
-            throw new Exception('You must call getNextScrollResults() at least once, before you can get the total hits');
+            throw new ScrollHitsUnavailableException('You must call getNextScrollResults() at least once, before you can get the total hits');
         }
 
         return $this->totalHits;

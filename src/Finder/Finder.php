@@ -2,6 +2,9 @@
 
 namespace Sineflow\ElasticsearchBundle\Finder;
 
+use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Elasticsearch\Exception\ServerResponseException;
+use Elastic\Transport\Exception\NoNodeAvailableException;
 use Psr\Cache\InvalidArgumentException;
 use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\DTO\IndicesToDocumentClasses;
@@ -51,7 +54,7 @@ class Finder
             'index' => $this->indexManagerRegistry->get($indexManagerName)->getReadAlias(),
             'body'  => ['query' => ['ids' => ['values' => [$id]]], 'version' => true],
         ];
-        $results = $this->getConnection([$documentClass])->getClient()->search($search);
+        $results = $this->getConnection([$documentClass])->getClient()->search($search)->asArray();
 
         // The document id must not be duplicated across the indices pointed by the read alias,
         // but in case it is, just return the first one we get
@@ -77,6 +80,10 @@ class Finder
      * @param int      $resultsType             Bitmask value determining how the results are returned
      * @param array    $additionalRequestParams Additional params to pass to the ES client's search() method
      * @param int|null $totalHits               (out param) The total hits of the query response
+     *
+     * @throws NoNodeAvailableException if all the hosts are offline
+     * @throws ClientResponseException  if the status code of response is 4xx
+     * @throws ServerResponseException  if the status code of response is 5xx
      */
     public function find(array $documentClasses, array $searchBody, int $resultsType = self::RESULTS_OBJECT, array $additionalRequestParams = [], ?int &$totalHits = null): array|KnpPaginatorAdapter|ScrollAdapter|DocumentIterator
     {
@@ -107,14 +114,14 @@ class Finder
 
             $rawResults = $client->search($params);
 
-            return new ScrollAdapter($this, $documentClasses, $rawResults, $resultsType, $params['scroll']);
+            return new ScrollAdapter($this, $documentClasses, $rawResults->asArray(), $resultsType, $params['scroll']);
         }
 
         $raw = $client->search($params);
 
         $totalHits = $raw['hits']['total']['value'];
 
-        return $this->parseResult($raw, $resultsType, $documentClasses);
+        return $this->parseResult($raw->asArray(), $resultsType, $documentClasses);
     }
 
     /**
@@ -126,6 +133,10 @@ class Finder
      * @param string   $scrollTime      The time to keep the scroll window open
      * @param int      $resultsType     Bitmask value determining how the results are returned
      * @param int|null $totalHits       (out param) The total hits of the query response
+     *
+     * @throws NoNodeAvailableException if all the hosts are offline
+     * @throws ClientResponseException  if the status code of response is 4xx
+     * @throws ServerResponseException  if the status code of response is 5xx
      */
     public function scroll(array $documentClasses, string &$scrollId, string $scrollTime = self::SCROLL_TIME, int $resultsType = self::RESULTS_OBJECT, ?int &$totalHits = null): array|bool|DocumentIterator
     {
@@ -155,7 +166,7 @@ class Finder
             return false;
         }
 
-        return $this->parseResult($raw, $resultsType, $documentClasses);
+        return $this->parseResult($raw->asArray(), $resultsType, $documentClasses);
     }
 
     /**

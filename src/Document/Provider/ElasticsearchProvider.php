@@ -51,7 +51,7 @@ class ElasticsearchProvider extends AbstractProvider
                 'index'  => $this->sourceIndexManager->getLiveIndex(),
                 'size'   => $this->chunkSize,
                 'scroll' => $this->scrollTime,
-            ]
+            ],
         );
 
         while (false !== ($matches = $scrollAdapter->getNextScrollResults())) {
@@ -72,7 +72,7 @@ class ElasticsearchProvider extends AbstractProvider
             'index' => $this->sourceIndexManager->getLiveIndex(),
             'id'    => $id,
         ];
-        $doc = $this->sourceIndexManager->getConnection()->getClient()->get($params);
+        $doc = $this->sourceIndexManager->getConnection()->getClient()->get($params)->asArray();
         $result = $doc['_source'];
         $result['_id'] = $doc['_id'];
 

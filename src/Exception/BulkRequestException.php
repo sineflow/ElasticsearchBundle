@@ -5,7 +5,7 @@ namespace Sineflow\ElasticsearchBundle\Exception;
 /**
  * Exception thrown when there are errors in the response of a bulk request
  */
-class BulkRequestException extends Exception
+class BulkRequestException extends \RuntimeException implements ElasticsearchBundleException
 {
     private array $bulkResponseItems = [];
     private array $bulkRequest = [];

@@ -2,7 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\DTO;
 
-use Elasticsearch\Common\Exceptions\InvalidArgumentException;
+use Sineflow\ElasticsearchBundle\Exception\InvalidArgumentException;
 
 /**
  * Class representing a query within a bulk request

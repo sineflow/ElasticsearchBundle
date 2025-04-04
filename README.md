@@ -20,14 +20,15 @@ Installation instructions and documentation of the bundle can be found [here](do
 
 ## Version matrix
 
-| ElasticsearchBundle | Elasticsearch  | Symfony     | PHP         |
-|---------------------| -------------- |-------------|-------------|
-| ~7.2                | >= 7.0         | 5.0+        | 8.1+        |
-| ~7.0                | >= 7.0         | 4.4+ / 5.0+ | 7.3+ / 8.0+ |
-| ~6.2                | >= 6.2, < 7.0  | 3.4+ / 4.0+ | 7.3+        |
-| ~6.1.0              | >= 6.0, < 6.2  |             |             |
-| ~5.0                | >= 5.0, < 6.0  |             |             |
-| >= 0.9, < 1.0       | >= 2.0, < 5.0  |             |             |
+| ElasticsearchBundle | Elasticsearch | Symfony     | PHP         |
+|---------------------|---------------|-------------|-------------|
+| ^8.0                | >= 8.0        | 5.0+        | 8.1+        |
+| ^7.2                | >= 7.0        | 5.0+        | 8.1+        |
+| ^7.0                | >= 7.0        | 4.4+ / 5.0+ | 7.3+ / 8.0+ |
+| ^6.2                | >= 6.2, < 7.0 | 3.4+ / 4.0+ | 7.3+        |
+| ^6.1.0              | >= 6.0, < 6.2 |             |             |
+| ^5.0                | >= 5.0, < 6.0 |             |             |
+| >= 0.9, < 1.0       | >= 2.0, < 5.0 |             |             |
 
 ## License
 
@@ -40,4 +41,12 @@ composer install
 docker compose up --detach --wait
 vendor/bin/simple-phpunit
 docker compose down --remove-orphans
+```
+
+## Checking and fixing code quality
+
+NOTE: Tests must be run first, so a Symfony container is generated
+```
+composer check-code
+composer fix-code
 ```

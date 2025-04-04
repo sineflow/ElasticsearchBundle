@@ -5,7 +5,7 @@ namespace Sineflow\ElasticsearchBundle\Exception;
 /**
  * Class IndexOrAliasNotFoundException
  */
-class IndexOrAliasNotFoundException extends Exception
+class IndexOrAliasNotFoundException extends \RuntimeException implements ElasticsearchBundleException
 {
     public function __construct(
         private readonly string $indexOrAlias,

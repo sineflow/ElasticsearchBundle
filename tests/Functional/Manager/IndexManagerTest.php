@@ -2,14 +2,18 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Manager;
 
-use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Elasticsearch\Exception\ElasticsearchException;
+use Elastic\Elasticsearch\Exception\MissingParameterException;
+use Elastic\Elasticsearch\Exception\ServerResponseException;
+use Psr\Cache\InvalidArgumentException;
 use Sineflow\ElasticsearchBundle\Document\Provider\ElasticsearchProvider;
 use Sineflow\ElasticsearchBundle\Document\Repository\Repository;
 use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
-use Sineflow\ElasticsearchBundle\Exception\Exception;
+use Sineflow\ElasticsearchBundle\Exception\IndexOrAliasNotFoundException;
+use Sineflow\ElasticsearchBundle\Exception\IndexRebuildingWithoutAliasesException;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
-use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadata;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product;
@@ -71,6 +75,10 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('sineflow-esb-test-bar', $imWithoutAliases->getWriteAlias());
     }
 
+    /**
+     * @throws ClientResponseException
+     * @throws ServerResponseException
+     */
     public function testCreateIndexWithAliases(): void
     {
         $imWithAliases = $this->getIndexManager('customer', false);
@@ -79,20 +87,29 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertTrue($imWithAliases->getConnection()->existsAlias(['name' => 'sineflow-esb-test-customer']), 'Read alias does not exist');
         $this->assertTrue($imWithAliases->getConnection()->existsAlias(['name' => 'sineflow-esb-test-customer_write']), 'Write alias does not exist');
 
-        $indicesPointedByAliases = $imWithAliases->getConnection()->getClient()->indices()->getAlias(['name' => 'sineflow-esb-test-customer,sineflow-esb-test-customer_write']);
+        $indicesPointedByAliases = $imWithAliases->getConnection()->getClient()->indices()->getAlias(['name' => 'sineflow-esb-test-customer,sineflow-esb-test-customer_write'])->asArray();
         $this->assertCount(1, $indicesPointedByAliases, 'Read and Write aliases must point to one and the same index');
     }
 
+    /**
+     * @throws ClientResponseException
+     * @throws ServerResponseException
+     */
     public function testCreateIndexWithoutAliases(): void
     {
         $imWithoutAliases = $this->getIndexManager('bar', false);
         $imWithoutAliases->createIndex();
 
-        $index = $imWithoutAliases->getConnection()->getClient()->indices()->getAlias(['index' => 'sineflow-esb-test-bar']);
+        $index = $imWithoutAliases->getConnection()->getClient()->indices()->getAlias(['index' => 'sineflow-esb-test-bar'])->asArray();
         $this->assertCount(1, $index, 'Index was not created');
         $this->assertCount(0, \current($index)['aliases'], 'Index should not have any aliases pointing to it');
     }
 
+    /**
+     * @throws ClientResponseException
+     * @throws ServerResponseException
+     * @throws MissingParameterException
+     */
     public function testDropIndexWithAliases(): void
     {
         $imWithAliases = $this->getIndexManager('customer', false);
@@ -101,7 +118,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         // Simulate state during rebuilding when write alias points to more than 1 index
         try {
             $imWithAliases->getConnection()->getClient()->indices()->delete(['index' => 'sineflow-esb-test-temp']);
-        } catch (\Exception) {
+        } catch (ElasticsearchException) {
         }
         $imWithAliases->getConnection()->getClient()->indices()->create(['index' => 'sineflow-esb-test-temp']);
         $setAliasParams = [
@@ -120,39 +137,50 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
 
         $imWithAliases->dropIndex();
 
-        $this->expectException(Missing404Exception::class);
-        $imWithAliases->getConnection()->getClient()->indices()->getAlias(['name' => 'sineflow-esb-test-customer,sineflow-esb-test-customer_write']);
+        $this->expectException(ClientResponseException::class);
+        $imWithAliases->getConnection()->getClient()->indices()->getAlias(['name' => 'sineflow-esb-test-customer,sineflow-esb-test-customer_write'])->asArray();
     }
 
     public function testGetLiveIndexWhenNoIndexExists(): void
     {
-        /** @var IndexManager $imWithAliases */
         $imWithAliases = $this->getIndexManager('customer', false);
 
-        $this->expectException(Exception::class);
+        $this->expectException(IndexOrAliasNotFoundException::class);
         $imWithAliases->getLiveIndex();
     }
 
     public function testGetLiveIndex(): void
     {
-        /** @var IndexManager $imWithAliases */
         $imWithAliases = $this->getIndexManager('customer');
         $liveIndex = $imWithAliases->getLiveIndex();
         $this->assertMatchesRegularExpression('/^sineflow-esb-test-customer_[0-9_]+$/', $liveIndex);
 
-        /** @var IndexManager $imWithoutAliases */
         $imWithoutAliases = $this->getIndexManager('bar');
         $liveIndex = $imWithoutAliases->getLiveIndex();
         $this->assertEquals('sineflow-esb-test-bar', $liveIndex);
     }
 
+    /**
+     * @throws ClientResponseException
+     * @throws ElasticsearchException
+     * @throws MissingParameterException
+     * @throws ServerResponseException
+     * @throws IndexRebuildingWithoutAliasesException
+     */
     public function testRebuildIndexWithoutAliases(): void
     {
         $imWithoutAliases = $this->getIndexManager('bar');
-        $this->expectException(Exception::class);
+        $this->expectException(IndexRebuildingWithoutAliasesException::class);
         $imWithoutAliases->rebuildIndex();
     }
 
+    /**
+     * @throws ClientResponseException
+     * @throws ElasticsearchException
+     * @throws IndexRebuildingWithoutAliasesException
+     * @throws MissingParameterException
+     * @throws ServerResponseException
+     */
     public function testRebuildIndexWithoutDeletingOld(): void
     {
         $imWithAliases = $this->getIndexManager('customer');
@@ -160,13 +188,20 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
 
         $imWithAliases->rebuildIndex();
 
-        $this->assertTrue($imWithAliases->getConnection()->getClient()->indices()->exists(['index' => $liveIndex]));
+        $this->assertTrue($imWithAliases->getConnection()->getClient()->indices()->exists(['index' => $liveIndex])->asBool());
         $imWithAliases->getConnection()->getClient()->indices()->delete(['index' => $liveIndex]);
 
         $newLiveIndex = $imWithAliases->getLiveIndex();
         $this->assertNotEquals($liveIndex, $newLiveIndex);
     }
 
+    /**
+     * @throws ClientResponseException
+     * @throws ElasticsearchException
+     * @throws IndexRebuildingWithoutAliasesException
+     * @throws MissingParameterException
+     * @throws ServerResponseException
+     */
     public function testRebuildIndexAndDeleteOld(): void
     {
         $imWithAliases = $this->getIndexManager('customer');
@@ -174,12 +209,17 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
 
         $imWithAliases->rebuildIndex(true);
 
-        $this->assertFalse($imWithAliases->getConnection()->getClient()->indices()->exists(['index' => $liveIndex]));
+        $this->assertFalse($imWithAliases->getConnection()->getClient()->indices()->exists(['index' => $liveIndex])->asBool());
 
         $newLiveIndex = $imWithAliases->getLiveIndex();
         $this->assertNotEquals($liveIndex, $newLiveIndex);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws ClientResponseException
+     * @throws ServerResponseException
+     */
     public function testPersistForManagerWithoutAliasesWithoutAutocommit(): void
     {
         $imWithoutAliases = $this->getIndexManager('bar');
@@ -206,6 +246,12 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertNull($doc->title, 'Null property value was not persisted');
     }
 
+    /**
+     * @throws ClientResponseException
+     * @throws MissingParameterException
+     * @throws InvalidArgumentException
+     * @throws ServerResponseException
+     */
     public function testPersistForManagerWithAliasesWithoutAutocommit(): void
     {
         $imWithAliases = $this->getIndexManager('customer');
@@ -240,12 +286,17 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $raw = $imWithAliases->getConnection()->getClient()->get([
             'index' => 'sineflow-esb-test-temp',
             'id'    => 555,
-        ]);
+        ])->asArray();
         $this->assertEquals('John Doe', $raw['_source']['name']);
 
         $imWithAliases->getConnection()->getClient()->indices()->delete(['index' => 'sineflow-esb-test-temp']);
     }
 
+    /**
+     * @throws ServerResponseException
+     * @throws ClientResponseException
+     * @throws InvalidArgumentException
+     */
     public function testPersistRawWithAutocommit(): void
     {
         $imWithAliases = $this->getIndexManager('customer');
@@ -261,6 +312,11 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('Jane', $doc->name);
     }
 
+    /**
+     * @throws ServerResponseException
+     * @throws ClientResponseException
+     * @throws InvalidArgumentException
+     */
     public function testPersistStrictMappingDocRetrievedById(): void
     {
         $im = $this->getIndexManager('bar');
@@ -275,6 +331,11 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('NewName', $doc->title);
     }
 
+    /**
+     * @throws ServerResponseException
+     * @throws ClientResponseException
+     * @throws InvalidArgumentException
+     */
     public function testUpdateWithCorrectParams(): void
     {
         $imWithAliases = $this->getIndexManager('customer');
@@ -288,6 +349,10 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('Alicia', $doc->name);
     }
 
+    /**
+     * @throws ServerResponseException
+     * @throws ClientResponseException
+     */
     public function testUpdateInexistingDoc(): void
     {
         $imWithAliases = $this->getIndexManager('customer');
@@ -299,6 +364,12 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         ]);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws ClientResponseException
+     * @throws ServerResponseException
+     * @throws MissingParameterException
+     */
     public function testDelete(): void
     {
         $imWithAliases = $this->getIndexManager('customer');
@@ -326,7 +397,7 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $doc = $imWithAliases->getRepository()->getById(111);
         $this->assertNull($doc);
 
-        $this->expectException(Missing404Exception::class);
+        $this->expectException(ClientResponseException::class);
         // Check that value is deleted in the additional index for the write alias as well
         $imWithAliases->getConnection()->getClient()->get([
             'index' => 'sineflow-esb-test-temp',
@@ -334,6 +405,11 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         ]);
     }
 
+    /**
+     * @throws ClientResponseException
+     * @throws InvalidArgumentException
+     * @throws ServerResponseException
+     */
     public function testReindexWithElasticsearchSelfProvider(): void
     {
         $im = $this->getIndexManager('backup');
@@ -391,9 +467,11 @@ class IndexManagerTest extends AbstractElasticsearchTestCase
         $this->assertEquals('bar', $imWithoutAliases->getManagerName());
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function testGetDocumentMetadata(): void
     {
-        /** @var IndexManager $imWithAliases */
         $imWithAliases = $this->getIndexManager('customer', false);
 
         $indexMetadata = $imWithAliases->getDocumentMetadata();

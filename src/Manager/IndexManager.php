@@ -2,8 +2,11 @@
 
 namespace Sineflow\ElasticsearchBundle\Manager;
 
-use Elasticsearch\Common\Exceptions\ElasticsearchException;
-use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Elasticsearch\Exception\ElasticsearchException;
+use Elastic\Elasticsearch\Exception\MissingParameterException;
+use Elastic\Elasticsearch\Exception\ServerResponseException;
+use Elastic\Transport\Exception\NoNodeAvailableException;
 use Psr\Cache\InvalidArgumentException;
 use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\Document\Provider\ProviderInterface;
@@ -13,10 +16,12 @@ use Sineflow\ElasticsearchBundle\Document\Repository\RepositoryFactory;
 use Sineflow\ElasticsearchBundle\Event\Events;
 use Sineflow\ElasticsearchBundle\Event\PrePersistEvent;
 use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
-use Sineflow\ElasticsearchBundle\Exception\Exception;
+use Sineflow\ElasticsearchBundle\Exception\IndexAliasAlreadyExistsException;
 use Sineflow\ElasticsearchBundle\Exception\IndexOrAliasNotFoundException;
 use Sineflow\ElasticsearchBundle\Exception\IndexRebuildingException;
+use Sineflow\ElasticsearchBundle\Exception\IndexRebuildingWithoutAliasesException;
 use Sineflow\ElasticsearchBundle\Exception\InvalidLiveIndexException;
+use Sineflow\ElasticsearchBundle\Exception\UnexpectedProviderDocumentException;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadata;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
@@ -198,7 +203,8 @@ class IndexManager
     }
 
     /**
-     * @throws IndexOrAliasNotFoundException
+     * @throws ClientResponseException
+     * @throws ServerResponseException
      */
     private function getIndicesForAlias(?string $alias): array
     {
@@ -223,7 +229,8 @@ class IndexManager
      * Get and verify the existence of all indices pointed by the read alias (if using aliases),
      * or the one actual index (if not using aliases)
      *
-     * @throws IndexOrAliasNotFoundException
+     * @throws ClientResponseException
+     * @throws ServerResponseException
      */
     public function getReadIndices(): array
     {
@@ -234,7 +241,8 @@ class IndexManager
      * Get and verify the existence of all indices pointed by the write alias (if using aliases),
      * or the one actual index (if not using aliases)
      *
-     * @throws IndexOrAliasNotFoundException
+     * @throws ClientResponseException
+     * @throws ServerResponseException
      */
     public function getWriteIndices(): array
     {
@@ -245,8 +253,10 @@ class IndexManager
      * Returns the physical index name of the live (aka "hot") index - the one both read and write aliases point to.
      * And verify that it exists
      *
-     * @throws IndexOrAliasNotFoundException If there are no indices for the read or write alias
-     * @throws InvalidLiveIndexException     If live index is not found or there are more than one
+     * @throws ClientResponseException
+     * @throws ServerResponseException
+     * @throws IndexOrAliasNotFoundException
+     * @throws InvalidLiveIndexException
      */
     public function getLiveIndex(): string
     {
@@ -285,17 +295,17 @@ class IndexManager
     /**
      * Creates elasticsearch index and adds aliases to it depending on index settings
      *
-     * @throws Exception
+     * @throws IndexAliasAlreadyExistsException
      */
     public function createIndex(): void
     {
         if (true === $this->getUseAliases()) {
             // Make sure the read and write aliases do not exist already as aliases or physical indices
             if ($this->getConnection()->existsIndexOrAlias(['index' => $this->readAlias])) {
-                throw new Exception(\sprintf('Read alias "%s" already exists as an alias or an index', $this->readAlias));
+                throw new IndexAliasAlreadyExistsException(\sprintf('Read alias "%s" already exists as an alias or an index', $this->readAlias));
             }
             if ($this->getConnection()->existsIndexOrAlias(['index' => $this->writeAlias])) {
-                throw new Exception(\sprintf('Write alias "%s" already exists as an alias or an index', $this->writeAlias));
+                throw new IndexAliasAlreadyExistsException(\sprintf('Write alias "%s" already exists as an alias or an index', $this->writeAlias));
             }
 
             // Create physical index with a unique name
@@ -315,7 +325,7 @@ class IndexManager
             $settings = $this->getIndexMapping();
             // Make sure the index name does not exist already as a physical index or alias
             if ($this->getConnection()->existsIndexOrAlias(['index' => $this->getBaseIndexName()])) {
-                throw new Exception(\sprintf('Index "%s" already exists as an alias or an index', $this->getBaseIndexName()));
+                throw new IndexAliasAlreadyExistsException(\sprintf('Index "%s" already exists as an alias or an index', $this->getBaseIndexName()));
             }
             $this->getConnection()->getClient()->indices()->create($settings);
         }
@@ -323,6 +333,10 @@ class IndexManager
 
     /**
      * Drops elasticsearch index(es).
+     *
+     * @throws MissingParameterException if a required parameter is missing
+     * @throws NoNodeAvailableException  if all the hosts are offline
+     * @throws ServerResponseException   if the status code of response is 5xx
      */
     public function dropIndex(): void
     {
@@ -330,12 +344,12 @@ class IndexManager
             if (true === $this->getUseAliases()) {
                 // Delete all physical indices aliased by the read and write aliases
                 $aliasNames = $this->readAlias.','.$this->writeAlias;
-                $indices = $this->getConnection()->getClient()->indices()->getAlias(['name' => $aliasNames]);
+                $indices = $this->getConnection()->getClient()->indices()->getAlias(['name' => $aliasNames])->asArray();
                 $this->getConnection()->getClient()->indices()->delete(['index' => \implode(',', \array_keys($indices))]);
             } else {
                 $this->getConnection()->getClient()->indices()->delete(['index' => $this->getBaseIndexName()]);
             }
-        } catch (Missing404Exception) {
+        } catch (ClientResponseException) {
             // No physical indices exist for the index manager's aliases, or the physical index did not exist
         }
     }
@@ -347,14 +361,18 @@ class IndexManager
      * @param bool $cancelExistingRebuild If set, any indices that the write alias points to (except the live one)
      *                                    will be deleted before the new build starts
      *
+     * @throws ClientResponseException
      * @throws ElasticsearchException
+     * @throws IndexRebuildingWithoutAliasesException
+     * @throws MissingParameterException
+     * @throws ServerResponseException
      */
     public function rebuildIndex(bool $deleteOld = false, bool $cancelExistingRebuild = false): void
     {
         $newIndex = null;
         try {
             if (false === $this->getUseAliases()) {
-                throw new Exception(\sprintf('Index rebuilding is not supported for "%s", unless you use aliases', $this->getBaseIndexName()));
+                throw new IndexRebuildingWithoutAliasesException(\sprintf('Index rebuilding is not supported for "%s", unless you use aliases', $this->getBaseIndexName()));
             }
 
             $oldIndex = $this->getLiveIndexPreparedForRebuilding($cancelExistingRebuild);
@@ -411,7 +429,10 @@ class IndexManager
      * Rebuilds the data of a document and adds it to a bulk request for the next commit.
      * Depending on the connection autocommit mode, the change may be committed right away.
      *
+     * @throws ClientResponseException
      * @throws InvalidArgumentException
+     * @throws ServerResponseException
+     * @throws UnexpectedProviderDocumentException
      */
     public function reindex(string|int $id): void
     {
@@ -423,23 +444,23 @@ class IndexManager
         switch (true) {
             case $document instanceof DocumentInterface:
                 if ($document::class !== $documentClass) {
-                    throw new Exception(\sprintf('Document must be [%s], but [%s] was returned from data provider', $documentClass, $document::class));
+                    throw new UnexpectedProviderDocumentException(\sprintf('Document must be [%s], but [%s] was returned from data provider', $documentClass, $document::class));
                 }
                 $this->persist($document);
                 break;
 
             case \is_array($document):
                 if (!isset($document['_id'])) {
-                    throw new Exception(\sprintf('The returned document array must include an "_id" field: (%s)', \serialize($document)));
+                    throw new UnexpectedProviderDocumentException(\sprintf('The returned document array must include an "_id" field: (%s)', \serialize($document)));
                 }
                 if ($document['_id'] != $id) {
-                    throw new Exception(\sprintf('The document id must be [%s], but "%s" was returned from data provider', $id, $document['_id']));
+                    throw new UnexpectedProviderDocumentException(\sprintf('The document id must be [%s], but "%s" was returned from data provider', $id, $document['_id']));
                 }
                 $this->persistRaw($document);
                 break;
 
             default:
-                throw new Exception('Document must be either a DocumentInterface instance or an array with raw data');
+                throw new UnexpectedProviderDocumentException('Document must be either a DocumentInterface instance or an array with raw data');
         }
 
         if ($this->getConnection()->isAutocommit()) {

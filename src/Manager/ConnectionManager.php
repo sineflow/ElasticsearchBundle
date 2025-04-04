@@ -2,9 +2,12 @@
 
 namespace Sineflow\ElasticsearchBundle\Manager;
 
-use Elasticsearch\Client;
-use Elasticsearch\ClientBuilder;
-use Elasticsearch\Common\Exceptions\InvalidArgumentException;
+use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\ClientBuilder;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Elasticsearch\Exception\InvalidArgumentException;
+use Elastic\Elasticsearch\Exception\ServerResponseException;
+use Elastic\Transport\Exception\NoNodeAvailableException;
 use Psr\Log\LoggerInterface;
 use Sineflow\ElasticsearchBundle\DTO\BulkQueryItem;
 use Sineflow\ElasticsearchBundle\Event\Events;
@@ -85,9 +88,10 @@ class ConnectionManager
             if (isset($this->connectionSettings['ssl_verification'])) {
                 $clientBuilder->setSSLVerification($this->connectionSettings['ssl_verification']);
             }
-            if ($this->tracer && $this->kernelDebug) {
-                $clientBuilder->setTracer($this->tracer);
-            }
+            // TODO: Figure out how I'll do the symfony toolbar profiling without this
+            //            if ($this->tracer && $this->kernelDebug) {
+            //                $clientBuilder->setTracer($this->tracer);
+            //            }
             if ($this->logger) {
                 $clientBuilder->setLogger($this->logger);
             }
@@ -107,6 +111,10 @@ class ConnectionManager
         return $this->autocommit;
     }
 
+    /**
+     * @throws ClientResponseException
+     * @throws ServerResponseException
+     */
     public function setAutocommit(bool $autocommit): void
     {
         // If the autocommit mode is being turned on, commit any pending bulk items
@@ -169,7 +177,8 @@ class ConnectionManager
      *                           to set this to false, to get better performance. In the latter case, data would be
      *                           normally available within 1 second
      *
-     * @throws BulkRequestException
+     * @throws ClientResponseException
+     * @throws ServerResponseException
      */
     public function commit(bool $forceRefresh = true): void
     {
@@ -186,7 +195,7 @@ class ConnectionManager
 
         $this->bulkQueries = [];
 
-        $this->eventDispatcher?->dispatch(new PostCommitEvent($response, $this), Events::POST_COMMIT);
+        $this->eventDispatcher?->dispatch(new PostCommitEvent($response->asArray(), $this), Events::POST_COMMIT);
 
         if ($response['errors']) {
             $errorCount = $this->logBulkRequestErrors($response['items']);
@@ -198,6 +207,10 @@ class ConnectionManager
 
     /**
      * Get the current bulk request queued for commit
+     *
+     * @throws NoNodeAvailableException if all the hosts are offline
+     * @throws ClientResponseException  if the status code of response is 4xx
+     * @throws ServerResponseException  if the status code of response is 5xx
      */
     private function getBulkRequest(): array
     {
@@ -210,7 +223,7 @@ class ConnectionManager
             } else {
                 // Check whether the target index is actually an alias pointing to more than one index
                 // in which case, two separate bulk query operation will be set for each physical index
-                $indices = \array_keys($this->getClient()->indices()->getAlias(['index' => $bulkQueryItem->getIndex()]));
+                $indices = \array_keys($this->getClient()->indices()->getAlias(['index' => $bulkQueryItem->getIndex()])->asArray());
                 $cachedAliasIndices[$bulkQueryItem->getIndex()] = $indices;
             }
             foreach ($indices as $index) {
@@ -220,9 +233,7 @@ class ConnectionManager
             }
         }
 
-        $bulkRequest = \array_merge($bulkRequest, $this->bulkParams);
-
-        return $bulkRequest;
+        return \array_merge($bulkRequest, $this->bulkParams);
     }
 
     /**
@@ -241,7 +252,7 @@ class ConnectionManager
             $actionResult = \reset($responseItem);
 
             // If there was an error on that item
-            if (!empty($actionResult['error']) && $this->logger) {
+            if (!empty($actionResult['error']) && $this->logger instanceof LoggerInterface) {
                 ++$errorsCount;
                 $this->logger->error(\sprintf('Bulk %s item failed', $action), $actionResult);
             }
@@ -252,6 +263,10 @@ class ConnectionManager
 
     /**
      * Refresh all indices, making any newly indexed documents immediately available for search
+     *
+     * @throws NoNodeAvailableException if all the hosts are offline
+     * @throws ClientResponseException  if the status code of response is 4xx
+     * @throws ServerResponseException  if the status code of response is 5xx
      */
     public function refresh(): void
     {
@@ -265,6 +280,10 @@ class ConnectionManager
      *
      * Causes a Lucene commit to happen
      * In most cases refresh() should be used instead, as this is a very expensive operation
+     *
+     * @throws NoNodeAvailableException if all the hosts are offline
+     * @throws ClientResponseException  if the status code of response is 4xx
+     * @throws ServerResponseException  if the status code of response is 5xx
      */
     public function flush(): void
     {
@@ -275,13 +294,17 @@ class ConnectionManager
      * Return all defined aliases in the ES cluster with all indices they point to
      *
      * @return array The ES aliases
+     *
+     * @throws NoNodeAvailableException if all the hosts are offline
+     * @throws ClientResponseException  if the status code of response is 4xx
+     * @throws ServerResponseException  if the status code of response is 5xx
      */
     public function getAliases(): array
     {
         $aliases = [];
         // Get all indices and their linked aliases (exc. dot-prefixed indices) and invert the results
         // Passing this 'index' argument should not be necessary in ES8
-        $indices = $this->getClient()->indices()->getAlias(['index' => '*,-.*']);
+        $indices = $this->getClient()->indices()->getAlias(['index' => '*,-.*'])->asArray();
         foreach ($indices as $index => $data) {
             foreach ($data['aliases'] as $alias => $aliasData) {
                 $aliases[$alias][$index] = [];
@@ -303,7 +326,8 @@ class ConnectionManager
      *
      * @param array $params Associative array of parameters
      *
-     * @throws InvalidArgumentException
+     * @throws ClientResponseException
+     * @throws ServerResponseException
      */
     public function existsIndexOrAlias(array $params): bool
     {
@@ -315,7 +339,7 @@ class ConnectionManager
 
         // Get all available indices (exc. dot-prefixed indices) with their aliases
         // Passing this 'index' argument should not be necessary in ES8
-        $allAliases = $this->getClient()->indices()->getAlias(['index' => '*,-.*']);
+        $allAliases = $this->getClient()->indices()->getAlias(['index' => '*,-.*'])->asArray();
         foreach ($allAliases as $index => $data) {
             if (isset($indicesAndAliasesToCheck[$index])) {
                 unset($indicesAndAliasesToCheck[$index]);
@@ -345,7 +369,8 @@ class ConnectionManager
      * @param array $params
      *                      $params['name']               = (list) A comma-separated list of alias names to return (Required)
      *
-     * @throws InvalidArgumentException
+     * @throws ClientResponseException
+     * @throws ServerResponseException
      */
     public function existsAlias(array $params): bool
     {
@@ -357,7 +382,7 @@ class ConnectionManager
 
         // Get all available indices (exc. dot-prefixed indices) with their aliases
         // Passing this 'index' argument should not be necessary in ES8
-        $allAliases = $this->getClient()->indices()->getAlias(['index' => '*,-.*']);
+        $allAliases = $this->getClient()->indices()->getAlias(['index' => '*,-.*'])->asArray();
         foreach ($allAliases as $data) {
             foreach ($aliasesToCheck as $aliasToCheck) {
                 if (isset($data['aliases'][$aliasToCheck])) {

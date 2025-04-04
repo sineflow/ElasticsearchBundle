@@ -25,7 +25,7 @@
 
         "doctrine/annotations": "^1.2",
         "doctrine/cache": "^1.4",
-        "elasticsearch/elasticsearch": "^7.0"
+        "elasticsearch/elasticsearch": "^8.0"
     },
     "require-dev": {
         "symfony/stopwatch": "^5.4 || ^6.4",
@@ -62,7 +62,10 @@
         }
     },
     "config": {
-        "prepend-autoloader": false
+        "prepend-autoloader": false,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     },
     "scripts": {
         "run-tests": [

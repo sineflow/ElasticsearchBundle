@@ -2,6 +2,6 @@
 
 namespace Sineflow\ElasticsearchBundle\Exception;
 
-class InvalidIndexManagerException extends Exception
+class InvalidIndexManagerException extends \Exception implements ElasticsearchBundleException
 {
 }
