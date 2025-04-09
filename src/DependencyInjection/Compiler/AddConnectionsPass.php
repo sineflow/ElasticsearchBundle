@@ -25,6 +25,7 @@ class AddConnectionsPass implements CompilerPassInterface
             $connectionName = \strtolower($connectionName);
 
             $connectionDefinition = new ChildDefinition('sfes.connection_manager_prototype');
+            $connectionDefinition->addTag('sfes.connection_manager');
 
             $connectionDefinition->replaceArgument(0, $connectionName);
             $connectionDefinition->replaceArgument(1, $connectionSettings);
@@ -33,10 +34,6 @@ class AddConnectionsPass implements CompilerPassInterface
             if ($connectionSettings['logging']) {
                 $connectionDefinition->addMethodCall('setLogger', [new Reference('logger')]);
                 $connectionDefinition->addTag('monolog.logger', ['channel' => 'sfes']);
-            }
-            // If profiling is enabled for the connection and the profiler is enabled for the application at all
-            if ($connectionSettings['profiling'] && $container->has('profiler')) {
-                $connectionDefinition->addMethodCall('setTracer', [new Reference('sfes.logger.profiler')]);
             }
 
             $connectionManagerId = \sprintf('sfes.connection.%s', $connectionName);

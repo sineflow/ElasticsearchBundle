@@ -3,13 +3,13 @@
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Profiler;
 
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
-use Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler;
+use Sineflow\ElasticsearchBundle\Profiler\ProfilerDataCollector;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
+class ProfilerDataCollectorTest extends AbstractElasticsearchTestCase
 {
     use ArraySubsetAsserts;
 
@@ -73,8 +73,8 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
         $imWithoutAliases->getConnection()->setAutocommit(true);
         $imWithoutAliases->getRepository()->getById(3);
 
-        $this->assertGreaterThan(0.0, $this->getCollector()->getTime(), 'Time should be greater than 0ms');
-        $this->assertLessThan(2000.0, $this->getCollector()->getTime(), 'Time should be less than 2s');
+        $this->assertGreaterThan(0.0, $this->getCollector()->getTotalQueryTime(), 'Time should be greater than 0ms');
+        $this->assertLessThan(2000.0, $this->getCollector()->getTotalQueryTime(), 'Time should be less than 2s');
     }
 
     /**
@@ -88,20 +88,20 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
 
         $queries = $this->getCollector()->getQueries();
 
-        $lastQuery = \end($queries[ElasticsearchProfiler::UNDEFINED_ROUTE]);
+        $lastQuery = \end($queries);
         $this->checkQueryParameters($lastQuery);
 
         $esHostAndPort = \explode(':', (string) $imWithoutAliases->getConnection()->getConnectionSettings()['hosts'][0]);
 
         $this->assertArraySubset(
             [
-                'curlRequest'  => "curl -XPOST 'http://".\implode(':', $esHostAndPort)."/sineflow-esb-test-bar/_search?pretty=true' -d '{\"query\":{\"ids\":{\"values\":[3]}},\"version\":true}'",
-                'senseRequest' => "POST /sineflow-esb-test-bar/_search\n{\"query\":{\"ids\":{\"values\":[3]}},\"version\":true}",
-                'backtrace'    => null,
-                'scheme'       => 'http',
-                'host'         => $esHostAndPort[0],
-                'port'         => (int) $esHostAndPort[1],
-                'path'         => '/sineflow-esb-test-bar/_search',
+                'curlRequest'   => "curl -XPOST 'http://".\implode(':', $esHostAndPort)."/sineflow-esb-test-bar/_search?pretty=true' -d '{\"query\":{\"ids\":{\"values\":[3]}},\"version\":true}'",
+                'kibanaRequest' => "POST /sineflow-esb-test-bar/_search\n{\"query\":{\"ids\":{\"values\":[3]}},\"version\":true}",
+                'method'        => 'POST',
+                'scheme'        => 'http',
+                'host'          => $esHostAndPort[0],
+                'port'          => (int) $esHostAndPort[1],
+                'path'          => '/sineflow-esb-test-bar/_search',
             ],
             $lastQuery,
             'Logged data did not match expected data.'
@@ -110,19 +110,17 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
 
     /**
      * Checks query parameters that are not static.
-     *
-     * @param array $query
      */
-    public function checkQueryParameters($query)
+    public function checkQueryParameters(array $query): void
     {
-        $this->assertArrayHasKey('time', $query, 'Query should have time set.');
-        $this->assertGreaterThan(0.0, $query['time'], 'Time should be greater than 0');
+        $this->assertArrayHasKey('queryDuration', $query, 'Query should have queryDuration set.');
+        $this->assertGreaterThan(0.0, $query['queryDuration'], 'Query duration should be greater than 0');
 
         $this->assertArrayHasKey('curlRequest', $query, 'Query should have curlRequest set.');
         $this->assertNotEmpty($query['curlRequest'], 'curlRequest should not be empty');
 
-        $this->assertArrayHasKey('senseRequest', $query, 'Query should have senseRequest set.');
-        $this->assertNotEmpty($query['senseRequest'], 'senseRequest should not be empty.');
+        $this->assertArrayHasKey('kibanaRequest', $query, 'Query should have kibanaRequest set.');
+        $this->assertNotEmpty($query['kibanaRequest'], 'kibanaRequest should not be empty.');
 
         $this->assertArrayHasKey('backtrace', $query, 'Query should have backtrace set.');
 
@@ -139,9 +137,10 @@ class ElasticsearchProfilerTest extends AbstractElasticsearchTestCase
         $this->assertNotEmpty($query['path'], 'Path should not be empty.');
     }
 
-    private function getCollector(): ElasticsearchProfiler
+    private function getCollector(): ProfilerDataCollector
     {
-        $collector = $this->getContainer()->get('test.'.ElasticsearchProfiler::class);
+        /** @var ProfilerDataCollector $collector */
+        $collector = $this->getContainer()->get(ProfilerDataCollector::class);
         $collector->collect(new Request(), new Response());
 
         return $collector;

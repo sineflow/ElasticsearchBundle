@@ -6,12 +6,12 @@ use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\DependencyInjection\SineflowElasticsearchExtension;
 use Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
+use Sineflow\ElasticsearchBundle\Manager\ConnectionManagerRegistry;
 use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentParser;
-use Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler;
-use Sineflow\ElasticsearchBundle\Profiler\Handler\CollectionHandler;
+use Sineflow\ElasticsearchBundle\Profiler\ProfilerDataCollector;
 use Sineflow\ElasticsearchBundle\Result\DocumentConverter;
 use Sineflow\ElasticsearchBundle\Subscriber\EntityTrackerSubscriber;
 use Sineflow\ElasticsearchBundle\Subscriber\KnpPaginateQuerySubscriber;
@@ -103,11 +103,12 @@ class ElasticsearchExtensionTest extends TestCase
 
         $expectedConnections = [
             'test1' => [
-                'hosts'            => ['user:pass@eshost:1111'],
-                'profiling'        => false,
-                'logging'          => false,
-                'bulk_batch_size'  => 123,
-                'ssl_verification' => null,
+                'hosts'               => ['user:pass@eshost:1111'],
+                'profiling'           => false,
+                'profiling_backtrace' => false,
+                'logging'             => false,
+                'bulk_batch_size'     => 123,
+                'ssl_verification'    => null,
             ],
         ];
 
@@ -200,13 +201,13 @@ class ElasticsearchExtensionTest extends TestCase
         $expectedServiceDefinitions = [
             DocumentConverter::class,
             ProviderRegistry::class,
+            ConnectionManagerRegistry::class,
             IndexManagerRegistry::class,
             Finder::class,
             DocumentLocator::class,
             DocumentParser::class,
             DocumentMetadataCollector::class,
-            CollectionHandler::class,
-            ElasticsearchProfiler::class,
+            ProfilerDataCollector::class,
             KnpPaginateQuerySubscriber::class,
             EntityTrackerSubscriber::class,
             'sfes.connection_manager_prototype',

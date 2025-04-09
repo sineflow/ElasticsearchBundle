@@ -21,6 +21,7 @@ sineflow_elasticsearch:
             hosts:
                 - user:pass@127.0.0.1:9200
             profiling: true
+            profiling_backtrace: false
             logging: true
             bulk_batch_size: 1000
 

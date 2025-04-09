@@ -2,17 +2,18 @@
 
 namespace Sineflow\ElasticsearchBundle\Manager;
 
-use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\ClientBuilder;
 use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elastic\Elasticsearch\Exception\InvalidArgumentException;
 use Elastic\Elasticsearch\Exception\ServerResponseException;
 use Elastic\Transport\Exception\NoNodeAvailableException;
 use Psr\Log\LoggerInterface;
+use Sineflow\ElasticsearchBundle\Client\Client;
 use Sineflow\ElasticsearchBundle\DTO\BulkQueryItem;
 use Sineflow\ElasticsearchBundle\Event\Events;
 use Sineflow\ElasticsearchBundle\Event\PostCommitEvent;
 use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
+use Sineflow\ElasticsearchBundle\Profiler\ProfilerQueryLogCollection;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -34,11 +35,11 @@ class ConnectionManager
 
     protected ?LoggerInterface $logger = null;
 
-    protected ?LoggerInterface $tracer = null;
-
     protected bool $autocommit;
 
     protected ?EventDispatcherInterface $eventDispatcher = null;
+
+    protected ?ProfilerQueryLogCollection $profilerQueryLogCollection = null;
 
     /**
      * @param string $connectionName     The unique connection name
@@ -53,6 +54,14 @@ class ConnectionManager
         $this->bulkQueries = [];
         $this->bulkParams = [];
         $this->autocommit = false;
+
+        $profilingEnabled = $kernelDebug && ($this->connectionSettings['profiling'] ?? false);
+        $this->profilerQueryLogCollection = $profilingEnabled ? new ProfilerQueryLogCollection() : null;
+    }
+
+    public function getProfilerQueryLogCollection(): ?ProfilerQueryLogCollection
+    {
+        return $this->profilerQueryLogCollection;
     }
 
     public function setLogger(LoggerInterface $logger): void
@@ -63,16 +72,6 @@ class ConnectionManager
     public function getLogger(): ?LoggerInterface
     {
         return $this->logger;
-    }
-
-    public function setTracer(LoggerInterface $tracer): void
-    {
-        $this->tracer = $tracer;
-    }
-
-    public function getTracer(): ?LoggerInterface
-    {
-        return $this->tracer;
     }
 
     public function getConnectionName(): string
@@ -88,14 +87,15 @@ class ConnectionManager
             if (isset($this->connectionSettings['ssl_verification'])) {
                 $clientBuilder->setSSLVerification($this->connectionSettings['ssl_verification']);
             }
-            // TODO: Figure out how I'll do the symfony toolbar profiling without this
-            //            if ($this->tracer && $this->kernelDebug) {
-            //                $clientBuilder->setTracer($this->tracer);
-            //            }
             if ($this->logger) {
                 $clientBuilder->setLogger($this->logger);
             }
-            $this->client = $clientBuilder->build();
+
+            $this->client = new Client(
+                $clientBuilder->build(),
+                $this->profilerQueryLogCollection,
+                $this->connectionSettings['profiling_backtrace'],
+            );
         }
 
         return $this->client;

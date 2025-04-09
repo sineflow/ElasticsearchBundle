@@ -2,7 +2,6 @@ imports:
     - { resource: services_commands.yml }
 
 parameters:
-    sfes.profiler_backtrace_enabled: false
     sfes.mlproperty.language_separator: '-'
 
     sfes.provider_self.class: Sineflow\ElasticsearchBundle\Document\Provider\ElasticsearchProvider
@@ -37,6 +36,10 @@ services:
             - '@Sineflow\ElasticsearchBundle\Finder\Finder'
             - '@Sineflow\ElasticsearchBundle\Result\DocumentConverter'
             - '@Sineflow\ElasticsearchBundle\Document\Repository\RepositoryFactory'
+
+    Sineflow\ElasticsearchBundle\Manager\ConnectionManagerRegistry:
+        arguments:
+            - !tagged_locator { tag: 'sfes.connection_manager' }
 
     Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry:
         arguments:
@@ -83,11 +86,6 @@ services:
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentLocator'
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentParser'
 
-    Sineflow\ElasticsearchBundle\Profiler\Handler\CollectionHandler:
-        arguments:
-            - '@request_stack'
-            - '%sfes.profiler_backtrace_enabled%'
-
     Sineflow\ElasticsearchBundle\Subscriber\KnpPaginateQuerySubscriber:
         arguments: ['@request_stack']
         tags:
@@ -105,15 +103,10 @@ services:
         tags:
             - { name: kernel.cache_warmer }
 
-    Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler:
+    Sineflow\ElasticsearchBundle\Profiler\ProfilerDataCollector:
+        arguments:
+            - '@Sineflow\ElasticsearchBundle\Manager\ConnectionManagerRegistry'
         calls:
             - [setIndexManagers, ['%sfes.indices%']]
-            - [addLogger, ['@sfes.logger.profiler']]
         tags:
-            - {name: data_collector, template: '@SineflowElasticsearch/Profiler/profiler.html.twig', id: sfes.profiler}
-
-    sfes.logger.profiler:
-        class: Monolog\Logger
-        arguments: ['sfes_profiler']
-        calls:
-            - [pushHandler, ['@Sineflow\ElasticsearchBundle\Profiler\Handler\CollectionHandler']]
+            - { name: data_collector, template: '@SineflowElasticsearch/Profiler/profiler.html.twig', id: sfes.profiler }

@@ -1,196 +1,168 @@
-{% extends app.request.isXmlHttpRequest ? '@WebProfiler/Profiler/ajax_layout.html.twig' : '@WebProfiler/Profiler/layout.html.twig' %}
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
-    {% set profiler_markup_version = profiler_markup_version|default(1) %}
-
     {% if collector.queryCount > 0 %}
+        {% set status_color = collector.totalQueryTime > 1000 ? 'red' : (collector.totalQueryTime > 500 ? 'yellow' : '') %}
 
         {% set icon %}
-            {% if profiler_markup_version == 1 %}
-                <img width="20" height="28" alt="Elasticsearch" src="data:image/png;base64,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" />
-                <span class="sf-toolbar-status{% if collector.time >= 500 %} sf-toolbar-status-yellow{% endif %}">{{ collector.queryCount }}</span>
-            {% else %}
-                {{ include('@SineflowElasticsearch/Profiler/images/elasticsearch.svg') }}
-                <span class="sf-toolbar-value">{{ collector.queryCount }} in {{ collector.time }}</span> <span class="sf-toolbar-label">ms</span>
-            {% endif %}
-
-        {%- endset %}
-
-        {% if collector.time > 1000 %}
-            {% set status = 'red' %}
-        {% elseif collector.time > 500 %}
-            {% set status = 'yellow' %}
-        {% else %}
-            {% set status = 'normal' %}
-        {% endif %}
+            {{ include('@SineflowElasticsearch/Profiler/images/elasticsearch.svg') }}
+            <span class="sf-toolbar-value">{{ collector.queryCount }}</span>
+            <span class="sf-toolbar-info-piece-additional-detail">
+                <span class="sf-toolbar-label">in</span>
+                <span class="sf-toolbar-value">{{ collector.totalQueryTime|number_format(0) }}</span>
+                <span class="sf-toolbar-label">ms</span>
+            </span>
+        {% endset %}
 
         {% set text %}
             <div class="sf-toolbar-info-piece">
                 <b>ES Queries</b>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ status }}">{{ collector.queryCount }}</span>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ status_color }}">{{ collector.queryCount }}</span>
             </div>
             <div class="sf-toolbar-info-piece">
                 <b>Query time</b>
-                <span class="sf-toolbar-status">{{ collector.time }} ms</span>
+                <span>{{ collector.totalQueryTime }} ms</span>
             </div>
         {% endset %}
-        {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
 
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
     {% endif %}
-
 {% endblock %}
 
 {% block head %}
     {{ parent() }}
-
     <style>
-        {{ include('@SineflowElasticsearch/Profiler/elasticsearch.css.twig') }}
-    </style>
-
-    <script type="text/javascript">//<![CDATA[
-        function expandQuery(link) {
-            var sections = link.children,
-                target = link.getAttribute('data-target-id');
-            if (document.getElementById(target).className != 'hide') {
-                document.getElementById(target).style.display = 'none';
-                document.getElementById(target).className = 'hide';
-                sections[0].style.display = 'inline';
-                sections[1].style.display = 'none';
-            } else {
-                document.getElementById(target).className = 'show';
-                document.getElementById(target).style.display = 'inline';
-                sections[0].style.display = 'none';
-                sections[1].style.display = 'inline';
-            }
-            return false;
+        .es-query {
+            border: 1px solid #AEAEAE;
+            margin: .5em 0;
+            padding: 1em;
         }
-        //]]></script>
+    </style>
 {% endblock %}
 
 {% block menu %}
-    {% set profiler_markup_version = profiler_markup_version|default(1) %}
-
-    {% if profiler_markup_version == 1 %}
-        <span class="label">
-            <span class="icon"><img src="data:image/png;base64,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" alt="" /></span>
-            <strong>Elasticsearch</strong>
-            <span class="count">
-                <span>{{ collector.queryCount }}</span>
-            </span>
-        </span>
-
-    {% else %}
-
-        <span class="label {{ collector.queryCount == 0 ? 'disabled' }}">
-            <span class="icon">
-            {{ include('@SineflowElasticsearch/Profiler/images/elasticsearch.svg') }}
-            </span>
-            <strong>Elasticsearch</strong>
-        </span>
-
-    {% endif %}
-
-{% endblock %}
-
-{% block queries %}
-
-    {% if collector.queryCount == 0 %}
-            <div class="empty">
-                <p>No Elasticsearch queries were performed.</p>
-            </div>
-    {% else %}
-
-        {% for i, route in collector.queries %}
-            <h3>Route: <i>{{ i }}</i></h3>
-            <table class="alt" id="queriesPlaceholder-{{ i }}">
-                <thead>
-                <tr>
-                    <th>#<span>&#9650;</span></th>
-                    <th style="width: 50px;">Time<span></span></th>
-                    <th style="width: 100%;">Info</th>
-                </tr>
-                </thead>
-                <tbody id="queries">
-                {% for q, query in route %}
-                    <tr id="queryNo-{{ q }}" class="{{ cycle(['odd', 'even'], q) }}">
-                        <td>{{ q }}</td>
-                        <td nowrap="nowrap">{{ '%0.3f'|format(query.time) }}&nbsp;ms</td>
-                        <td>
-                            <div onclick="return expandQuery(this);" title="Expand query" data-target-id="sensecode-{{ i ~q }}" style="cursor: pointer;">
-                                <span class="sf-icon" style="display: inline;">{{ include('@SineflowElasticsearch/Profiler/images/icon-plus-square-o.svg') }}</span>
-                                <span class="sf-icon" style="display: none;">{{ include('@SineflowElasticsearch/Profiler/images/icon-minus-square-o.svg') }}</span>
-                                <span id="smallsensecode-{{ i ~ q }}">
-                                    <strong>Query:</strong>
-                                    <small>
-                                        {{ query.senseRequest|length > 50 ? query.senseRequest|slice(0, 100) ~ ' ...' : query.senseRequest }}
-                                    </small>
-                                </span>
-                            </div>
-                            <code id="sensecode-{{ i ~ q }}" class="hide">
-                                <pre class="code">{{ query.senseRequest }}</pre>
-                            </code>
-
-                            <div onclick="return expandQuery(this);" title="Expand query" data-target-id="curlcode-{{ i ~q }}" style="cursor: pointer;">
-                                <span class="sf-icon" style="display: inline;">{{ include('@SineflowElasticsearch/Profiler/images/icon-plus-square-o.svg') }}</span>
-                                <span class="sf-icon" style="display: none;">{{ include('@SineflowElasticsearch/Profiler/images/icon-minus-square-o.svg') }}</span>
-                                <span id="smallcurlcode-{{ i ~ q }}">
-                                    <strong>CLI Request:</strong>
-                                    <small>
-                                        {{ query.curlRequest|length > 50 ? query.curlRequest|slice(0, 100) ~ ' ...' : query.curlRequest }}
-                                    </small>
-                                </span>
-                            </div>
-                            <code id="curlcode-{{ i ~ q }}" class="hide">
-                                <pre class="code">{{ query.curlRequest }}</pre>
-                            </code>
-
-
-                            <div onclick="return expandQuery(this);" title="Expand query" data-target-id="backtrace-{{ i ~q }}" style="cursor: pointer;">
-                                <span class="sf-icon" style="display: inline;">{{ include('@SineflowElasticsearch/Profiler/images/icon-plus-square-o.svg') }}</span>
-                                <span class="sf-icon" style="display: none;">{{ include('@SineflowElasticsearch/Profiler/images/icon-minus-square-o.svg') }}</span>
-                                <span id="smallbacktrace-{{ i ~ q }}">
-                                    <strong>Backtrace:</strong>
-                                    <small>
-                                        Click to view
-                                    </small>
-                                </span>
-                            </div>
-                            <code id="backtrace-{{ i ~ q }}" class="hide">
-                                {% if query.backtrace is empty %}
-                                    <pre>
-Backtrace is disabled by default for performance reasons.
-To enable it, set 'sfes.profiler_backtrace_enabled' to true.</pre>
-                                {% else %}
-                                    <pre class="code">{% for line in query.backtrace %}
-{{ line.class|default('<none>')|trim }}:{{ line.function|default('') }}()
-{% endfor %}</pre>
-                                {% endif %}
-                            </code>
-
-
-                        </td>
-                    </tr>
-
-                {% endfor %}
-                </tbody>
-            </table>
-        {% endfor %}
-
-    {% endif %}
-
+    <span class="label {{ collector.queryCount == 0 ? 'disabled' }}">
+        <span class="icon">{{ include('@SineflowElasticsearch/Profiler/images/elasticsearch.svg') }}</span>
+        <strong>Elasticsearch</strong>
+        {% if collector.queryCount %}
+            <span class="count"><span>{{ collector.queryCount }}</span></span>
+        {% endif %}
+    </span>
 {% endblock %}
 
 {% block panel %}
-    <h2>Queries</h2>
-    {{ block('queries') }}
+    <h2>Elasticsearch Queries</h2>
 
-    <h2>Index managers</h2>
-    {% if collector.indexManagers %}
-        {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.indexManagers }, with_context = false) }}
-    {% else %}
-        <p>
-            <em>No managers.</em>
-        </p>
-    {% endif %}
+    <div class="metrics">
+        <div class="metric-group">
+            <div class="metric">
+                <span class="value">{{ collector.queryCount }}</span>
+                <span class="label">Queries</span>
+            </div>
 
+            <div class="metric">
+                <span class="value">{{ '%0.2f'|format(collector.totalQueryTime) }} ms</span>
+                <span class="label">Query time</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="sf-tabs" style="margin-top: 20px;">
+        <div class="tab">
+            <h3 class="tab-title">Queries</h3>
+            <div class="tab-content">
+                {% if collector.queryCount == 0 %}
+                    <div class="empty">
+                        <p>No Elasticsearch queries were performed.</p>
+                    </div>
+                {% else %}
+                    <table class="alt">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Time</th>
+                            <th>Query</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for i, query in collector.queries %}
+                            <tr>
+                                <td>{{ i + 1 }}</td>
+                                <td>{{ query.queryDuration|number_format(3) }} ms</td>
+                                <td>
+                                    {{ query.kibanaRequest|length > 50 ? query.kibanaRequest|slice(0, 95) ~ '...' : query.kibanaRequest }}
+
+                                    <div class="text-small font-normal">
+                                        <a href="#" class="sf-toggle" data-toggle-selector="#full-query-{{ i }}" data-toggle-alt-content="Hide full query">View full query</a>
+                                        &nbsp;&nbsp;
+                                        <a href="#" class="sf-toggle" data-toggle-selector="#cli-request-{{ i }}" data-toggle-alt-content="Hide CLI request">View CLI request</a>
+                                        &nbsp;&nbsp;
+                                        <a href="#" class="sf-toggle" data-toggle-selector="#backtrace-{{ i }}" data-toggle-alt-content="Hide query backtrace">View query backtrace</a>
+                                    </div>
+
+                                    <div id="full-query-{{ i }}" class="hidden es-query">
+                                        {{ query.kibanaRequest }}
+                                        <br><br>
+                                        <button class="btn btn-sm hidden" data-clipboard-text="{{ query.kibanaRequest|e('html_attr') }}">Copy</button>
+                                    </div>
+
+                                    <div id="cli-request-{{ i }}" class="hidden es-query">
+                                        {{ query.curlRequest }}
+                                        <br><br>
+                                        <button class="btn btn-sm hidden" data-clipboard-text="{{ query.curlRequest|e('html_attr') }}">Copy</button>
+                                    </div>
+
+                                    {% if query.backtrace is defined %}
+                                        <div id="backtrace-{{ i }}" class="hidden">
+                                            <table>
+                                                <thead>
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">File/Call</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for trace in query.backtrace %}
+                                                    <tr>
+                                                        <td>{{ loop.index }}</td>
+                                                        <td>
+                                                            <span class="text-small">
+                                                                {% set line_number = trace.line|default(1) %}
+                                                                {% if trace.file is defined %}
+                                                                    <a href="{{ trace.file|file_link(line_number) }}">
+                                                                {% endif %}
+                                                                    {{- trace.class|default ~ (trace.class is defined ? trace.type|default('::')) -}}
+                                                                    <span class="status-warning">{{ trace.function }}</span>
+                                                                {% if trace.file is defined %}
+                                                                    </a>
+                                                                {% endif %}
+                                                                (line {{ line_number }})
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tab">
+            <h3 class="tab-title">Index managers</h3>
+            <div class="tab-content">
+                {% if collector.indexManagers %}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.indexManagers }, with_context = false) }}
+                {% else %}
+                    <p><em>No index managers configured.</em></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 {% endblock %}

@@ -28,6 +28,7 @@ sineflow_elasticsearch:
         default:
             hosts: '%elasticsearch_hosts%'
             profiling: true
+            profiling_backtrace: true
             logging: true
             bulk_batch_size: 100
 
@@ -89,11 +90,6 @@ services:
     # Some service named as an index manager that is not actually an index manager
     sfes.index.blah:
         class: Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Repository\ProductRepository
-        public: true
-
-    # Since the profiler is not used by any service inside the bundle, it is removed from the container unless I explicitly make it public
-    test.Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler:
-        alias: 'Sineflow\ElasticsearchBundle\Profiler\ElasticsearchProfiler'
         public: true
 
     app.null_cache_adapter:
