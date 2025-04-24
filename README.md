@@ -2,7 +2,7 @@
 
 ![License](https://img.shields.io/github/license/sineflow/elasticsearchbundle.svg)
 [![Latest Stable Version](https://img.shields.io/github/release/sineflow/elasticsearchbundle.svg)](https://packagist.org/packages/sineflow/elasticsearch-bundle)
-![Tests Workflow](https://github.com/sineflow/ElasticsearchBundle/actions/workflows/phpunit-tests.yml/badge.svg)
+[![Tests Workflow](https://github.com/sineflow/ElasticsearchBundle/actions/workflows/phpunit-tests.yml/badge.svg)](https://github.com/sineflow/ElasticsearchBundle/actions/workflows/phpunit-tests.yml)
 [![Coverage Status](https://coveralls.io/repos/github/sineflow/ElasticsearchBundle/badge.svg?branch=main)](https://coveralls.io/github/sineflow/ElasticsearchBundle?branch=main)
 
 ## Key points

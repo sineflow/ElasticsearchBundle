@@ -11,7 +11,7 @@ env:
 
 jobs:
     static_code_analysis:
-        runs-on: 'ubuntu-20.04'
+        runs-on: 'ubuntu-24.04'
         name: 'Static code analysis'
         steps:
             - name: Setup PHP
@@ -36,7 +36,7 @@ jobs:
 
     phpunit:
         needs: [ static_code_analysis ]
-        runs-on: 'ubuntu-20.04'
+        runs-on: 'ubuntu-24.04'
         name: 'PHPUnit (PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, ES ${{ matrix.elasticsearch }})'
         timeout-minutes: 30
         continue-on-error: ${{ matrix.experimental }}
@@ -128,7 +128,7 @@ jobs:
 
     finalize:
         needs: [phpunit]
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         steps:
             - name: Finalize Coveralls Parallel Build
               uses: coverallsapp/github-action@v2
