@@ -109,6 +109,9 @@ class ElasticsearchExtensionTest extends TestCase
                 'logging'             => false,
                 'bulk_batch_size'     => 123,
                 'ssl_verification'    => null,
+                'ssl_ca'              => null,
+                'ssl_key'             => null,
+                'ssl_cert'            => null,
             ],
         ];
 

@@ -84,9 +84,21 @@ class ConnectionManager
         if (!$this->client) {
             $clientBuilder = ClientBuilder::create();
             $clientBuilder->setHosts($this->connectionSettings['hosts']);
+
+            // Configure SSL/TLS settings
             if (isset($this->connectionSettings['ssl_verification'])) {
                 $clientBuilder->setSSLVerification($this->connectionSettings['ssl_verification']);
             }
+            if (isset($this->connectionSettings['ssl_ca'])) {
+                $clientBuilder->setCABundle($this->connectionSettings['ssl_ca']);
+            }
+            if (isset($this->connectionSettings['ssl_key'])) {
+                $clientBuilder->setSSLKey($this->connectionSettings['ssl_key']);
+            }
+            if (isset($this->connectionSettings['ssl_cert'])) {
+                $clientBuilder->setSSLCert($this->connectionSettings['ssl_cert']);
+            }
+
             if ($this->logger) {
                 $clientBuilder->setLogger($this->logger);
             }
