@@ -130,6 +130,10 @@ class DocumentMetadataCollector implements WarmableInterface
         $documentClass = $this->documentLocator->resolveClassName($documentClass);
         $indexManagerName = $this->getDocumentClassIndex($documentClass);
         $indexAnalyzers = $this->indexManagers[$indexManagerName]['settings']['analysis']['analyzer'] ?? [];
+
+        // TODO: Determine whether to use the annotation or attribute parser
+        //  If the class is annotated with the SFES\Document attribute, use the attribute parser, otherwise fallback to the annotation parser
+        //  Or maybe better to have a global setting to choose the parser - check how Doctrine does it
         $documentMetadataArray = $this->parser->parse(new \ReflectionClass($documentClass), $indexAnalyzers);
 
         return new DocumentMetadata($documentMetadataArray);

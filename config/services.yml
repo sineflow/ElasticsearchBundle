@@ -80,6 +80,12 @@ services:
             - '%sfes.mlproperty.language_separator%'
             - '%sfes.languages%'
 
+    Sineflow\ElasticsearchBundle\Mapping\DocumentAttributeParser:
+        arguments:
+            - '@Sineflow\ElasticsearchBundle\Mapping\DocumentLocator'
+            - '%sfes.mlproperty.language_separator%'
+            - '%sfes.languages%'
+
     Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector:
         arguments:
             - '%sfes.indices%'
