@@ -13,6 +13,8 @@ use Sineflow\ElasticsearchBundle\Annotation\Score;
 
 /**
  * Document parser used for reading document annotations.
+ *
+ * @deprecated Use DocumentAttributeParser instead.
  */
 class DocumentParser
 {

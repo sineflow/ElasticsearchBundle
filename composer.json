@@ -23,8 +23,6 @@
         "symfony/http-kernel": "^5.4 || ^6.4",
         "symfony/event-dispatcher-contracts": "^3.5",
 
-        "doctrine/annotations": "^1.2",
-        "doctrine/cache": "^1.4",
         "elasticsearch/elasticsearch": "^8.0"
     },
     "require-dev": {
@@ -33,6 +31,7 @@
         "symfony/browser-kit": "^5.4 || ^6.4",
         "symfony/dotenv": "^5.4 || ^6.4",
         "doctrine/orm": "^2.6.3",
+        "doctrine/annotations": "^1.2",
 
         "monolog/monolog": "^2.0|^3.0",
         "knplabs/knp-paginator-bundle": "^4.0 || ^5.0",
@@ -48,7 +47,8 @@
     "suggest": {
         "monolog/monolog": "Allows for client-level logging and tracing",
         "knplabs/knp-paginator-bundle": "Allows for search results to be paginated",
-        "doctrine/orm": "Allows for using Doctrine as source for rebuilding indices"
+        "doctrine/orm": "Allows for using Doctrine as source for rebuilding indices",
+        "doctrine/annotations": "Allows for using annotations to configure the bundle, which is now deprecated"
     },
     "autoload": {
         "psr-4": {

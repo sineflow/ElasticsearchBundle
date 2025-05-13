@@ -27,17 +27,32 @@ class DocumentMetadataCollector implements WarmableInterface
      */
     private array $documentClassToIndexManagerNames = [];
 
+    private readonly DocumentParser|DocumentAttributeParser $documentParser;
+
     /**
-     * @param array          $indexManagers The list of index managers defined
-     * @param DocumentParser $parser        For reading entity annotations
-     * @param CacheInterface $cache         For caching entity metadata
+     * @param array                   $indexManagers    The list of index managers defined
+     * @param DocumentParser|null     $annotationParser For reading entity annotations
+     * @param DocumentAttributeParser $attributeParser  For reading entity attributes
+     * @param CacheInterface          $cache            For caching entity metadata
+     * @param bool                    $useAnnotations   Whether to use the attribute parser or the annotation parser
      */
     public function __construct(
-        private array $indexManagers,
+        private readonly array $indexManagers,
         private readonly DocumentLocator $documentLocator,
-        private readonly DocumentParser $parser,
+        private readonly ?DocumentParser $annotationParser,
+        private readonly DocumentAttributeParser $attributeParser,
         private readonly CacheInterface $cache,
+        private readonly bool $useAnnotations = false,
     ) {
+        if ($this->useAnnotations) {
+            if (null === $this->annotationParser) {
+                throw new \LogicException('Annotations are enabled (use_annotations: true), but the "doctrine/annotations" package is not available.');
+            }
+            $this->documentParser = $this->annotationParser;
+        } else {
+            $this->documentParser = $this->attributeParser;
+        }
+
         // Build an internal array with map of document class to index manager name
         foreach ($this->indexManagers as $indexManagerName => $indexSettings) {
             $documentClass = $this->documentLocator->resolveClassName($indexSettings['class']);
@@ -101,7 +116,7 @@ class DocumentMetadataCollector implements WarmableInterface
 
         $cacheKey = self::OBJECTS_CACHE_KEY_PREFIX.\strtr($objectClass, '\\', '.');
 
-        return $this->cache->get($cacheKey, fn (ItemInterface $item): array => $this->parser->getPropertiesMetadata(new \ReflectionClass($objectClass)), 0);
+        return $this->cache->get($cacheKey, fn (ItemInterface $item): array => $this->documentParser->getPropertiesMetadata(new \ReflectionClass($objectClass)), 0);
     }
 
     /**
@@ -130,7 +145,8 @@ class DocumentMetadataCollector implements WarmableInterface
         $documentClass = $this->documentLocator->resolveClassName($documentClass);
         $indexManagerName = $this->getDocumentClassIndex($documentClass);
         $indexAnalyzers = $this->indexManagers[$indexManagerName]['settings']['analysis']['analyzer'] ?? [];
-        $documentMetadataArray = $this->parser->parse(new \ReflectionClass($documentClass), $indexAnalyzers);
+
+        $documentMetadataArray = $this->documentParser->parse(new \ReflectionClass($documentClass), $indexAnalyzers);
 
         return new DocumentMetadata($documentMetadataArray);
     }

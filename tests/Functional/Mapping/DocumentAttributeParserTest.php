@@ -2,10 +2,9 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Mapping;
 
-use Doctrine\Common\Annotations\AnnotationException;
-use Doctrine\Common\Annotations\AnnotationReader;
+use Sineflow\ElasticsearchBundle\Exception\InvalidMappingException;
+use Sineflow\ElasticsearchBundle\Mapping\DocumentAttributeParser;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
-use Sineflow\ElasticsearchBundle\Mapping\DocumentParser;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\ObjCategory;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\ObjTag;
@@ -15,43 +14,37 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Custo
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\EntityWithInvalidEnum;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Enum\CustomerTypeEnum;
 
-class DocumentParserTest extends AbstractContainerAwareTestCase
+class DocumentAttributeParserTest extends AbstractContainerAwareTestCase
 {
-    private DocumentParser $documentParser;
+    private DocumentAttributeParser $documentAttributeParser;
 
     protected function setUp(): void
     {
-        if (!class_exists(AnnotationReader::class)) {
-            $this->markTestSkipped('doctrine/annotations is not installed, skipping DocumentParser tests.');
-        }
-
-        $reader = new AnnotationReader();
         $locator = $this->getContainer()->get(DocumentLocator::class);
         $separator = $this->getContainer()->getParameter('sfes.mlproperty.language_separator');
         $languages = $this->getContainer()->getParameter('sfes.languages');
-        $this->documentParser = new DocumentParser($reader, $locator, $separator, $languages);
+        $this->documentAttributeParser = new DocumentAttributeParser($locator, $separator, $languages);
     }
 
     public function testParseNonDocument(): void
     {
+        $this->expectException(InvalidMappingException::class);
         $reflection = new \ReflectionClass(ObjCategory::class);
-        $res = $this->documentParser->parse($reflection, []);
-
-        $this->assertEquals([], $res);
+        $res = $this->documentAttributeParser->parse($reflection, []);
     }
 
     public function testParseDocumentWithEnumProperty()
     {
         $reflection = new \ReflectionClass(Customer::class);
-        $res = $this->documentParser->parse($reflection, []);
+        $res = $this->documentAttributeParser->parse($reflection, []);
         $this->assertSame(CustomerTypeEnum::class, $res['propertiesMetadata']['customer_type']['enumType']);
     }
 
     public function testParseDocumentWithInvalidEnumFieldProperty()
     {
-        $this->expectException(AnnotationException::class);
+        $this->expectException(InvalidMappingException::class);
         $reflection = new \ReflectionClass(EntityWithInvalidEnum::class);
-        $this->documentParser->parse($reflection, []);
+        $this->documentAttributeParser->parse($reflection, []);
     }
 
     public function testParse(): void
@@ -66,7 +59,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
             ],
         ];
 
-        $res = $this->documentParser->parse($reflection, $indexAnalyzers);
+        $res = $this->documentAttributeParser->parse($reflection, $indexAnalyzers);
 
         $expected = [
             'properties' => [

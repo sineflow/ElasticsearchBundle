@@ -157,7 +157,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
     }
 
     /**
-     * Make sure null is returned when field doesn't exist or is empty and ObjectIterator otherwise
+     * Make sure the default value is returned when field doesn't exist or is empty and ObjectIterator otherwise
      */
     public function testNestedObjectIterator(): void
     {
@@ -172,7 +172,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
             $this->assertContains($product->id, ['1', '2', '3', '54321']);
             switch ($product->id) {
                 case '54321':
-                    $this->assertNull($product->relatedCategories);
+                    $this->assertSame([], $product->relatedCategories);
                     break;
                 case '3':
                     $this->assertInstanceOf(ObjectIterator::class, $product->relatedCategories);

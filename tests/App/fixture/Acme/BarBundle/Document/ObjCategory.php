@@ -3,38 +3,51 @@
 namespace Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document;
 
 use Sineflow\ElasticsearchBundle\Annotation as ES;
+use Sineflow\ElasticsearchBundle\Attribute as SFES;
 use Sineflow\ElasticsearchBundle\Document\ObjectInterface;
+use Sineflow\ElasticsearchBundle\Result\ObjectIterator;
 
 /**
  * Category document for testing.
  *
  * @ES\DocObject
  */
+#[SFES\DocObject]
 class ObjCategory implements ObjectInterface
 {
     /**
-     * @var string Field without ESB annotation, should not be indexed.
+     * @var string Field without a SFES attribute or ES annotation - should not be indexed.
      */
-    public $withoutAnnotation;
+    public string $withoutAnnotation;
 
     /**
-     * @var int
-     *
      * @ES\Property(type="integer", name="id")
      */
-    public $id;
+    #[SFES\Property(
+        name: 'id',
+        type: 'integer',
+    )]
+    public ?int $id = null;
 
     /**
-     * @var string
-     *
      * @ES\Property(type="keyword", name="title")
      */
-    public $title;
+    #[SFES\Property(
+        name: 'title',
+        type: 'keyword',
+    )]
+    public ?string $title = null;
 
     /**
-     * @var ObjTag[]
+     * @var ObjTag[]|ObjectIterator<ObjTag>
      *
      * @ES\Property(type="object", name="tags", multiple=true, objectName="AcmeBarBundle:ObjTag")
      */
-    public $tags;
+    #[SFES\Property(
+        name: 'tags',
+        type: 'object',
+        objectName: ObjTag::class,
+        multiple: true,
+    )]
+    public ObjectIterator|array $tags = [];
 }

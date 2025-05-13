@@ -14,6 +14,8 @@ framework:
 
 sineflow_elasticsearch:
 
+    use_annotations: false
+
     languages: ['en', 'fr']
 
     entity_locations:
