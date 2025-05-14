@@ -128,6 +128,9 @@ class DocumentAttributeParser
                         );
                     } else {
                         if (null !== $propertyAttribute->enumType) {
+                            if (!enum_exists($propertyAttribute->enumType)) {
+                                throw new InvalidMappingException(sprintf('Enum "%s" for property "%s" in %s does not exist', $propertyAttribute->enumType, $propertyName, $className));
+                            }
                             $propertyMetadata[$propertyAttribute->name]['enumType'] = $propertyAttribute->enumType;
                         }
                     }

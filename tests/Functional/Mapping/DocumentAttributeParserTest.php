@@ -3,6 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Mapping;
 
 use Doctrine\Common\Annotations\AnnotationException;
+use Sineflow\ElasticsearchBundle\Exception\InvalidMappingException;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentAttributeParser;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
@@ -10,7 +11,9 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\ObjCa
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\ObjTag;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Repository\ProductRepository;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Customer;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\EntityWithInvalidEnum;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Enum\CustomerTypeEnum;
 
 class DocumentAttributeParserTest extends AbstractContainerAwareTestCase
 {
@@ -32,13 +35,19 @@ class DocumentAttributeParserTest extends AbstractContainerAwareTestCase
         $this->assertEquals([], $res);
     }
 
-    // TODO: It's not throwing an exception. How was it throwing an exception with the annotations parser?!
-    //    public function testParseDocumentWithInvalidEnumFieldProperty()
-    //    {
-    //        $this->expectException(AnnotationException::class);
-    //        $reflection = new \ReflectionClass(EntityWithInvalidEnum::class);
-    //        $this->documentAttributeParser->parse($reflection, []);
-    //    }
+    public function testParseDocumentWithEnumProperty()
+    {
+        $reflection = new \ReflectionClass(Customer::class);
+        $res = $this->documentAttributeParser->parse($reflection, []);
+        $this->assertSame(CustomerTypeEnum::class, $res['propertiesMetadata']['customer_type']['enumType']);
+    }
+
+    public function testParseDocumentWithInvalidEnumFieldProperty()
+    {
+        $this->expectException(InvalidMappingException::class);
+        $reflection = new \ReflectionClass(EntityWithInvalidEnum::class);
+        $this->documentAttributeParser->parse($reflection, []);
+    }
 
     public function testParse(): void
     {

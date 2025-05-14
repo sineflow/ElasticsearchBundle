@@ -11,7 +11,9 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\ObjCa
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\ObjTag;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Repository\ProductRepository;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Customer;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\EntityWithInvalidEnum;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Enum\CustomerTypeEnum;
 
 class DocumentParserTest extends AbstractContainerAwareTestCase
 {
@@ -32,6 +34,13 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
         $res = $this->documentParser->parse($reflection, []);
 
         $this->assertEquals([], $res);
+    }
+
+    public function testParseDocumentWithEnumProperty()
+    {
+        $reflection = new \ReflectionClass(Customer::class);
+        $res = $this->documentParser->parse($reflection, []);
+        $this->assertSame(CustomerTypeEnum::class, $res['propertiesMetadata']['customer_type']['enumType']);
     }
 
     public function testParseDocumentWithInvalidEnumFieldProperty()
