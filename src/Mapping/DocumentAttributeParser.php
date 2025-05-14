@@ -173,7 +173,7 @@ class DocumentAttributeParser
     }
 
     /**
-     * Returns all defined properties including private from parents.
+     * Returns all defined properties, including the ones from parents.
      */
     private function getDocumentPropertiesReflection(\ReflectionClass $documentReflection): array
     {

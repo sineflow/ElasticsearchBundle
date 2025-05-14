@@ -5,6 +5,7 @@ namespace Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document
 use Sineflow\ElasticsearchBundle\Annotation as ES;
 use Sineflow\ElasticsearchBundle\Attribute as SFES;
 use Sineflow\ElasticsearchBundle\Document\ObjectInterface;
+use Sineflow\ElasticsearchBundle\Result\ObjectIterator;
 
 /**
  * Category document for testing.
@@ -38,7 +39,7 @@ class ObjCategory implements ObjectInterface
     public ?string $title = null;
 
     /**
-     * @var ObjTag[]
+     * @var ObjTag[]|ObjectIterator<ObjTag>
      *
      * @ES\Property(type="object", name="tags", multiple=true, objectName="AcmeBarBundle:ObjTag")
      */
@@ -48,5 +49,5 @@ class ObjCategory implements ObjectInterface
         objectName: ObjTag::class,
         multiple: true,
     )]
-    public ?array $tags;
+    public ObjectIterator|array $tags = [];
 }

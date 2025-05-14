@@ -24,7 +24,6 @@
         "symfony/event-dispatcher-contracts": "^3.5",
 
         "doctrine/annotations": "^1.2",
-        "doctrine/cache": "^1.4",
         "elasticsearch/elasticsearch": "^8.0"
     },
     "require-dev": {
