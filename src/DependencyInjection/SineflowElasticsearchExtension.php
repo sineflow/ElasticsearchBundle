@@ -35,6 +35,7 @@ class SineflowElasticsearchExtension extends Extension
         $container->setParameter('sfes.indices', $config['indices']);
         $container->setParameter('sfes.languages', $config['languages']);
         $container->setParameter('sfes.cache_pool', $config['metadata_cache_pool'] ?? null);
+        $container->setParameter('sfes.use_attributes', $config['use_attributes']);
 
         $container
             ->registerForAutoconfiguration(ServiceRepositoryInterface::class)

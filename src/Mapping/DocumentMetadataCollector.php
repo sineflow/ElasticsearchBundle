@@ -27,17 +27,25 @@ class DocumentMetadataCollector implements WarmableInterface
      */
     private array $documentClassToIndexManagerNames = [];
 
+    private readonly DocumentParser|DocumentAttributeParser $documentParser;
+
     /**
-     * @param array          $indexManagers The list of index managers defined
-     * @param DocumentParser $parser        For reading entity annotations
-     * @param CacheInterface $cache         For caching entity metadata
+     * @param array                   $indexManagers    The list of index managers defined
+     * @param DocumentParser          $annotationParser For reading entity annotations
+     * @param DocumentAttributeParser $attributeParser  For reading entity attributes
+     * @param CacheInterface          $cache            For caching entity metadata
+     * @param bool                    $useAttributes    Whether to use the attribute parser or the annotation parser
      */
     public function __construct(
         private array $indexManagers,
         private readonly DocumentLocator $documentLocator,
-        private readonly DocumentParser $parser,
+        private readonly DocumentParser $annotationParser,
+        private readonly DocumentAttributeParser $attributeParser,
         private readonly CacheInterface $cache,
+        private readonly bool $useAttributes = false,
     ) {
+        $this->documentParser = $this->useAttributes ? $this->attributeParser : $this->annotationParser;
+
         // Build an internal array with map of document class to index manager name
         foreach ($this->indexManagers as $indexManagerName => $indexSettings) {
             $documentClass = $this->documentLocator->resolveClassName($indexSettings['class']);
@@ -101,7 +109,7 @@ class DocumentMetadataCollector implements WarmableInterface
 
         $cacheKey = self::OBJECTS_CACHE_KEY_PREFIX.\strtr($objectClass, '\\', '.');
 
-        return $this->cache->get($cacheKey, fn (ItemInterface $item): array => $this->parser->getPropertiesMetadata(new \ReflectionClass($objectClass)), 0);
+        return $this->cache->get($cacheKey, fn (ItemInterface $item): array => $this->documentParser->getPropertiesMetadata(new \ReflectionClass($objectClass)), 0);
     }
 
     /**
@@ -131,10 +139,7 @@ class DocumentMetadataCollector implements WarmableInterface
         $indexManagerName = $this->getDocumentClassIndex($documentClass);
         $indexAnalyzers = $this->indexManagers[$indexManagerName]['settings']['analysis']['analyzer'] ?? [];
 
-        // TODO: Determine whether to use the annotation or attribute parser
-        //  If the class is annotated with the SFES\Document attribute, use the attribute parser, otherwise fallback to the annotation parser
-        //  Or maybe better to have a global setting to choose the parser - check how Doctrine does it
-        $documentMetadataArray = $this->parser->parse(new \ReflectionClass($documentClass), $indexAnalyzers);
+        $documentMetadataArray = $this->documentParser->parse(new \ReflectionClass($documentClass), $indexAnalyzers);
 
         return new DocumentMetadata($documentMetadataArray);
     }

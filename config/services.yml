@@ -88,9 +88,11 @@ services:
 
     Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector:
         arguments:
-            - '%sfes.indices%'
-            - '@Sineflow\ElasticsearchBundle\Mapping\DocumentLocator'
-            - '@Sineflow\ElasticsearchBundle\Mapping\DocumentParser'
+            $indexManagers: '%sfes.indices%'
+            $documentLocator: '@Sineflow\ElasticsearchBundle\Mapping\DocumentLocator'
+            $annotationParser: '@Sineflow\ElasticsearchBundle\Mapping\DocumentParser'
+            $attributeParser: '@Sineflow\ElasticsearchBundle\Mapping\DocumentAttributeParser'
+            $useAttributes: '%sfes.use_attributes%'
 
     Sineflow\ElasticsearchBundle\Subscriber\KnpPaginateQuerySubscriber:
         arguments: ['@request_stack']

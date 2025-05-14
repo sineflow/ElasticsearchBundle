@@ -2,7 +2,6 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Mapping;
 
-use Doctrine\Common\Annotations\AnnotationException;
 use Sineflow\ElasticsearchBundle\Exception\InvalidMappingException;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentAttributeParser;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;

@@ -12,10 +12,6 @@ final class Property implements DumperInterface
     public const DEFAULT_LANG_SUFFIX = 'default';
 
     /**
-     * @param string      $name
-     * @param string      $type
-     * @param string|null $enumType
-     * @param bool        $multilanguage
      * @param array       $multilanguageDefaultOptions Override mapping for the 'default' language field of multilanguage properties
      * @param string|null $objectName                  The object name must be defined if $type is 'object' or 'nested'
      * @param bool        $multiple                    For objects, defines if the property contains a single or multiple values.

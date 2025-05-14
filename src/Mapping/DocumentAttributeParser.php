@@ -43,33 +43,31 @@ class DocumentAttributeParser
     }
 
     /**
-     * Parses document by used annotations and returns mapping for elasticsearch with some extra metadata.
+     * Parses a document class and returns its metadata.
      *
      * @throws \ReflectionException
      */
     public function parse(\ReflectionClass $documentReflection, array $indexAnalyzers): array
     {
-        $metadata = [];
-
         $documentAttributes = $documentReflection->getAttributes(Document::class);
 
-        if ($documentAttributes) {
-            /** @var Document $documentAttribute */
-            $documentAttribute = $documentAttributes[0]->newInstance();
-
-            $properties = $this->getProperties($documentReflection, $indexAnalyzers);
-
-            $metadata = [
-                'properties'         => $properties,
-                'fields'             => \array_filter($documentAttribute->dump()),
-                'propertiesMetadata' => $this->getPropertiesMetadata($documentReflection),
-                'repositoryClass'    => $documentAttribute->repositoryClass,
-                'providerClass'      => $documentAttribute->providerClass,
-                'className'          => $documentReflection->getName(),
-            ];
+        if (empty($documentAttributes)) {
+            throw new InvalidMappingException(sprintf('Class "%s" must have the "%s" attribute in order to be used as a Document', $documentReflection->getName(), Document::class));
         }
 
-        return $metadata;
+        /** @var Document $documentAttribute */
+        $documentAttribute = $documentAttributes[0]->newInstance();
+
+        $properties = $this->getProperties($documentReflection, $indexAnalyzers);
+
+        return [
+            'properties'         => $properties,
+            'fields'             => \array_filter($documentAttribute->dump()),
+            'propertiesMetadata' => $this->getPropertiesMetadata($documentReflection),
+            'repositoryClass'    => $documentAttribute->repositoryClass,
+            'providerClass'      => $documentAttribute->providerClass,
+            'className'          => $documentReflection->getName(),
+        ];
     }
 
     /**
@@ -94,7 +92,7 @@ class DocumentAttributeParser
             $propertyAttributes = $propertyAttributes ?: $propertyReflection->getAttributes(Id::class);
             $propertyAttributes = $propertyAttributes ?: $propertyReflection->getAttributes(Score::class);
 
-            // Ignore class properties without any recognized annotation
+            // Ignore class properties without any recognized attribute
             if (empty($propertyAttributes)) {
                 continue;
             }
@@ -124,7 +122,7 @@ class DocumentAttributeParser
                                 'multiple'           => $propertyAttribute->multiple,
                                 'propertiesMetadata' => $this->getPropertiesMetadata($child),
                                 'className'          => $child->getName(),
-                            ]
+                            ],
                         );
                     } else {
                         if (null !== $propertyAttribute->enumType) {
@@ -196,7 +194,7 @@ class DocumentAttributeParser
         if (false !== $parentReflection) {
             $properties = \array_merge(
                 $properties,
-                \array_diff_key($this->getDocumentPropertiesReflection($parentReflection), $properties)
+                \array_diff_key($this->getDocumentPropertiesReflection($parentReflection), $properties),
             );
         }
 
@@ -208,7 +206,7 @@ class DocumentAttributeParser
     /**
      * Returns properties of reflection class.
      *
-     * @param \ReflectionClass $documentReflection Class to read properties from.
+     * @param \ReflectionClass $documentReflection class to read properties from
      *
      * @throws \ReflectionException
      * @throws InvalidMappingException
