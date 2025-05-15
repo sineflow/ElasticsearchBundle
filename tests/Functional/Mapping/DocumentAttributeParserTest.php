@@ -28,10 +28,9 @@ class DocumentAttributeParserTest extends AbstractContainerAwareTestCase
 
     public function testParseNonDocument(): void
     {
+        $this->expectException(InvalidMappingException::class);
         $reflection = new \ReflectionClass(ObjCategory::class);
         $res = $this->documentAttributeParser->parse($reflection, []);
-
-        $this->assertEquals([], $res);
     }
 
     public function testParseDocumentWithEnumProperty()

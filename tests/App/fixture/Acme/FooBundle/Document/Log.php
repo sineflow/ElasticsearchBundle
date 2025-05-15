@@ -9,6 +9,7 @@ use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
 /**
  * @ES\Document;
  */
+#[SFES\Document]
 class Log extends AbstractDocument
 {
     /**
