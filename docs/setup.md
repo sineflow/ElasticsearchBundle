@@ -65,20 +65,17 @@ The bundle uses `Document` objects to represent Elasticsearch documents. Now let
 <?php
 namespace App\Document;
 
-use Sineflow\ElasticsearchBundle\Annotation as ES;
+use Sineflow\ElasticsearchBundle\Attribute as ES;
 use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
 
-/**
- * @ES\Document
- */
+#[ES\Document]
 class Customer extends AbstractDocument
 {
-    /**
-     * @var string
-     *
-     * @ES\Property(name="text", type="text")
-     */
-    public $name;
+    #[ES\Property(
+        name: 'name',
+        type: 'text',
+    )]
+    public ?string $name = null;
 }
 
 ```

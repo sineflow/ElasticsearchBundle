@@ -73,13 +73,6 @@ services:
         arguments:
             - '%sfes.entity_locations%'
 
-    Sineflow\ElasticsearchBundle\Mapping\DocumentParser:
-        arguments:
-            - '@annotation_reader'
-            - '@Sineflow\ElasticsearchBundle\Mapping\DocumentLocator'
-            - '%sfes.mlproperty.language_separator%'
-            - '%sfes.languages%'
-
     Sineflow\ElasticsearchBundle\Mapping\DocumentAttributeParser:
         arguments:
             - '@Sineflow\ElasticsearchBundle\Mapping\DocumentLocator'
@@ -90,9 +83,9 @@ services:
         arguments:
             $indexManagers: '%sfes.indices%'
             $documentLocator: '@Sineflow\ElasticsearchBundle\Mapping\DocumentLocator'
-            $annotationParser: '@Sineflow\ElasticsearchBundle\Mapping\DocumentParser'
+            $annotationParser: '@?Sineflow\ElasticsearchBundle\Mapping\DocumentParser'
             $attributeParser: '@Sineflow\ElasticsearchBundle\Mapping\DocumentAttributeParser'
-            $useAttributes: '%sfes.use_attributes%'
+            $useAnnotations: '%sfes.use_annotations%'
 
     Sineflow\ElasticsearchBundle\Subscriber\KnpPaginateQuerySubscriber:
         arguments: ['@request_stack']

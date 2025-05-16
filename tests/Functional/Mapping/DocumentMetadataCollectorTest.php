@@ -28,7 +28,7 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
     private DocumentMetadataCollector $metadataCollector;
     private array $indexManagers;
     private DocumentLocator $docLocator;
-    private DocumentParser $docParser;
+    private ?DocumentParser $docParser;
     private CacheInterface $cache;
     private CacheInterface $nullCache;
 
@@ -329,7 +329,7 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
     {
         $this->indexManagers = $this->getContainer()->getParameter('sfes.indices');
         $this->docLocator = $this->getContainer()->get(DocumentLocator::class);
-        $this->docParser = $this->getContainer()->get(DocumentParser::class);
+        $this->docParser = $this->getContainer()->has(DocumentParser::class) ? $this->getContainer()->get(DocumentParser::class) : null;
         $this->docAttributeParser = $this->getContainer()->get(DocumentAttributeParser::class);
         $this->cache = $this->getContainer()->get('cache.system');
         $this->nullCache = $this->getContainer()->get('app.null_cache_adapter');

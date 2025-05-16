@@ -21,6 +21,10 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
 
     protected function setUp(): void
     {
+        if (!class_exists(AnnotationReader::class)) {
+            $this->markTestSkipped('doctrine/annotations is not installed, skipping DocumentParser tests.');
+        }
+
         $reader = new AnnotationReader();
         $locator = $this->getContainer()->get(DocumentLocator::class);
         $separator = $this->getContainer()->getParameter('sfes.mlproperty.language_separator');

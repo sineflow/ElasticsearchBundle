@@ -14,7 +14,8 @@ framework:
 
 sineflow_elasticsearch:
 
-    use_attributes: true
+#    use_annotations: false
+    use_annotations: true
 
     languages: ['en', 'fr']
 

@@ -30,7 +30,7 @@ class ElasticsearchExtensionTest extends TestCase
     {
         $parameters = [
             'sineflow_elasticsearch' => [
-                'use_attributes' => true,
+                'use_annotations' => false,
 
                 'entity_locations' => [
                     'AcmeBarBundle' => [
