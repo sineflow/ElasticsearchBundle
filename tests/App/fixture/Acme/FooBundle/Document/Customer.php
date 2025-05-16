@@ -3,6 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document;
 
 use Sineflow\ElasticsearchBundle\Annotation as ES;
+use Sineflow\ElasticsearchBundle\Attribute as SFES;
 use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Provider\CustomerProvider;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Enum\CustomerTypeEnum;
@@ -12,6 +13,9 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Enum\CustomerT
  *     providerClass=CustomerProvider::class
  * )
  */
+#[SFES\Document(
+    providerClass: CustomerProvider::class,
+)]
 class Customer extends AbstractDocument
 {
     /**
@@ -19,6 +23,10 @@ class Customer extends AbstractDocument
      *
      * @ES\Property(name="name", type="keyword")
      */
+    #[SFES\Property(
+        name: 'name',
+        type: 'keyword',
+    )]
     public string $name;
 
     /**
@@ -30,25 +38,30 @@ class Customer extends AbstractDocument
      *  enumType=Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Enum\CustomerTypeEnum::class
      * )
      */
+    #[SFES\Property(
+        name: 'customer_type',
+        type: 'integer',
+        enumType: CustomerTypeEnum::class,
+    )]
     public ?CustomerTypeEnum $customerType = null;
 
     /**
+     * @var bool
+     *
      * @ES\Property(name="active", type="boolean")
      */
+    #[SFES\Property(
+        name: 'active',
+        type: 'boolean',
+    )]
     private $active;
 
-    /**
-     * @return bool
-     */
     public function isActive()
     {
         return $this->active;
     }
 
-    /**
-     * @param bool $active
-     */
-    public function setActive($active)
+    public function setActive($active): void
     {
         $this->active = $active;
     }

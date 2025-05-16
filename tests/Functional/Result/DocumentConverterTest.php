@@ -21,10 +21,12 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         'title'    => 'Foo Product',
         'category' => [
             'title' => 'Bar',
+            'tags'  => [],
         ],
         'related_categories' => [
             [
                 'title' => 'Acme',
+                'tags'  => [],
             ],
         ],
         'ml_info-en'  => 'info in English',
@@ -154,11 +156,11 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         $converter->assignArrayToObject(
             $rawDoc,
             $product,
-            $metadataCollector->getDocumentMetadata('AcmeBarBundle:Product')->getPropertiesMetadata()
+            $metadataCollector->getDocumentMetadata(Product::class)->getPropertiesMetadata()
         );
         $this->assertNull($product->title);
         $this->assertNull($product->category);
-        $this->assertNull($product->relatedCategories);
+        $this->assertSame([], $product->relatedCategories);
         $this->assertNull($product->mlInfo);
     }
 
@@ -175,7 +177,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         $converter->assignArrayToObject(
             $rawDoc,
             $product,
-            $metadataCollector->getDocumentMetadata('AcmeBarBundle:Product')->getPropertiesMetadata()
+            $metadataCollector->getDocumentMetadata(Product::class)->getPropertiesMetadata()
         );
         $this->assertInstanceOf(ObjectIterator::class, $product->relatedCategories);
         $this->assertSame(0, $product->relatedCategories->count());

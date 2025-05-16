@@ -3,9 +3,11 @@
 namespace Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document;
 
 use Sineflow\ElasticsearchBundle\Annotation as ES;
+use Sineflow\ElasticsearchBundle\Attribute as SFES;
 use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
 use Sineflow\ElasticsearchBundle\Document\MLProperty;
 use Sineflow\ElasticsearchBundle\Result\ObjectIterator;
+use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Repository\ProductRepository;
 
 /**
  * Product document for testing.
@@ -17,11 +19,15 @@ use Sineflow\ElasticsearchBundle\Result\ObjectIterator;
  *  }
  * )
  */
+#[SFES\Document(
+    repositoryClass: ProductRepository::class,
+    options: [
+        'dynamic' => 'strict',
+    ],
+)]
 class Product extends AbstractDocument
 {
     /**
-     * @var string
-     *
      * @ES\Property(
      *  type="text",
      *  name="title",
@@ -33,60 +39,87 @@ class Product extends AbstractDocument
      *  }
      * )
      */
-    public $title;
+    #[SFES\Property(
+        name: 'title',
+        type: 'text',
+        options: [
+            'fields' => [
+                'raw'   => ['type' => 'keyword'],
+                'title' => ['type' => 'text'],
+            ],
+        ],
+    )]
+    public ?string $title = null;
 
     /**
-     * @var string
-     *
      * @ES\Property(type="text", name="description")
      */
-    public $description;
+    #[SFES\Property(
+        name: 'description',
+        type: 'text',
+    )]
+    public ?string $description = null;
 
     /**
-     * @var ObjCategory
-     *
      * @ES\Property(type="object", name="category", objectName="AcmeBarBundle:ObjCategory")
      */
-    public $category;
+    #[SFES\Property(
+        name: 'category',
+        type: 'object',
+        objectName: ObjCategory::class,
+    )]
+    public ?ObjCategory $category = null;
 
     /**
      * @var ObjCategory[]|ObjectIterator<ObjCategory>
      *
      * @ES\Property(type="object", name="related_categories", multiple=true, objectName="AcmeBarBundle:ObjCategory")
      */
-    public $relatedCategories;
+    #[SFES\Property(
+        name: 'related_categories',
+        type: 'object',
+        objectName: ObjCategory::class,
+        multiple: true,
+    )]
+    public array|ObjectIterator $relatedCategories = [];
 
     /**
-     * @var int
-     *
      * @ES\Property(type="float", name="price")
      */
-    public $price;
+    #[SFES\Property(
+        name: 'price',
+        type: 'float',
+    )]
+    public ?int $price = null;
 
     /**
-     * @var string
-     *
      * @ES\Property(type="geo_point", name="location")
      */
-    public $location;
+    #[SFES\Property(
+        name: 'location',
+        type: 'geo_point',
+    )]
+    public ?string $location = null;
 
     /**
-     * @var string
-     *
      * @ES\Property(type="boolean", name="limited")
      */
-    public $limited;
+    #[SFES\Property(
+        name: 'limited',
+        type: 'boolean',
+    )]
+    public ?string $limited = null;
 
     /**
-     * @var string
-     *
      * @ES\Property(type="date", name="released")
      */
-    public $released;
+    #[SFES\Property(
+        name: 'released',
+        type: 'date',
+    )]
+    public ?string $released = null;
 
     /**
-     * @var MLProperty
-     *
      * @ES\Property(
      *  name="ml_info",
      *  type="text",
@@ -102,11 +135,23 @@ class Product extends AbstractDocument
      *  }
      * )
      */
-    public $mlInfo;
+    #[SFES\Property(
+        name: 'ml_info',
+        type: 'text',
+        multilanguage: true,
+        options: [
+            'analyzer' => '{lang}_analyzer',
+            'fields'   => [
+                'ngram' => [
+                    'type'     => 'text',
+                    'analyzer' => '{lang}_analyzer',
+                ],
+            ],
+        ],
+    )]
+    public ?MLProperty $mlInfo = null;
 
     /**
-     * @var MLProperty
-     *
      * @ES\Property(
      *  name="ml_more_info",
      *  type="text",
@@ -117,11 +162,18 @@ class Product extends AbstractDocument
      *  }
      * )
      */
-    public $mlMoreInfo;
+    #[SFES\Property(
+        name: 'ml_more_info',
+        type: 'text',
+        multilanguage: true,
+        multilanguageDefaultOptions: [
+            'type'  => 'text',
+            'index' => false,
+        ],
+    )]
+    public ?MLProperty $mlMoreInfo = null;
 
     /**
-     * @var int
-     *
      * @ES\Property(
      *     type="text",
      *     name="pieces_count",
@@ -132,5 +184,17 @@ class Product extends AbstractDocument
      *     }
      * )
      */
-    public $tokenPiecesCount;
+    #[SFES\Property(
+        name: 'pieces_count',
+        type: 'text',
+        options: [
+            'fields' => [
+                'count' => [
+                    'type'     => 'token_count',
+                    'analyzer' => 'whitespace',
+                ],
+            ],
+        ],
+    )]
+    public ?int $tokenPiecesCount = null;
 }

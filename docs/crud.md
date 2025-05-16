@@ -11,15 +11,14 @@ For all steps below we assume that there is an `App` entity location with the `P
 use Sineflow\ElasticsearchBundle\Annotation as ES;
 use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
 
-/**
- * @ES\Document
- */
+#[ES\Document]
 class Product extends AbstractDocument
 {
-    /**
-     * @ES\Property(type="text", name="title")
-     */
-    public $title;
+    #[ES\Property(
+        name: 'title',
+        type: 'text',
+    )]
+    public ?string $title = null;
 }
 
 ```
