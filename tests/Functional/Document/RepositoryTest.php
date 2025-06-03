@@ -6,7 +6,6 @@ use Jchook\AssertThrows\AssertThrows;
 use Sineflow\ElasticsearchBundle\Document\Repository\Repository;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
-use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 
 class RepositoryTest extends AbstractElasticsearchTestCase
@@ -16,10 +15,6 @@ class RepositoryTest extends AbstractElasticsearchTestCase
     private Repository $repository;
 
     private IndexManager $indexManager;
-
-    private Finder $finder;
-
-    private DocumentMetadataCollector $metadataCollector;
 
     /**
      * {@inheritdoc}
@@ -48,12 +43,12 @@ class RepositoryTest extends AbstractElasticsearchTestCase
     {
         parent::setUp();
 
-        $this->finder = $this->getContainer()->get(Finder::class);
+        $finder = $this->getContainer()->get(Finder::class);
         $this->indexManager = $this->getContainer()->get('sfes.index.bar');
 
         $this->indexManager->getConnection()->setAutocommit(true);
 
-        $this->repository = new Repository($this->indexManager, $this->finder);
+        $this->repository = new Repository($this->indexManager, $finder);
 
         $this->getIndexManager('bar', !$this->hasCreatedIndexManager('bar'));
     }
@@ -66,9 +61,9 @@ class RepositoryTest extends AbstractElasticsearchTestCase
     public function testGetById(): void
     {
         $doc = $this->repository->getById('doc1');
-        $this->assertEquals('aaa', $doc->title);
+        $this->assertSame('aaa', $doc->title);
         $doc = $this->repository->getById(2);
-        $this->assertEquals('ccc', $doc->title);
+        $this->assertSame('ccc', $doc->title);
     }
 
     public function testCount(): void
@@ -81,17 +76,17 @@ class RepositoryTest extends AbstractElasticsearchTestCase
             ],
         ];
 
-        $this->assertEquals(2, $this->repository->count($searchBody));
+        $this->assertSame(2, $this->repository->count($searchBody));
     }
 
     public function testReindex(): void
     {
-        $this->assertEquals(1, $this->repository->getById('doc1', Finder::RESULTS_RAW)['_version']);
+        $this->assertSame(1, $this->repository->getById('doc1', Finder::RESULTS_RAW)['_version']);
 
         $this->indexManager->reindex('doc1');
 
         $rawDoc = $this->repository->getById('doc1', Finder::RESULTS_RAW);
-        $this->assertEquals(2, $rawDoc['_version']);
-        $this->assertEquals('aaa', $rawDoc['_source']['title']);
+        $this->assertSame(2, $rawDoc['_version']);
+        $this->assertSame('aaa', $rawDoc['_source']['title']);
     }
 }

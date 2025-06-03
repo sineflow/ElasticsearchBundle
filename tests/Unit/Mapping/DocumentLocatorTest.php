@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\Mapping;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product;
@@ -33,7 +34,7 @@ class DocumentLocatorTest extends TestCase
     /**
      * Data provider
      */
-    public function getTestResolveClassNameDataProvider(): array
+    public static function getTestResolveClassNameDataProvider(): array
     {
         $out = [
             [
@@ -109,11 +110,10 @@ class DocumentLocatorTest extends TestCase
      *
      * @param string $className
      * @param string $expectedClassName
-     *
-     * @dataProvider getTestResolveClassNameDataProvider
      */
+    #[DataProvider('getTestResolveClassNameDataProvider')]
     public function testResolveClassName($className, $expectedClassName): void
     {
-        $this->assertEquals($expectedClassName, $this->locator->resolveClassName($className));
+        $this->assertSame($expectedClassName, $this->locator->resolveClassName($className));
     }
 }

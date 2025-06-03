@@ -111,7 +111,7 @@ jobs:
 
             - name: 'Run phpunit tests'
               run: |
-                  vendor/bin/simple-phpunit --coverage-clover=tests/App/build/clover.xml
+                  vendor/bin/phpunit --coverage-clover=tests/App/build/clover.xml
 
             - name: Upload coverage results to Coveralls
               uses: coverallsapp/github-action@v2

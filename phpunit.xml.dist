@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
-        backupGlobals="false"
-        backupStaticAttributes="false"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
         colors="true"
-        convertErrorsToExceptions="true"
-        convertNoticesToExceptions="true"
-        convertWarningsToExceptions="true"
-        processIsolation="false"
-        stopOnFailure="false"
-        bootstrap="tests/tests.bootstrap.php">
+        displayDetailsOnTestsThatTriggerDeprecations="true"
+        displayDetailsOnTestsThatTriggerErrors="true"
+        displayDetailsOnTestsThatTriggerNotices="true"
+        displayDetailsOnTestsThatTriggerWarnings="true"
+        bootstrap="tests/tests.bootstrap.php"
+        cacheDirectory=".phpunit.cache">
 
     <testsuites>
         <testsuite name="Unit">
@@ -19,20 +17,15 @@
         <testsuite name="Functional">
             <directory>./tests/Functional/</directory>
         </testsuite>
-        <testsuite name="All">
-            <directory>./tests/</directory>
-        </testsuite>
     </testsuites>
 
     <php>
         <server name="APP_ENV" value="test" force="true" />
         <server name="KERNEL_CLASS" value="Sineflow\ElasticsearchBundle\Tests\App\AppKernel" />
         <server name="SHELL_VERBOSITY" value="-1" />
-        <env name="SYMFONY_PHPUNIT_VERSION" value="9" />
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak" />
     </php>
 
-    <coverage>
+    <source>
         <include>
             <directory>./</directory>
         </include>
@@ -41,6 +34,9 @@
             <directory>./vendor</directory>
             <directory>./var</directory>
         </exclude>
+    </source>
+
+    <coverage>
         <report>
             <text outputFile="php://stdout" showOnlySummary="true"/>
             <!--<html outputDirectory="tests/App/build/coverage" lowUpperBound="50" highLowerBound="90"/>-->

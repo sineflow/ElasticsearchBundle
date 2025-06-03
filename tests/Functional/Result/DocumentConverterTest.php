@@ -3,6 +3,7 @@
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Result;
 
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
+use PHPUnit\Framework\Attributes\Depends;
 use Sineflow\ElasticsearchBundle\Document\MLProperty;
 use Sineflow\ElasticsearchBundle\Exception\DocumentConversionException;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
@@ -57,7 +58,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         );
         $category = $result->relatedCategories->current();
 
-        $this->assertEquals($category->id, 123);
+        $this->assertSame(123, $category->id);
     }
 
     public function testAssignArrayToObjectWithNestedSingleValueArrayInsteadOfSingleValue(): void
@@ -83,7 +84,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
             $metadataCollector->getDocumentMetadata('AcmeBarBundle:Product')->getPropertiesMetadata()
         );
 
-        $this->assertEquals($result->category->id, 123);
+        $this->assertSame(123, $result->category->id);
     }
 
     public function testAssignArrayToObjectWithNestedMultiValueArrayInsteadOfSingleValue(): void
@@ -134,13 +135,13 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
 
         $this->assertSame($product, $result);
 
-        $this->assertEquals('Foo Product', $product->title);
-        $this->assertEquals('doc1', $product->id);
+        $this->assertSame('Foo Product', $product->title);
+        $this->assertSame('doc1', $product->id);
         $this->assertInstanceOf(ObjCategory::class, $product->category);
         $this->assertContainsOnlyInstancesOf(ObjCategory::class, $product->relatedCategories);
         $this->assertInstanceOf(MLProperty::class, $product->mlInfo);
-        $this->assertEquals('info in English', $product->mlInfo->getValue('en'));
-        $this->assertEquals('info in French', $product->mlInfo->getValue('fr'));
+        $this->assertSame('info in English', $product->mlInfo->getValue('en'));
+        $this->assertSame('info in French', $product->mlInfo->getValue('fr'));
 
         return $product;
     }
@@ -183,9 +184,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         $this->assertSame(0, $product->relatedCategories->count());
     }
 
-    /**
-     * @depends testAssignArrayToObjectWithAllFieldsCorrectlySet
-     */
+    #[Depends('testAssignArrayToObjectWithAllFieldsCorrectlySet')]
     public function testConvertToArray(Product $product): void
     {
         $converter = $this->getContainer()->get(DocumentConverter::class);
@@ -223,13 +222,13 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         /** @var Product $product */
         $product = $converter->convertToDocument($rawFromEs, 'AcmeBarBundle:Product');
 
-        $this->assertEquals('Foo Product', $product->title);
-        $this->assertEquals('doc1', $product->id);
+        $this->assertSame('Foo Product', $product->title);
+        $this->assertSame('doc1', $product->id);
         $this->assertInstanceOf(ObjCategory::class, $product->category);
         $this->assertContainsOnlyInstancesOf(ObjCategory::class, $product->relatedCategories);
         $this->assertInstanceOf(MLProperty::class, $product->mlInfo);
-        $this->assertEquals('info in English', $product->mlInfo->getValue('en'));
-        $this->assertEquals('info in French', $product->mlInfo->getValue('fr'));
+        $this->assertSame('info in English', $product->mlInfo->getValue('en'));
+        $this->assertSame('info in French', $product->mlInfo->getValue('fr'));
     }
 
     public function testConvertToDocumentWithFields(): void
@@ -261,9 +260,9 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         /** @var Product $product */
         $product = $converter->convertToDocument($rawFromEs, 'AcmeBarBundle:Product');
 
-        $this->assertEquals('Foo Product', $product->title);
-        $this->assertEquals('doc1', $product->id);
+        $this->assertSame('Foo Product', $product->title);
+        $this->assertSame('doc1', $product->id);
         $this->assertInstanceOf(MLProperty::class, $product->mlInfo);
-        $this->assertEquals('info in English', $product->mlInfo->getValue('en'));
+        $this->assertSame('info in English', $product->mlInfo->getValue('en'));
     }
 }

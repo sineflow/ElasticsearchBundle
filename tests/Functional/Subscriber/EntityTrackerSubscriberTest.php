@@ -114,7 +114,7 @@ class EntityTrackerSubscriberTest extends AbstractElasticsearchTestCase
         $this->assertNull($rawCustomer->id);
         $this->assertNull($customer->id);
         $this->assertNull($secondRawCustomer->id);
-        $this->assertEquals('555', $secondCustomer->id);
+        $this->assertSame('555', $secondCustomer->id);
 
         $imWithAliases->getConnection()->commit();
         $backupIm->getConnection()->commit();
@@ -122,8 +122,8 @@ class EntityTrackerSubscriberTest extends AbstractElasticsearchTestCase
         $this->assertNull($rawCustomer->id, 'id should not have been set');
         $this->assertNotNull($customer->id, 'id should have been set');
         $this->assertNull($secondRawCustomer->id, 'id should not have been set');
-        $this->assertEquals('555', $secondCustomer->id);
-        $this->assertEquals(123, $log->id);
+        $this->assertSame('555', $secondCustomer->id);
+        $this->assertSame('123', $log->id);
 
         // Get the customer from ES by name
         $finder = $this->getContainer()->get(Finder::class);

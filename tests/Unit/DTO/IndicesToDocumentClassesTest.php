@@ -18,7 +18,7 @@ class IndicesToDocumentClassesTest extends TestCase
         $obj = new IndicesToDocumentClasses();
 
         $obj->set('my_real_index', 'App:Entity');
-        $this->assertEquals('App:Entity', $obj->get('my_real_index'));
+        $this->assertSame('App:Entity', $obj->get('my_real_index'));
 
         $this->assertThrows(\InvalidArgumentException::class, static function () use ($obj): void {
             $obj->set(null, 'App:Entity');
@@ -31,8 +31,8 @@ class IndicesToDocumentClassesTest extends TestCase
         $obj = new IndicesToDocumentClasses();
 
         $obj->set(null, 'App:Entity');
-        $this->assertEquals('App:Entity', $obj->get('second_real_index'));
-        $this->assertEquals('App:Entity', $obj->get('non_existing_index'));
+        $this->assertSame('App:Entity', $obj->get('second_real_index'));
+        $this->assertSame('App:Entity', $obj->get('non_existing_index'));
 
         $this->assertThrows(\InvalidArgumentException::class, static function () use ($obj): void {
             $obj->set('my_real_index', 'App:Entity');

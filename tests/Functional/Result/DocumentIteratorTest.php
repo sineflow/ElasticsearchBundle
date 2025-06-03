@@ -89,7 +89,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
 
         $this->assertCount(3, $iterator);
 
-        $this->assertEquals(4, $iterator->getTotalCount());
+        $this->assertSame(4, $iterator->getTotalCount());
 
         $iteration = 0;
         /** @var Product $document */
@@ -105,9 +105,7 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
             $this->assertInstanceOf(Product::class, $document);
             $this->assertInstanceOf(ObjectIterator::class, $categories);
 
-            foreach ($categories as $category) {
-                $this->assertInstanceOf(ObjCategory::class, $category);
-            }
+            $this->assertContainsOnlyInstancesOf(ObjCategory::class, $categories);
 
             ++$iteration;
         }
@@ -134,13 +132,13 @@ class DocumentIteratorTest extends AbstractElasticsearchTestCase
             '3rd Product',
         ];
         while ($iterator->valid()) {
-            $this->assertEquals($i, $iterator->key());
+            $this->assertSame($i, $iterator->key());
             $this->assertEquals($expected[$i], $iterator->current()->title);
             $iterator->next();
             ++$i;
         }
         $iterator->rewind();
-        $this->assertEquals($expected[0], $iterator->current()->title);
+        $this->assertSame($expected[0], $iterator->current()->title);
     }
 
     /**

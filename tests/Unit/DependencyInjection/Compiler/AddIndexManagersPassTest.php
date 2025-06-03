@@ -60,14 +60,20 @@ class AddIndexManagersPassTest extends TestCase
                     default            => null,
                 }
             );
+        $matcher = $this->exactly(1);
 
         $containerMock
-            ->expects($this->exactly(1))
+            ->expects($matcher)
             ->method('setDefinition')
-            ->withConsecutive(
-                [$this->equalTo('sfes.index.test')]
-            )
-            ->willReturn(new Definition());
+            ->willReturnCallback(
+                function (...$parameters) use ($matcher) {
+                    if (1 === $matcher->numberOfInvocations()) {
+                        $this->assertSame('sfes.index.test', $parameters[0]);
+                    }
+
+                    return new Definition();
+                }
+            );
 
         $imPrototypeDefinitionMock = $this->getMockBuilder(Definition::class)
             ->getMock();

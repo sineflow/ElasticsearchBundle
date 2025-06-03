@@ -37,9 +37,9 @@ class ElasticsearchProviderTest extends AbstractElasticsearchTestCase
 
         $doc = $esProvider->getDocument(3);
 
-        $this->assertEquals([
-            '_id'   => 3,
+        $this->assertSame([
             'title' => 'Product 3',
+            '_id'   => '3',
         ], $doc);
     }
 
@@ -58,7 +58,7 @@ class ElasticsearchProviderTest extends AbstractElasticsearchTestCase
         \sort($ids);
 
         // Make sure all and exact documents were returned
-        $this->assertEquals([1, 2, 3], $ids);
+        $this->assertSame(['1', '2', '3'], $ids);
     }
 
     private function getProvider()

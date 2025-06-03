@@ -90,8 +90,8 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
 
         $this->assertCount(2, $pagination);
         $this->assertInstanceOf(Product::class, $pagination->offsetGet(0));
-        $this->assertEquals(3, $pagination->offsetGet(0)->id);
-        $this->assertEquals(10, $pagination->getCustomParameter('aggregations')['avg_price']['value']);
+        $this->assertSame('3', $pagination->offsetGet(0)->id);
+        $this->assertEqualsWithDelta(10.0, $pagination->getCustomParameter('aggregations')['avg_price']['value'], PHP_FLOAT_EPSILON);
         $this->assertIsArray($pagination->getCustomParameter('suggestions'));
 
         // Test array results
@@ -102,8 +102,8 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         /** @var SlidingPagination $pagination */
         $pagination = $paginator->paginate($adapter, 2, 2);
 
-        $this->assertEquals(3, $pagination->key());
-        $this->assertEquals('3rd Product', $pagination->current()['title']);
+        $this->assertSame(3, $pagination->key());
+        $this->assertSame('3rd Product', $pagination->current()['title']);
         $this->assertNull($pagination->getCustomParameter('aggregations'));
         $this->assertNull($pagination->getCustomParameter('suggestions'));
 
@@ -115,9 +115,9 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         /** @var SlidingPagination $pagination */
         $pagination = $paginator->paginate($adapter, 2, 2);
 
-        $this->assertEquals(3, $pagination->current()['_id']);
-        $this->assertEquals('3rd Product', $pagination->current()['_source']['title']);
-        $this->assertEquals(10, $pagination->getCustomParameter('aggregations')['avg_price']['value']);
+        $this->assertSame('3', $pagination->current()['_id']);
+        $this->assertSame('3rd Product', $pagination->current()['_source']['title']);
+        $this->assertEqualsWithDelta(10.0, $pagination->getCustomParameter('aggregations')['avg_price']['value'], PHP_FLOAT_EPSILON);
         $this->assertIsArray($pagination->getCustomParameter('suggestions'));
     }
 
@@ -139,14 +139,14 @@ class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
         // Do not apply default order to KNP, so just use the one in the query
         /** @var SlidingPagination $pagination */
         $pagination = $paginator->paginate($adapter, 1, 3);
-        $this->assertEquals(3, $pagination->current()->id);
+        $this->assertSame('3', $pagination->current()->id);
 
         // Test setting default order to KNP
         $pagination = $paginator->paginate($adapter, 1, 3, [
             'defaultSortFieldName' => '_id',
             'defaultSortDirection' => 'desc',
         ]);
-        $this->assertEquals(54321, $pagination->current()->id);
+        $this->assertSame('54321', $pagination->current()->id);
     }
 
     public function testInvalidResultsType(): void

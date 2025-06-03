@@ -25,19 +25,19 @@ class MLPropertyTest extends TestCase
 
         $mlProperty->setValue('test default', 'default');
 
-        $this->assertEquals(
+        $this->assertSame(
             'test en',
             $mlProperty->getValue('en'),
             'MLProperty does not return required language correctly.'
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'test default',
             $mlProperty->getValue('default'),
             'MLProperty does not return default language correctly.'
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'test default',
             $mlProperty->getValue('bg'),
             'MLProperty does not return default language if required language is missing.'
@@ -54,7 +54,7 @@ class MLPropertyTest extends TestCase
         $mlProperty->setValue('test en', 'en');
         $mlProperty->setValue('test bg', 'bg');
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'default' => 'test default',
                 'en'      => 'test en',
@@ -76,7 +76,7 @@ class MLPropertyTest extends TestCase
             'bg'      => 'test bg',
         ]);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'default' => 'test default',
                 'en'      => 'test en',

@@ -23,7 +23,7 @@ class DocumentTest extends TestCase
             'foo'     => 'bar',
         ];
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'dynamic' => 'strict',
                 'foo'     => 'bar',

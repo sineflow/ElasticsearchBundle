@@ -29,11 +29,11 @@ class PropertyTest extends TestCase
         ];
         $type->enumType = 'bar';
 
-        $this->assertEquals(
+        $this->assertSame(
             [
+                'type'     => 'mytype',
                 'analyzer' => 'standard',
                 'foo'      => 'bar',
-                'type'     => 'mytype',
             ],
             $type->dump(),
             'Properties should be filtered'
@@ -74,7 +74,7 @@ class PropertyTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'copy_to'  => 'en_all',
                 'analyzer' => 'en_analyzer',

@@ -75,9 +75,9 @@ class ScrollAdapterTest extends AbstractElasticsearchTestCase
             ++$scrolls;
         }
 
-        $this->assertEquals(6, $i, 'Total matching documents iterated');
-        $this->assertEquals(6, $scrollAdapter->getTotalHits(), 'Total hits returned by scroll');
-        $this->assertEquals(3, $scrolls, 'Total number of scrolls');
+        $this->assertSame(6, $i, 'Total matching documents iterated');
+        $this->assertSame(6, $scrollAdapter->getTotalHits(), 'Total hits returned by scroll');
+        $this->assertSame(3, $scrolls, 'Total number of scrolls');
 
         // Test array results
         /** @var ScrollAdapter $scrollAdapter */
@@ -98,9 +98,9 @@ class ScrollAdapterTest extends AbstractElasticsearchTestCase
             }
             ++$scrolls;
         }
-        $this->assertEquals(6, $i, 'Total matching documents iterated');
-        $this->assertEquals(6, $scrollAdapter->getTotalHits(), 'Total hits returned by scroll');
-        $this->assertEquals(2, $scrolls, 'Total number of scrolls');
+        $this->assertSame(6, $i, 'Total matching documents iterated');
+        $this->assertSame(6, $scrollAdapter->getTotalHits(), 'Total hits returned by scroll');
+        $this->assertSame(2, $scrolls, 'Total number of scrolls');
 
         // Test raw results
 
@@ -126,8 +126,8 @@ class ScrollAdapterTest extends AbstractElasticsearchTestCase
             }
             ++$scrolls;
         }
-        $this->assertEquals(6, $i, 'Total matching documents iterated');
-        $this->assertEquals(6, $scrollAdapter->getTotalHits(), 'Total hits returned by scroll');
-        $this->assertEquals(2, $scrolls, 'Total number of scrolls');
+        $this->assertSame(6, $i, 'Total matching documents iterated');
+        $this->assertSame(6, $scrollAdapter->getTotalHits(), 'Total hits returned by scroll');
+        $this->assertSame(2, $scrolls, 'Total number of scrolls');
     }
 }

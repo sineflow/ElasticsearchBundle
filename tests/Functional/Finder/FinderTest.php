@@ -124,10 +124,10 @@ class FinderTest extends AbstractElasticsearchTestCase
 
         $docAsObject = $finder->get(Product::class, 'doc1');
         $this->assertInstanceOf(Product::class, $docAsObject);
-        $this->assertEquals('aaa', $docAsObject->title);
+        $this->assertSame('aaa', $docAsObject->title);
 
         $docAsArray = $finder->get('AcmeBarBundle:Product', 'doc1', Finder::RESULTS_ARRAY);
-        $this->assertEquals('aaa', $docAsArray['title']);
+        $this->assertSame('aaa', $docAsArray['title']);
 
         $docAsRaw = $finder->get('AcmeBarBundle:Product', 'doc1', Finder::RESULTS_RAW);
         $this->assertArraySubset([
@@ -169,18 +169,18 @@ class FinderTest extends AbstractElasticsearchTestCase
         $res = $finder->find(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer'], $searchBody, Finder::RESULTS_OBJECT, [], $totalHits);
         $this->assertInstanceOf(DocumentIterator::class, $res);
         $this->assertCount(3, $res);
-        $this->assertEquals(3, $totalHits);
+        $this->assertSame(3, $totalHits);
         $resAsArray = iterator_to_array($res);
 
         $this->assertInstanceOf(Customer::class, $resAsArray[0]);
         $this->assertInstanceOf(Customer::class, $resAsArray[1]);
         $this->assertInstanceOf(Product::class, $resAsArray[2]);
 
-        $this->assertEquals(111, $resAsArray[0]->id);
+        $this->assertSame('111', $resAsArray[0]->id);
         $this->assertSame('Jane Doe', $resAsArray[0]->name);
         $this->assertSame(CustomerTypeEnum::COMPANY, $resAsArray[0]->customerType);
 
-        $this->assertEquals(222, $resAsArray[1]->id);
+        $this->assertSame('222', $resAsArray[1]->id);
         $this->assertSame('John Doe', $resAsArray[1]->name);
         $this->assertSame(CustomerTypeEnum::INDIVIDUAL, $resAsArray[1]->customerType);
 
@@ -247,8 +247,8 @@ class FinderTest extends AbstractElasticsearchTestCase
             ],
         ];
 
-        $this->assertEquals(2, $finder->count(['AcmeFooBundle:Customer'], $searchBody));
-        $this->assertEquals(3, $finder->count(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer'], $searchBody));
+        $this->assertSame(2, $finder->count(['AcmeFooBundle:Customer'], $searchBody));
+        $this->assertSame(3, $finder->count(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer'], $searchBody));
     }
 
     public function testGetTargetIndices(): void
@@ -257,7 +257,7 @@ class FinderTest extends AbstractElasticsearchTestCase
 
         $res = $finder->getTargetIndices(['AcmeBarBundle:Product', 'AcmeFooBundle:Customer']);
 
-        $this->assertEquals([
+        $this->assertSame([
             'sineflow-esb-test-bar',
             'sineflow-esb-test-customer',
         ], $res);

@@ -2,6 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\DependencyInjection\SineflowElasticsearchExtension;
 use Sineflow\ElasticsearchBundle\Document\Provider\ProviderRegistry;
@@ -26,7 +27,7 @@ class ElasticsearchExtensionTest extends TestCase
     /**
      * @return array
      */
-    public function getData()
+    public static function getData()
     {
         $parameters = [
             'sineflow_elasticsearch' => [
@@ -171,9 +172,8 @@ class ElasticsearchExtensionTest extends TestCase
      * @param array $expectedEntityLocations
      * @param array $expectedConnections
      * @param array $expectedManagers
-     *
-     * @dataProvider getData
      */
+    #[DataProvider('getData')]
     public function testLoad($parameters, $expectedEntityLocations, $expectedConnections, $expectedManagers): void
     {
         $container = new ContainerBuilder();

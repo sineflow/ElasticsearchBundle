@@ -30,8 +30,6 @@ class ConnectionManagerRegistryTest extends AbstractContainerAwareTestCase
         $registry = $this->getContainer()->get(ConnectionManagerRegistry::class);
 
         $connections = $registry->getAll();
-        foreach ($connections as $connection) {
-            $this->assertInstanceOf(ConnectionManager::class, $connection);
-        }
+        $this->assertContainsOnlyInstancesOf(ConnectionManager::class, $connections);
     }
 }

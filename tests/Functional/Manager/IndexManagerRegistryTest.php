@@ -35,7 +35,7 @@ class IndexManagerRegistryTest extends AbstractContainerAwareTestCase
         $product = new Product();
         $im = $registry->getByClass($product::class);
         $this->assertInstanceOf(IndexManager::class, $im);
-        $this->assertEquals('bar', $im->getManagerName());
+        $this->assertSame('bar', $im->getManagerName());
     }
 
     public function testGetByEntity(): void
@@ -45,6 +45,6 @@ class IndexManagerRegistryTest extends AbstractContainerAwareTestCase
         $product = new Product();
         $im = $registry->getByEntity($product);
         $this->assertInstanceOf(IndexManager::class, $im);
-        $this->assertEquals('bar', $im->getManagerName());
+        $this->assertSame('bar', $im->getManagerName());
     }
 }

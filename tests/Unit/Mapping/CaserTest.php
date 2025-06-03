@@ -2,12 +2,13 @@
 
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\Mapping;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\Mapping\Caser;
 
 class CaserTest extends TestCase
 {
-    public function providerForCamel(): array
+    public static function providerForCamel(): array
     {
         $out = [
             ['foo_bar', 'fooBar'],
@@ -20,7 +21,7 @@ class CaserTest extends TestCase
         return $out;
     }
 
-    public function providerForSnake(): array
+    public static function providerForSnake(): array
     {
         $out = [
             ['FooBar', 'foo_bar'],
@@ -35,22 +36,20 @@ class CaserTest extends TestCase
     /**
      * @param string $input
      * @param string $expected
-     *
-     * @dataProvider providerForCamel
      */
+    #[DataProvider('providerForCamel')]
     public function testCamel($input, $expected): void
     {
-        $this->assertEquals($expected, Caser::camel($input));
+        $this->assertSame($expected, Caser::camel($input));
     }
 
     /**
      * @param string $input
      * @param string $expected
-     *
-     * @dataProvider providerForSnake
      */
+    #[DataProvider('providerForSnake')]
     public function testSnake($input, $expected): void
     {
-        $this->assertEquals($expected, Caser::snake($input));
+        $this->assertSame($expected, Caser::snake($input));
     }
 }

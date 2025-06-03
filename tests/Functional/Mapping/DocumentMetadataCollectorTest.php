@@ -29,7 +29,7 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
     private array $indexManagers;
     private DocumentLocator $docLocator;
     private ?DocumentParser $docParser;
-    private CacheInterface $cache;
+    private DocumentAttributeParser $docAttributeParser;
     private CacheInterface $nullCache;
 
     /**
@@ -331,7 +331,7 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
         $this->docLocator = $this->getContainer()->get(DocumentLocator::class);
         $this->docParser = $this->getContainer()->has(DocumentParser::class) ? $this->getContainer()->get(DocumentParser::class) : null;
         $this->docAttributeParser = $this->getContainer()->get(DocumentAttributeParser::class);
-        $this->cache = $this->getContainer()->get('cache.system');
+        $cache = $this->getContainer()->get('cache.system');
         $this->nullCache = $this->getContainer()->get('app.null_cache_adapter');
 
         $this->metadataCollector = new DocumentMetadataCollector(
@@ -339,7 +339,7 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
             $this->docLocator,
             $this->docParser,
             $this->docAttributeParser,
-            $this->cache
+            $cache
         );
     }
 
@@ -402,10 +402,10 @@ class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
     public function testGetDocumentClassIndex(): void
     {
         $docClassIndex = $this->metadataCollector->getDocumentClassIndex('AcmeBarBundle:Product');
-        $this->assertEquals('bar', $docClassIndex);
+        $this->assertSame('bar', $docClassIndex);
 
         $docClassIndex = $this->metadataCollector->getDocumentClassIndex(Product::class);
-        $this->assertEquals('bar', $docClassIndex);
+        $this->assertSame('bar', $docClassIndex);
 
         $this->assertThrows(\InvalidArgumentException::class, function (): void {
             $this->metadataCollector->getDocumentClassIndex('Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\NonExistingClass');

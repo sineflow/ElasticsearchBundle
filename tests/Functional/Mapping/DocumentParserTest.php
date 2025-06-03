@@ -37,7 +37,7 @@ class DocumentParserTest extends AbstractContainerAwareTestCase
         $reflection = new \ReflectionClass(ObjCategory::class);
         $res = $this->documentParser->parse($reflection, []);
 
-        $this->assertEquals([], $res);
+        $this->assertSame([], $res);
     }
 
     public function testParseDocumentWithEnumProperty()

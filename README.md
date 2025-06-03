@@ -39,7 +39,7 @@ This bundle is licensed under the MIT license. Please, see the complete license 
 ```
 composer install
 docker compose up --detach --wait
-vendor/bin/simple-phpunit
+vendor/bin/phpunit
 docker compose down --remove-orphans
 ```
 

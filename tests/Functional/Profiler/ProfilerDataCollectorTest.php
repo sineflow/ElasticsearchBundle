@@ -50,7 +50,7 @@ class ProfilerDataCollectorTest extends AbstractElasticsearchTestCase
         // 1. DELETE query to remove existing index,
         // 2. Internal call to GET /_aliases to check if index/alias already exists
         // 3. PUT request to create index
-        $this->assertEquals(3, $this->getCollector()->getQueryCount());
+        $this->assertSame(3, $this->getCollector()->getQueryCount());
 
         $product = new Product();
         $product->title = 'tuna';
@@ -61,7 +61,7 @@ class ProfilerDataCollectorTest extends AbstractElasticsearchTestCase
         // 1. GET /sineflow-esb-test-bar/_alias to check if more than one index should be written to
         // 2. POST bulk request to enter the data
         // 3. GET /_refresh, because of the $forceRefresh param of ->commit()
-        $this->assertEquals(6, $this->getCollector()->getQueryCount());
+        $this->assertSame(6, $this->getCollector()->getQueryCount());
     }
 
     /**
