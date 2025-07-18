@@ -85,6 +85,14 @@ class ConnectionManager
             $clientBuilder = ClientBuilder::create();
             $clientBuilder->setHosts($this->connectionSettings['hosts']);
 
+            // Configure basic auth
+            if (isset($this->connectionSettings['username']) && isset($this->connectionSettings['password'])) {
+                $clientBuilder->setBasicAuthentication(
+                    $this->connectionSettings['username'],
+                    $this->connectionSettings['password']
+                );
+            }
+
             // Configure SSL/TLS settings
             if (isset($this->connectionSettings['ssl_verification'])) {
                 $clientBuilder->setSSLVerification($this->connectionSettings['ssl_verification']);

@@ -112,6 +112,8 @@ class ElasticsearchExtensionTest extends TestCase
                 'profiling_backtrace' => false,
                 'logging'             => false,
                 'bulk_batch_size'     => 123,
+                'username'            => null,
+                'password'            => null,
                 'ssl_verification'    => null,
                 'ssl_ca'              => null,
                 'ssl_key'             => null,
