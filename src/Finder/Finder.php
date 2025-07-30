@@ -8,6 +8,7 @@ use Elastic\Transport\Exception\NoNodeAvailableException;
 use Psr\Cache\InvalidArgumentException;
 use Sineflow\ElasticsearchBundle\Document\DocumentInterface;
 use Sineflow\ElasticsearchBundle\DTO\IndicesToDocumentClasses;
+use Sineflow\ElasticsearchBundle\Exception\InvalidIndexManagerException;
 use Sineflow\ElasticsearchBundle\Finder\Adapter\KnpPaginatorAdapter;
 use Sineflow\ElasticsearchBundle\Finder\Adapter\ScrollAdapter;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
@@ -44,7 +45,10 @@ class Finder
      *
      * @param string $documentClass FQN or short notation (i.e. App:Product)
      *
+     * @throws ClientResponseException
      * @throws InvalidArgumentException
+     * @throws InvalidIndexManagerException
+     * @throws ServerResponseException
      */
     public function get(string $documentClass, string|int $id, int $resultType = self::RESULTS_OBJECT): DocumentInterface|array|null
     {
@@ -81,9 +85,10 @@ class Finder
      * @param array    $additionalRequestParams Additional params to pass to the ES client's search() method
      * @param int|null $totalHits               (out param) The total hits of the query response
      *
-     * @throws NoNodeAvailableException if all the hosts are offline
-     * @throws ClientResponseException  if the status code of response is 4xx
-     * @throws ServerResponseException  if the status code of response is 5xx
+     * @throws NoNodeAvailableException     if all the hosts are offline
+     * @throws ClientResponseException      if the status code of response is 4xx
+     * @throws ServerResponseException      if the status code of response is 5xx
+     * @throws InvalidIndexManagerException
      */
     public function find(array $documentClasses, array $searchBody, int $resultsType = self::RESULTS_OBJECT, array $additionalRequestParams = [], ?int &$totalHits = null): array|KnpPaginatorAdapter|ScrollAdapter|DocumentIterator
     {
@@ -134,9 +139,10 @@ class Finder
      * @param int      $resultsType     Bitmask value determining how the results are returned
      * @param int|null $totalHits       (out param) The total hits of the query response
      *
-     * @throws NoNodeAvailableException if all the hosts are offline
-     * @throws ClientResponseException  if the status code of response is 4xx
-     * @throws ServerResponseException  if the status code of response is 5xx
+     * @throws NoNodeAvailableException     if all the hosts are offline
+     * @throws ClientResponseException      if the status code of response is 4xx
+     * @throws ServerResponseException      if the status code of response is 5xx
+     * @throws InvalidIndexManagerException
      */
     public function scroll(array $documentClasses, string &$scrollId, string $scrollTime = self::SCROLL_TIME, int $resultsType = self::RESULTS_OBJECT, ?int &$totalHits = null): array|bool|DocumentIterator
     {
@@ -216,6 +222,10 @@ class Finder
      * @param array    $raw             The raw results as received from Elasticsearch
      * @param int      $resultsType     Bitmask value determining how the results are returned
      * @param string[] $documentClasses The ES entity classes that may be returned from the search
+     *
+     * @throws ClientResponseException
+     * @throws InvalidIndexManagerException
+     * @throws ServerResponseException
      */
     public function parseResult(array $raw, int $resultsType, ?array $documentClasses = null): array|DocumentIterator
     {
@@ -246,8 +256,14 @@ class Finder
      * Returns a mapping of live indices to the document classes that represent them
      *
      * @param string[] $documentClasses
+     *
+     * @throws ClientResponseException
+     * @throws ServerResponseException
+     * @throws InvalidIndexManagerException
+     *
+     * @internal
      */
-    private function getIndicesToDocumentClasses(array $documentClasses): IndicesToDocumentClasses
+    public function getIndicesToDocumentClasses(array $documentClasses): IndicesToDocumentClasses
     {
         $indicesToDocumentClasses = new IndicesToDocumentClasses();
 
