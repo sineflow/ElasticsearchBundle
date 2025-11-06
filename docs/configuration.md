@@ -26,6 +26,7 @@ sineflow_elasticsearch:
             profiling_backtrace: false
             logging: true
             bulk_batch_size: 1000
+            request_timeout: 300
 
     indices:
         _base:
@@ -81,6 +82,7 @@ And here is the breakdown:
     * `profiling` *(default: true)*: Enable or disable profiling. The default setup makes use of Elasticsearch client's profiling to gather information for the Symfony profiler toolbar, which is extremely useful in development.
     * `logging` *(default: true)*: When enabled, the bundle uses Symfony's 'logger' service to log Elasticsearch events in the 'sfes' channel. Using symfony/monolog-bundle, the logging can be easily controlled. For example the 'sfes' channel can be redirected to a rotating file log.
     * `bulk_batch_size` *(default: 1000)*: This is currently used only when using the **rebuildIndex()** method of the index manager.
+    * `request_timeout` *(default: 300)*: The timeout for HTTP requests to Elasticsearch in seconds. This applies to all synchronous operations including reindex, bulk operations, and long-running queries. Increase this value if you have long-running operations that exceed the default timeout.
 
 * `indices`: Here you define the Elasticsearch indexes you have. The key here is the name of the index manager, which determines how it will be accessible in the application. In the example above, we have an index manager named **products**, which would be accessible as **$container->get('sfes.index.products')**.
 It is important to note here the use of **'_'** in front of the index manager name. When defined like that, this will be an abstract definition, i.e. no manager will actually be created from that definition. This is very useful when you have common setting for several indices, as you can define a template for them all and not have to duplicate stuff.

@@ -137,6 +137,10 @@ class Configuration implements ConfigurationInterface
                         ->defaultValue(1000)
                         ->info('The number of requests to send at once, when doing bulk operations')
                     ->end()
+                    ->scalarNode('request_timeout')
+                        ->defaultValue(300)
+                        ->info('Timeout for HTTP requests to Elasticsearch in seconds (default: 300)')
+                    ->end()
 
                 ->end()
             ->end();

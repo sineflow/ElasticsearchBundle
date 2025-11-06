@@ -118,6 +118,7 @@ class ElasticsearchExtensionTest extends TestCase
                 'ssl_ca'              => null,
                 'ssl_key'             => null,
                 'ssl_cert'            => null,
+                'request_timeout'     => 300,
             ],
         ];
 

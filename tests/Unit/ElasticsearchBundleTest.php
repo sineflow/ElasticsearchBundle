@@ -40,7 +40,7 @@ class ElasticsearchBundleTest extends TestCase
         $finder = new Finder();
         $finder->files()->in(__DIR__.'/../../src/DependencyInjection/Compiler/');
 
-        /** @var $file SplFileInfo */
+        /** @var SplFileInfo $file */
         foreach ($finder as $file) {
             $passName = \str_replace('.php', '', $file->getFilename());
             // Check whether pass is not blacklisted and not added by bundle.

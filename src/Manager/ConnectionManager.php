@@ -107,6 +107,15 @@ class ConnectionManager
                 $clientBuilder->setSSLCert($this->connectionSettings['ssl_cert']);
             }
 
+            // Configure HTTP client timeout
+            $httpClientOptions = [];
+            if (isset($this->connectionSettings['request_timeout'])) {
+                $httpClientOptions['timeout'] = $this->connectionSettings['request_timeout'];
+            }
+            if (!empty($httpClientOptions)) {
+                $clientBuilder->setHttpClientOptions($httpClientOptions);
+            }
+
             if ($this->logger) {
                 $clientBuilder->setLogger($this->logger);
             }
