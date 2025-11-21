@@ -45,9 +45,14 @@ class ElasticsearchExtensionTest extends TestCase
                         'hosts' => [
                             'user:pass@eshost:1111',
                         ],
-                        'profiling'       => false,
-                        'logging'         => false,
-                        'bulk_batch_size' => 123,
+                        'profiling'           => false,
+                        'logging'             => false,
+                        'bulk_batch_size'     => 123,
+                        'http_client_service' => 'app.custom_http_client',
+                        'http_client_options' => [
+                            'timeout'         => 0,
+                            'connect_timeout' => 5,
+                        ],
                     ],
                 ],
                 'indices' => [
@@ -118,7 +123,11 @@ class ElasticsearchExtensionTest extends TestCase
                 'ssl_ca'              => null,
                 'ssl_key'             => null,
                 'ssl_cert'            => null,
-                'request_timeout'     => 300,
+                'http_client_service' => 'app.custom_http_client',
+                'http_client_options' => [
+                    'timeout'         => 0,
+                    'connect_timeout' => 5,
+                ],
             ],
         ];
 

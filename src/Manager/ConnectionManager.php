@@ -7,6 +7,7 @@ use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elastic\Elasticsearch\Exception\InvalidArgumentException;
 use Elastic\Elasticsearch\Exception\ServerResponseException;
 use Elastic\Transport\Exception\NoNodeAvailableException;
+use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Sineflow\ElasticsearchBundle\Client\Client;
 use Sineflow\ElasticsearchBundle\DTO\BulkQueryItem;
@@ -42,14 +43,16 @@ class ConnectionManager
     protected ?ProfilerQueryLogCollection $profilerQueryLogCollection = null;
 
     /**
-     * @param string $connectionName     The unique connection name
-     * @param array  $connectionSettings Settings array
-     * @param bool   $kernelDebug        The kernel.debug value
+     * @param string               $connectionName     The unique connection name
+     * @param array                $connectionSettings Settings array
+     * @param bool                 $kernelDebug        The kernel.debug value
+     * @param ClientInterface|null $httpClient         Optional PSR-18 HTTP client to use
      */
     public function __construct(
         protected string $connectionName,
         protected array $connectionSettings,
         protected bool $kernelDebug,
+        protected ?ClientInterface $httpClient = null,
     ) {
         $this->bulkQueries = [];
         $this->bulkParams = [];
@@ -83,6 +86,17 @@ class ConnectionManager
     {
         if (!$this->client) {
             $clientBuilder = ClientBuilder::create();
+
+            // Use injected HTTP client if available
+            if (null !== $this->httpClient) {
+                $clientBuilder->setHttpClient($this->httpClient);
+            } else {
+                // Warn when using auto-discovery
+                $this->logger?->notice('Using auto-discovered HTTP client. Consider configuring http_client_service for deterministic behavior.', [
+                    'connection' => $this->connectionName,
+                ]);
+            }
+
             $clientBuilder->setHosts($this->connectionSettings['hosts']);
 
             // Configure basic auth
@@ -107,13 +121,9 @@ class ConnectionManager
                 $clientBuilder->setSSLCert($this->connectionSettings['ssl_cert']);
             }
 
-            // Configure HTTP client timeout
-            $httpClientOptions = [];
-            if (isset($this->connectionSettings['request_timeout'])) {
-                $httpClientOptions['timeout'] = $this->connectionSettings['request_timeout'];
-            }
-            if (!empty($httpClientOptions)) {
-                $clientBuilder->setHttpClientOptions($httpClientOptions);
+            // Check if there are any HTTP client options specified and set them to the connection
+            if (!empty($this->connectionSettings['http_client_options'] ?? [])) {
+                $clientBuilder->setHttpClientOptions($this->connectionSettings['http_client_options']);
             }
 
             if ($this->logger) {

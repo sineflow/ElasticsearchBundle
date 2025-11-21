@@ -26,7 +26,10 @@ sineflow_elasticsearch:
             profiling_backtrace: false
             logging: true
             bulk_batch_size: 1000
-            request_timeout: 300
+            http_client_service: 'app.elasticsearch.http_client'  # Optional: Service ID of custom PSR-18 HTTP client
+            http_client_options:    # If using the recommended Guzzle HTTP client
+                timeout: 0          # No timeout (the default behaviour of Guzzle)
+                connect_timeout: 5  # Try connecting for max 5 seconds (so we don't block in case of an unresponsive node)
 
     indices:
         _base:
@@ -82,7 +85,8 @@ And here is the breakdown:
     * `profiling` *(default: true)*: Enable or disable profiling. The default setup makes use of Elasticsearch client's profiling to gather information for the Symfony profiler toolbar, which is extremely useful in development.
     * `logging` *(default: true)*: When enabled, the bundle uses Symfony's 'logger' service to log Elasticsearch events in the 'sfes' channel. Using symfony/monolog-bundle, the logging can be easily controlled. For example the 'sfes' channel can be redirected to a rotating file log.
     * `bulk_batch_size` *(default: 1000)*: This is currently used only when using the **rebuildIndex()** method of the index manager.
-    * `request_timeout` *(default: 300)*: The timeout for HTTP requests to Elasticsearch in seconds. This applies to all synchronous operations including reindex, bulk operations, and long-running queries. Increase this value if you have long-running operations that exceed the default timeout.
+    * `http_client_service` *(default: null)*: Service ID of a PSR-18 HTTP client to use for this connection (e.g., `'app.elasticsearch.http_client'`). When specified, this custom HTTP client will be injected into the Elasticsearch client instead of using auto-discovery. If not specified, the Elasticsearch client will auto-discover an available HTTP client implementation. **Note:** Auto-discovery is not recommended for production environments - always specify an explicit HTTP client service for deterministic behavior and to avoid discovery overhead.
+    * `http_client_options` *(default: [])*: HTTP client-specific parameters passed directly to the underlying PSR-18 HTTP client (Guzzle, Symfony HttpClient, etc.). This allows you to configure timeout and connection behavior for any HTTP client:
 
 * `indices`: Here you define the Elasticsearch indexes you have. The key here is the name of the index manager, which determines how it will be accessible in the application. In the example above, we have an index manager named **products**, which would be accessible as **$container->get('sfes.index.products')**.
 It is important to note here the use of **'_'** in front of the index manager name. When defined like that, this will be an abstract definition, i.e. no manager will actually be created from that definition. This is very useful when you have common setting for several indices, as you can define a template for them all and not have to duplicate stuff.
@@ -91,6 +95,34 @@ It is important to note here the use of **'_'** in front of the index manager na
     * `use_aliases` *(default: true)*: Whether to setup read and write alias for working with the physical index. Very useful for being able to reindex with no downtime.
     * `settings`: Here you can specify any index settings supported by Elasticsearch. [See here for more info on that](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-update-settings.html)
     * `types`: This is where you specify the types, which will be managed by the index. This is done by listing the document entities that manage the respective types, in short notation.
+
+## Configuring custom HTTP client:
+
+It is recommended to explicitly configure an HTTP client service for your Elasticsearch connections rather than relying on auto-discovery.
+
+**For example:**
+
+Use Guzzle HTTP Client (requires `guzzlehttp/guzzle` ^7.0):
+
+```yaml
+# config/services.yaml
+services:
+    app.guzzle.client:
+        class: GuzzleHttp\Client
+        arguments:
+            - { http_errors: false }  # Ensures PSR-18 compliance
+
+# config/packages/elasticsearch.yaml
+sineflow_elasticsearch:
+    connections:
+        default:
+            hosts:
+                - 'elasticsearch.example.com:9200'
+            http_client_service: 'app.guzzle.client'
+            http_client_options:
+                timeout: 0          # No timeout (the default behaviour of Guzzle)
+                connect_timeout: 5  # Try connecting for max 5 seconds (so we don't block in case of an unresponsive node)
+```
 
 ## Configuring custom cache pool:
 

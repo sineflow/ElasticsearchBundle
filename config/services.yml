@@ -23,6 +23,7 @@ services:
             - # connection name
             - # connection settings
             - '%kernel.debug%'
+            - # optional PSR-18 HTTP client service
 
     sfes.index_manager_prototype:
         abstract: true

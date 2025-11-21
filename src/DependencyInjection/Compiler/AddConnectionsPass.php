@@ -30,6 +30,11 @@ class AddConnectionsPass implements CompilerPassInterface
             $connectionDefinition->replaceArgument(0, $connectionName);
             $connectionDefinition->replaceArgument(1, $connectionSettings);
 
+            // Inject HTTP client service if specified
+            if (!empty($connectionSettings['http_client_service'])) {
+                $connectionDefinition->replaceArgument(3, new Reference($connectionSettings['http_client_service']));
+            }
+
             $connectionDefinition->addMethodCall('setEventDispatcher', [new Reference('event_dispatcher')]);
             if ($connectionSettings['logging']) {
                 $connectionDefinition->addMethodCall('setLogger', [new Reference('logger')]);
