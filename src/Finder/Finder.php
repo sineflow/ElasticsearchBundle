@@ -117,9 +117,16 @@ class Finder
                 'body'   => ['sort' => ['_doc']],
             ], $params);
 
-            $rawResults = $client->search($params);
+            $rawResults = $client->search($params)->asArray();
+            $totalHits = $rawResults['hits']['total']['value'];
 
-            return new ScrollAdapter($this, $documentClasses, $rawResults->asArray(), $resultsType, $params['scroll']);
+            // The search matched no documents, so no scroll request will follow that would clear the scroll
+            // context - clear it right away, instead of letting it occupy a slot on the cluster until it expires
+            if (0 === $totalHits) {
+                $this->clearScroll($documentClasses, $rawResults['_scroll_id']);
+            }
+
+            return new ScrollAdapter($this, $documentClasses, $rawResults, $resultsType, $params['scroll']);
         }
 
         $raw = $client->search($params);
@@ -133,18 +140,17 @@ class Finder
      * Executes a scroll request, based on a given scrollId.
      * Returns false when there are no more hits
      *
-     * @param array    $documentClasses The ES entities involved in the scrolled search
-     * @param string   $scrollId        (in/out param) The Scroll ID as returned from the Scan request or a previous Scroll request
-     * @param string   $scrollTime      The time to keep the scroll window open
-     * @param int      $resultsType     Bitmask value determining how the results are returned
-     * @param int|null $totalHits       (out param) The total hits of the query response
+     * @param array  $documentClasses The ES entities involved in the scrolled search
+     * @param string $scrollId        (in/out param) The Scroll ID as returned from the Scan request or a previous Scroll request
+     * @param string $scrollTime      The time to keep the scroll window open
+     * @param int    $resultsType     Bitmask value determining how the results are returned
      *
      * @throws NoNodeAvailableException     if all the hosts are offline
      * @throws ClientResponseException      if the status code of response is 4xx
      * @throws ServerResponseException      if the status code of response is 5xx
      * @throws InvalidIndexManagerException
      */
-    public function scroll(array $documentClasses, string &$scrollId, string $scrollTime = self::SCROLL_TIME, int $resultsType = self::RESULTS_OBJECT, ?int &$totalHits = null): array|bool|DocumentIterator
+    public function scroll(array $documentClasses, string &$scrollId, string $scrollTime = self::SCROLL_TIME, int $resultsType = self::RESULTS_OBJECT): array|bool|DocumentIterator
     {
         $client = $this->getConnection($documentClasses)->getClient();
 
@@ -159,20 +165,35 @@ class Finder
 
         $scrollId = $raw['_scroll_id'];
 
-        $totalHits = $raw['hits']['total']['value'];
-
         // If no results were returned, clear the scroll
         if (0 === \count($raw['hits']['hits'])) {
-            $client->clearScroll([
-                'body' => [
-                    'scroll_id' => $scrollId,
-                ],
-            ]);
+            $this->clearScroll($documentClasses, $scrollId);
 
             return false;
         }
 
         return $this->parseResult($raw->asArray(), $resultsType, $documentClasses);
+    }
+
+    /**
+     * Explicitly clears a scroll context, freeing the resources it holds on the cluster.
+     * Without this, the context would remain open until its scroll time expires.
+     *
+     * @param string[] $documentClasses The ES entities involved in the scrolled search
+     * @param string   $scrollId        The Scroll ID identifying the scroll context to clear
+     *
+     * @throws NoNodeAvailableException     if all the hosts are offline
+     * @throws ClientResponseException      if the status code of response is 4xx
+     * @throws ServerResponseException      if the status code of response is 5xx
+     * @throws InvalidIndexManagerException
+     */
+    private function clearScroll(array $documentClasses, string $scrollId): void
+    {
+        $this->getConnection($documentClasses)->getClient()->clearScroll([
+            'body' => [
+                'scroll_id' => $scrollId,
+            ],
+        ]);
     }
 
     /**
@@ -315,7 +336,7 @@ class Finder
     }
 
     /**
-     * Verify that all types are in indices using the same connection object and return that object
+     * Verify that all searched indices are using the same connection object and return that object
      */
     private function getConnection(array $documentClasses): ?ConnectionManager
     {
@@ -324,7 +345,7 @@ class Finder
             $indexManagerName = $this->documentMetadataCollector->getDocumentClassIndex($documentClass);
             $indexManager = $this->indexManagerRegistry->get($indexManagerName);
             if (null !== $connection && $indexManager->getConnection()->getConnectionName() !== $connection->getConnectionName()) {
-                throw new \InvalidArgumentException('All searched types must be in indices within the same connection');
+                throw new \InvalidArgumentException('All searched indices must use the same connection');
             }
             $connection = $indexManager->getConnection();
         }

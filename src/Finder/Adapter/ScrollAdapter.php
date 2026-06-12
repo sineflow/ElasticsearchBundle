@@ -4,7 +4,6 @@ namespace Sineflow\ElasticsearchBundle\Finder\Adapter;
 
 use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elastic\Elasticsearch\Exception\ServerResponseException;
-use Sineflow\ElasticsearchBundle\Exception\ScrollHitsUnavailableException;
 use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Result\DocumentIterator;
 
@@ -12,7 +11,7 @@ class ScrollAdapter
 {
     private string $scrollId;
     private readonly int $resultsType;
-    private ?int $totalHits = null;
+    private readonly int $totalHits;
 
     /**
      * When a search query with a 'scroll' param is performed, not only the scroll id is returned, but also the
@@ -33,34 +32,39 @@ class ScrollAdapter
     ) {
         $this->scrollId = $rawResults['_scroll_id'];
         $this->initialResults = $rawResults;
+        $this->totalHits = $rawResults['hits']['total']['value'];
         // Make sure we don't get an adapter returned again when we recursively execute the paginated find()
         $this->resultsType = $resultsType & ~Finder::BITMASK_RESULT_ADAPTERS;
     }
 
     /**
-     * Returns results from a scroll request
+     * Returns the next batch of results from a scroll request, or false when there are no more.
+     * Once false is returned, the scroll context is cleared and this method must not be called again -
+     * doing so would attempt a scroll request with a scroll id that no longer exists on the cluster
+     * and result in a ClientResponseException, unless the search matched no documents at all.
      *
      * @throws ClientResponseException
      * @throws ServerResponseException
      */
     public function getNextScrollResults(): array|DocumentIterator|false
     {
+        // The search matched no documents, so no scroll context is held on the cluster -
+        // Finder::find() has already cleared it
+        if (0 === $this->totalHits) {
+            return false;
+        }
+
         // If this is the first call to this method, return the cached initial results from the search request
         if (null !== $this->initialResults) {
-            if (\count($this->initialResults['hits']['hits']) > 0) {
-                $results = $this->finder->parseResult($this->initialResults, $this->resultsType, $this->documentClasses);
-            } else {
-                $results = false;
-            }
+            $results = $this->finder->parseResult($this->initialResults, $this->resultsType, $this->documentClasses);
             $this->initialResults = null;
         } else {
-            // Execute a scroll request
+            // Execute a scroll request, which also clears the scroll context when there are no more results
             $results = $this->finder->scroll(
                 $this->documentClasses,
                 $this->scrollId,
                 $this->scrollTime,
-                $this->resultsType,
-                $this->totalHits
+                $this->resultsType
             );
         }
 
@@ -68,17 +72,10 @@ class ScrollAdapter
     }
 
     /**
-     * Returns the total hits by the query, which the scroll is for
-     * or throws an exception, if no scrolls have been retrieved yet
-     *
-     * @throws ScrollHitsUnavailableException
+     * Returns the total hits matched by the query, which the scroll is for
      */
     public function getTotalHits(): int
     {
-        if (null === $this->totalHits) {
-            throw new ScrollHitsUnavailableException('You must call getNextScrollResults() at least once, before you can get the total hits');
-        }
-
         return $this->totalHits;
     }
 }
