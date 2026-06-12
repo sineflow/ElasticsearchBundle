@@ -5,6 +5,14 @@ services:
     environment:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
+      # -XX:-UseContainerSupport works around JDK-8287073: the JDKs bundled in older ES images (8.0, 8.1)
+      # crash with an NPE in CgroupV2Subsystem on hosts with a cgroup v2 layout they cannot parse, such as
+      # current GitHub Actions runners (https://github.com/actions/runner-images/issues/13684).
+      # It is set via _JAVA_OPTIONS, as that is picked up by every JVM the image starts - including the
+      # options-parsing launcher and the CLI tools, not just the server (unlike ES_JAVA_OPTS, and unlike
+      # JAVA_TOOL_OPTIONS, which the elasticsearch-env script explicitly unsets). Disabling JVM container awareness
+      # is safe here, as the heap size is set explicitly.
+      - "_JAVA_OPTIONS=-XX:-UseContainerSupport"
       - "ES_JAVA_OPTS=-Xms${ELASTICSEARCH_JAVA_MEM:-2048m} -Xmx${ELASTICSEARCH_JAVA_MEM:-2048m}"
       - cluster.name=sfes
       - node.name=sfes1

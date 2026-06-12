@@ -107,7 +107,14 @@ jobs:
             - name: 'Setup Elasticsearch'
               env:
                   ELASTICSEARCH_VERSION: ${{ matrix.elasticsearch }}
-              run: docker compose up --detach --wait ; curl -XGET 'http://localhost:'"$ELASTICSEARCH_PORT"
+              run: |
+                  if ! docker compose up --detach --wait; then
+                      echo '::group::Elasticsearch container logs'
+                      docker compose logs elasticsearch
+                      echo '::endgroup::'
+                      exit 1
+                  fi
+                  curl -XGET 'http://localhost:'"$ELASTICSEARCH_PORT"
 
             - name: 'Run phpunit tests'
               run: |
