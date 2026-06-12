@@ -2,7 +2,6 @@
 
 namespace Sineflow\ElasticsearchBundle\Mapping;
 
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\Reader;
 use Sineflow\ElasticsearchBundle\Annotation\DocObject;
 use Sineflow\ElasticsearchBundle\Annotation\Document;
@@ -45,7 +44,6 @@ class DocumentParser
         private readonly string $languageSeparator,
         private readonly array $languages = [],
     ) {
-        $this->registerAnnotations();
     }
 
     /**
@@ -184,24 +182,6 @@ class DocumentParser
     private function getPropertyAnnotationData(\ReflectionProperty $property): ?Property
     {
         return $this->reader->getPropertyAnnotation($property, Property::class);
-    }
-
-    /**
-     * Registers annotations to registry so that it could be used by reader.
-     */
-    private function registerAnnotations(): void
-    {
-        $annotations = [
-            'Document',
-            'Property',
-            'DocObject',
-            'Id',
-            'Score',
-        ];
-
-        foreach ($annotations as $annotation) {
-            AnnotationRegistry::registerFile(__DIR__."/../Annotation/{$annotation}.php");
-        }
     }
 
     /**
