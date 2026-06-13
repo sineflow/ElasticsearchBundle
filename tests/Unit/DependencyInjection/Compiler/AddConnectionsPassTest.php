@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
@@ -13,7 +15,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Unit tests for AddConnectionsPass.
  */
-class AddConnectionsPassTest extends TestCase
+final class AddConnectionsPassTest extends TestCase
 {
     public function testProcessWithBasicConnection(): void
     {

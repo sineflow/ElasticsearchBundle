@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\Mapping;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sineflow\ElasticsearchBundle\Mapping\Caser;
 
-class CaserTest extends TestCase
+final class CaserTest extends TestCase
 {
     public static function providerForCamel(): array
     {
@@ -15,7 +17,7 @@ class CaserTest extends TestCase
             ['_foo-bar', 'fooBar'],
             ['Fo0bAr', 'fo0bAr'],
             ['_f$oo^ba&r_', 'f$oo^ba&r'],
-            [23456, '23456'],
+            ['23456', '23456'],
         ];
 
         return $out;
@@ -27,7 +29,7 @@ class CaserTest extends TestCase
             ['FooBar', 'foo_bar'],
             ['_foo-bar', 'foo_bar'],
             ['Fo0bAr', 'fo0b_ar'],
-            [23456, '23456'],
+            ['23456', '23456'],
         ];
 
         return $out;

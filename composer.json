@@ -14,23 +14,24 @@
         "php": "^8.1",
         "psr/log": "^2.0 || ^3.0",
 
-        "symfony/framework-bundle": "^5.4 || ^6.4",
-        "symfony/options-resolver": "^5.4 || ^6.4",
-        "symfony/config": "^5.4 || ^6.4",
-        "symfony/event-dispatcher": "^5.4 || ^6.4",
-        "symfony/translation": "^5.4 || ^6.4",
-        "symfony/console": "^5.4 || ^6.4",
-        "symfony/http-kernel": "^5.4 || ^6.4",
+        "symfony/framework-bundle": "^5.4 || ^6.4 || ^7.0 || ^8.0",
+        "symfony/options-resolver": "^5.4 || ^6.4 || ^7.0 || ^8.0",
+        "symfony/config": "^5.4 || ^6.4 || ^7.0 || ^8.0",
+        "symfony/event-dispatcher": "^5.4 || ^6.4 || ^7.0 || ^8.0",
+        "symfony/translation": "^5.4 || ^6.4 || ^7.0 || ^8.0",
+        "symfony/console": "^5.4 || ^6.4 || ^7.0 || ^8.0",
+        "symfony/http-kernel": "^5.4 || ^6.4 || ^7.0 || ^8.0",
         "symfony/event-dispatcher-contracts": "^3.5",
 
-        "elasticsearch/elasticsearch": "^8.0"
+        "elasticsearch/elasticsearch": "^8.0 || ^9.0"
     },
     "require-dev": {
-        "symfony/dotenv": "^5.4 || ^6.4",
+        "symfony/dotenv": "^5.4 || ^6.4 || ^7.0 || ^8.0",
 
-        "doctrine/orm": "^2.6.3",
+        "doctrine/orm": "^2.6.3 || ^3.0",
         "doctrine/annotations": "^1.14 || ^2.0",
-        "knplabs/knp-paginator-bundle": "^4.0 || ^5.0",
+        "knplabs/knp-paginator-bundle": "^4.0 || ^5.0 || ^6.0",
+        "twig/twig": "^3.0",
         "monolog/monolog": "^2.0|^3.0",
 
         "phpunit/phpunit": "^10.5",
@@ -39,10 +40,10 @@
         "dms/phpunit-arraysubset-asserts": "^0.5.0",
 
         "friendsofphp/php-cs-fixer": "^3.34",
-        "phpstan/phpstan": "^1.12",
-        "phpstan/phpstan-symfony": "^1.4",
-        "phpstan/phpstan-phpunit": "^1.4",
-        "rector/rector": "^1.2"
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-symfony": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "rector/rector": "^2.0"
     },
     "suggest": {
         "monolog/monolog": "Allows for client-level logging and tracing",

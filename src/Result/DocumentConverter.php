@@ -42,7 +42,7 @@ class DocumentConverter
                 break;
 
             case isset($rawData['fields']):
-                $data = \array_map('current', $rawData['fields']);
+                $data = \array_map(current(...), $rawData['fields']);
                 /* Check for returned fields as well (@see https://www.elastic.co/guide/en/elasticsearch/reference/7.11/search-fields.html#docvalue-fields) */
                 // TODO: when partial fields of nested objects are selected, partial objects should be constructed
                 foreach ($data as $key => $field) {
@@ -74,8 +74,9 @@ class DocumentConverter
     /**
      * Assigns all properties to object.
      *
-     * @param array           $array  Flat array with fields and their value
-     * @param ObjectInterface $object A document or a (nested) object
+     * @param array                               $array              Flat array with fields and their value
+     * @param ObjectInterface                     $object             A document or a (nested) object
+     * @param array<string, array<string, mixed>> $propertiesMetadata
      */
     public function assignArrayToObject(array $array, ObjectInterface $object, array $propertiesMetadata): ObjectInterface
     {
@@ -91,11 +92,11 @@ class DocumentConverter
                 $objectValue = null;
                 foreach ($array as $fieldName => $value) {
                     $prefixLength = \strlen($esField.$this->languageSeparator);
-                    if (\substr($fieldName, 0, $prefixLength) === $esField.$this->languageSeparator) {
+                    if (\substr((string) $fieldName, 0, $prefixLength) === $esField.$this->languageSeparator) {
                         if (!$objectValue) {
                             $objectValue = new MLProperty();
                         }
-                        $language = \substr($fieldName, $prefixLength);
+                        $language = \substr((string) $fieldName, $prefixLength);
                         $objectValue->setValue($value, $language);
                     }
                 }

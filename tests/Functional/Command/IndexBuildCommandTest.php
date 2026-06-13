@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Command;
 
 use Sineflow\ElasticsearchBundle\Command\IndexBuildCommand;
@@ -8,7 +10,7 @@ use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 /**
  * Class IndexBuildCommandTest
  */
-class IndexBuildCommandTest extends AbstractCommandTestCase
+final class IndexBuildCommandTest extends AbstractCommandTestCase
 {
     /**
      * Tests building index

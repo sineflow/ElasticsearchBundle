@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Result;
 
 use Sineflow\ElasticsearchBundle\Document\Repository\Repository;
@@ -13,7 +15,7 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Produ
 /**
  * Class DocumentIteratorTest
  */
-class DocumentIteratorTest extends AbstractElasticsearchTestCase
+final class DocumentIteratorTest extends AbstractElasticsearchTestCase
 {
     /**
      * {@inheritdoc}

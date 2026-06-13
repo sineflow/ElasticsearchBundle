@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Finder\Adapter;
 
 use Knp\Bundle\PaginatorBundle\Pagination\SlidingPagination;
@@ -10,7 +12,7 @@ use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product;
 use Symfony\Component\HttpFoundation\Request;
 
-class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
+final class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
 {
     /**
      * {@inheritdoc}

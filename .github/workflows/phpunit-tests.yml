@@ -37,7 +37,7 @@ jobs:
     phpunit:
         needs: [ static_code_analysis ]
         runs-on: 'ubuntu-24.04'
-        name: 'PHPUnit (PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, ES ${{ matrix.elasticsearch }})'
+        name: 'PHPUnit (PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, ES ${{ matrix.elasticsearch }}, client ${{ matrix.es-client }})'
         timeout-minutes: 30
         continue-on-error: ${{ matrix.experimental }}
         strategy:
@@ -53,30 +53,60 @@ jobs:
                     - '8.17.4'
                 symfony:
                     - '~6.0'
+                es-client:
+                    - '~8.0'
                 include:
                     - php: '8.4'
                       symfony: '~6.0'
                       elasticsearch: '8.0.1'
+                      es-client: '~8.0'
                       experimental: false
                     - php: '8.4'
                       symfony: '~6.0'
                       elasticsearch: '8.1.3' # there are some bc in minor version https://www.elastic.co/guide/en/elasticsearch/reference/current/migrating-8.1.html#breaking-changes-8.1
+                      es-client: '~8.0'
                       experimental: false
                     - php: '8.4'
                       symfony: '~6.0'
                       elasticsearch: '8.5.3' # there are some bc in minor version https://www.elastic.co/guide/en/elasticsearch/reference/current/migrating-8.5.html
+                      es-client: '~8.0'
                       experimental: false
                     - php: '8.4'
                       symfony: '~6.0'
                       elasticsearch: '8.6.2' # there are no bc in minor version https://www.elastic.co/guide/en/elasticsearch/reference/current/migrating-8.6.html
+                      es-client: '~8.0'
                       experimental: false
                     - php: '8.4'
                       symfony: '~6.0'
                       elasticsearch: '8.7.1' # there are no bc in minor version https://www.elastic.co/guide/en/elasticsearch/reference/current/migrating-8.7.html
+                      es-client: '~8.0'
                       experimental: false
                     - php: '8.4'
                       symfony: '~6.0'
                       elasticsearch: '8.8.0' # there are no bc in minor version https://www.elastic.co/guide/en/elasticsearch/reference/current/migrating-8.8.html
+                      es-client: '~8.0'
+                      experimental: false
+                    # ES client 8 against an ES9 server (REST API compatibility mode)
+                    - php: '8.4'
+                      symfony: '~6.0'
+                      elasticsearch: '9.3.2'
+                      es-client: '~8.0'
+                      experimental: false
+                    # ES client 9 against ES9 servers (oldest and recent), Symfony 7 and 8
+                    - php: '8.2'
+                      symfony: '~7.0'
+                      elasticsearch: '9.0.0'
+                      es-client: '~9.0'
+                      experimental: false
+                    - php: '8.4'
+                      symfony: '~7.0'
+                      elasticsearch: '9.3.2'
+                      es-client: '~9.0'
+                      experimental: false
+                    - php: '8.4'
+                      symfony: '~8.0'
+                      elasticsearch: '9.3.2'
+                      es-client: '~9.0'
                       experimental: false
             fail-fast: false
         steps:
@@ -92,8 +122,8 @@ jobs:
                   extensions: 'curl, json, mbstring, openssl'
                   ini-values: 'memory_limit=256M'
 
-            - name: 'Fix symfony/framework-bundle version'
-              run: composer require --no-update symfony/framework-bundle:${{ matrix.symfony }}
+            - name: 'Fix symfony/framework-bundle and elasticsearch/elasticsearch versions'
+              run: composer require --no-update symfony/framework-bundle:'${{ matrix.symfony }}' elasticsearch/elasticsearch:'${{ matrix.es-client }}'
 
             - name: 'Install dependencies with Composer'
               uses: ramsey/composer-install@v3

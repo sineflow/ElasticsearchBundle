@@ -9,6 +9,19 @@ parameters:
     tmpDir: .phpstan-cache
     treatPhpDocTypesAsCertain: false
 
+    ignoreErrors:
+        # The method_exists() checks in the Client wrapper are version-dependent:
+        # the serverless methods exist in elasticsearch/elasticsearch ^9.0 but not in ^8.0,
+        # so depending on which client version is installed, PHPStan sees the checks as always-true or always-false
+        -
+            identifier: function.alreadyNarrowedType
+            path: src/Client/Client.php
+            reportUnmatched: false
+        -
+            identifier: function.impossibleType
+            path: src/Client/Client.php
+            reportUnmatched: false
+
     symfony:
         containerXmlPath: var/cache/test/Sineflow_ElasticsearchBundle_Tests_App_AppKernelTestDebugContainer.xml
 
@@ -16,3 +29,7 @@ parameters:
         - config
         - src
         #- tests
+
+    excludePaths:
+        # Auto-generated config reference, dumped by Symfony >= 7.3 when the test kernel is booted
+        - config/reference.php

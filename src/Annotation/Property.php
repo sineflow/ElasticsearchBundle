@@ -52,12 +52,12 @@ final class Property implements PropertyAnnotationInterface, DumperInterface
      */
     public array $options = [];
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function getType(): ?string
+    public function getType(): string
     {
         return $this->type;
     }

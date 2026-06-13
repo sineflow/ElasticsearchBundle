@@ -14,12 +14,12 @@ final class Id implements PropertyAnnotationInterface
     public const NAME = '_id';
     public const TYPE = 'keyword';
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return self::NAME;
     }
 
-    public function getType(): ?string
+    public function getType(): string
     {
         return self::TYPE;
     }

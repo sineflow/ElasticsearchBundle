@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests;
 
 use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;

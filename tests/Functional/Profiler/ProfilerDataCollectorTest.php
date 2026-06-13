@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Profiler;
 
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
@@ -9,7 +11,7 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Produ
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ProfilerDataCollectorTest extends AbstractElasticsearchTestCase
+final class ProfilerDataCollectorTest extends AbstractElasticsearchTestCase
 {
     use ArraySubsetAsserts;
 
@@ -104,7 +106,7 @@ class ProfilerDataCollectorTest extends AbstractElasticsearchTestCase
                 'path'          => '/sineflow-esb-test-bar/_search',
             ],
             $lastQuery,
-            'Logged data did not match expected data.'
+            message: 'Logged data did not match expected data.'
         );
     }
 

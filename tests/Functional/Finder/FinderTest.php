@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Finder;
 
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
@@ -14,7 +16,7 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Enum\CustomerT
 /**
  * Class FinderTest
  */
-class FinderTest extends AbstractElasticsearchTestCase
+final class FinderTest extends AbstractElasticsearchTestCase
 {
     use ArraySubsetAsserts;
 

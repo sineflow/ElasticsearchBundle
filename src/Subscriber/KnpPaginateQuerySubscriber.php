@@ -19,17 +19,14 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'knp_pager.items' => ['items', 1],
         ];
     }
 
-    public function items(ItemsEvent $event)
+    public function items(ItemsEvent $event): void
     {
         if ($event->target instanceof KnpPaginatorAdapter) {
             // Add sort to query
@@ -76,8 +73,8 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
 
         $request = $this->requestStack->getCurrentRequest();
         if ($request instanceof Request) {
-            $sortField = isset($event->options['sortFieldParameterName']) ? $request->get($event->options['sortFieldParameterName']) : null;
-            $sortDirection = isset($event->options['sortDirectionParameterName']) ? $request->get($event->options['sortDirectionParameterName'], 'desc') : null;
+            $sortField = isset($event->options['sortFieldParameterName']) ? $this->getRequestParam($request, $event->options['sortFieldParameterName']) : null;
+            $sortDirection = isset($event->options['sortDirectionParameterName']) ? $this->getRequestParam($request, $event->options['sortDirectionParameterName'], 'desc') : null;
             $sortDirection = 'desc' === \strtolower((string) $sortDirection) ? 'desc' : 'asc';
 
             if ($sortField) {
@@ -89,5 +86,22 @@ class KnpPaginateQuerySubscriber implements EventSubscriberInterface
         }
 
         return [$sortField, $sortDirection];
+    }
+
+    /**
+     * Get a parameter from the request attributes, falling back to the query string.
+     * Replacement for Request::get(), which was removed in Symfony 8.
+     */
+    private function getRequestParam(Request $request, string $key, mixed $default = null): mixed
+    {
+        if ($request->attributes->has($key)) {
+            return $request->attributes->get($key);
+        }
+
+        if ($request->query->has($key)) {
+            return $request->query->all()[$key];
+        }
+
+        return $default;
     }
 }

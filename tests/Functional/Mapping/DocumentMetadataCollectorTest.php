@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Mapping;
 
 use Jchook\AssertThrows\AssertThrows;
@@ -18,10 +20,7 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Provi
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Enum\CustomerTypeEnum;
 use Symfony\Contracts\Cache\CacheInterface;
 
-/**
- * Class DocumentMetadataCollectorTest
- */
-class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
+final class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
 {
     use AssertThrows;
 

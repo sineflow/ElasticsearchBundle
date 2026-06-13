@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Command;
 
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
@@ -40,7 +42,12 @@ abstract class AbstractCommandTestCase extends AbstractContainerAwareTestCase
     protected function getCommandTester($commandName)
     {
         $app = new Application();
-        $app->add($this->getCommand());
+        if (method_exists($app, 'addCommand')) {
+            // Symfony >= 7.4 (Application::add() is removed in Symfony 8)
+            $app->addCommand($this->getCommand());
+        } else {
+            $app->add($this->getCommand());
+        }
 
         $command = $app->find($commandName);
         $commandTester = new CommandTester($command);

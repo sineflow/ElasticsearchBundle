@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
@@ -12,7 +14,7 @@ use Symfony\Component\Finder\SplFileInfo;
 /**
  * Unit test for Sineflow\ElasticsearchBundle.
  */
-class ElasticsearchBundleTest extends TestCase
+final class ElasticsearchBundleTest extends TestCase
 {
     /**
      * @var array List of passes, which should not be added to compiler.

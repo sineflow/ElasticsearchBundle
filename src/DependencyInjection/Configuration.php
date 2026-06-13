@@ -197,7 +197,6 @@ class Configuration implements ConfigurationInterface
                         ->info('Inherit the definition of another index manager')
                     ->end()
                     ->scalarNode('connection')
-                        ->isRequired()
                         ->cannotBeEmpty()
                         ->defaultValue('default')
                         ->info('Sets connection for index')

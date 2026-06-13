@@ -14,12 +14,12 @@ final class Score implements PropertyAnnotationInterface
     public const NAME = '_score';
     public const TYPE = 'float';
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return self::NAME;
     }
 
-    public function getType(): ?string
+    public function getType(): string
     {
         return self::TYPE;
     }

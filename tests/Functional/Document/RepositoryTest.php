@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Functional\Document;
 
 use Jchook\AssertThrows\AssertThrows;
@@ -8,7 +10,7 @@ use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Manager\IndexManager;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 
-class RepositoryTest extends AbstractElasticsearchTestCase
+final class RepositoryTest extends AbstractElasticsearchTestCase
 {
     use AssertThrows;
 

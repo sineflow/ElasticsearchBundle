@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Subscriber;
 
 use Sineflow\ElasticsearchBundle\Exception\BulkRequestException;
@@ -12,7 +14,7 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Log;
 /**
  * Class EntityTrackerSubscriberTest
  */
-class EntityTrackerSubscriberTest extends AbstractElasticsearchTestCase
+final class EntityTrackerSubscriberTest extends AbstractElasticsearchTestCase
 {
     /**
      * Test executing 2 separate bulk requests, where there's an error in the first one,

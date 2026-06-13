@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\Annotation;
 
 use PHPUnit\Framework\TestCase;
@@ -8,7 +10,7 @@ use Sineflow\ElasticsearchBundle\Annotation\Property;
 /**
  * Class PropertyTest
  */
-class PropertyTest extends TestCase
+final class PropertyTest extends TestCase
 {
     /**
      * Tests if values are dumped correctly for mapping.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\Document;
 
 use PHPUnit\Framework\TestCase;
@@ -8,7 +10,7 @@ use Sineflow\ElasticsearchBundle\Document\MLProperty;
 /**
  * Class MLPropertyTest
  */
-class MLPropertyTest extends TestCase
+final class MLPropertyTest extends TestCase
 {
     /**
      * Tests if value is set and returned correctly

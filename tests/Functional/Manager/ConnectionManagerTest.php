@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Manager;
 
 use Psr\Http\Client\ClientInterface;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
 
-class ConnectionManagerTest extends AbstractContainerAwareTestCase
+final class ConnectionManagerTest extends AbstractContainerAwareTestCase
 {
     public function testConnectionManagerWithoutHttpClientService(): void
     {
@@ -17,7 +19,6 @@ class ConnectionManagerTest extends AbstractContainerAwareTestCase
         // Use reflection to verify HTTP client is null (will use auto-discovery)
         $reflection = new \ReflectionClass($connectionManager);
         $httpClientProperty = $reflection->getProperty('httpClient');
-        $httpClientProperty->setAccessible(true);
 
         $this->assertNull($httpClientProperty->getValue($connectionManager), 'Default connection should not have a custom HTTP client injected');
     }
@@ -31,7 +32,6 @@ class ConnectionManagerTest extends AbstractContainerAwareTestCase
         // Use reflection to access connection settings
         $reflection = new \ReflectionClass($connectionManager);
         $settingsProperty = $reflection->getProperty('connectionSettings');
-        $settingsProperty->setAccessible(true);
 
         $settings = $settingsProperty->getValue($connectionManager);
 
@@ -43,7 +43,7 @@ class ConnectionManagerTest extends AbstractContainerAwareTestCase
     public function testConnectionManagerWithCustomHttpClientService(): void
     {
         // Create a mock HTTP client
-        $mockHttpClient = $this->createMock(ClientInterface::class);
+        $mockHttpClient = $this->createStub(ClientInterface::class);
 
         // Register it as a service
         $container = $this->getContainer();
@@ -70,7 +70,6 @@ class ConnectionManagerTest extends AbstractContainerAwareTestCase
         // Use reflection to verify the HTTP client is set
         $reflection = new \ReflectionClass($connectionManager);
         $httpClientProperty = $reflection->getProperty('httpClient');
-        $httpClientProperty->setAccessible(true);
 
         $injectedClient = $httpClientProperty->getValue($connectionManager);
         $this->assertSame($mockHttpClient, $injectedClient, 'Custom HTTP client should be injected into ConnectionManager');
@@ -106,7 +105,6 @@ class ConnectionManagerTest extends AbstractContainerAwareTestCase
         // Use reflection to access connection settings
         $reflection = new \ReflectionClass($connectionManager);
         $settingsProperty = $reflection->getProperty('connectionSettings');
-        $settingsProperty->setAccessible(true);
 
         $settings = $settingsProperty->getValue($connectionManager);
 
@@ -121,7 +119,7 @@ class ConnectionManagerTest extends AbstractContainerAwareTestCase
 
     public function testConnectionManagerWithBothHttpClientServiceAndOptions(): void
     {
-        $mockHttpClient = $this->createMock(ClientInterface::class);
+        $mockHttpClient = $this->createStub(ClientInterface::class);
 
         $customOptions = [
             'timeout'      => 60,
@@ -145,14 +143,12 @@ class ConnectionManagerTest extends AbstractContainerAwareTestCase
         // Verify HTTP client is injected
         $reflection = new \ReflectionClass($connectionManager);
         $httpClientProperty = $reflection->getProperty('httpClient');
-        $httpClientProperty->setAccessible(true);
 
         $injectedClient = $httpClientProperty->getValue($connectionManager);
         $this->assertSame($mockHttpClient, $injectedClient);
 
         // Verify HTTP client options are preserved
         $settingsProperty = $reflection->getProperty('connectionSettings');
-        $settingsProperty->setAccessible(true);
 
         $settings = $settingsProperty->getValue($connectionManager);
         $this->assertSame($customOptions, $settings['http_client_options']);

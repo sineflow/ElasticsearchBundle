@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -22,7 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Unit tests for ElasticsearchExtension.
  */
-class ElasticsearchExtensionTest extends TestCase
+final class ElasticsearchExtensionTest extends TestCase
 {
     /**
      * @return array

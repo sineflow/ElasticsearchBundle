@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Finder\Adapter;
 
 use Elastic\Elasticsearch\Exception\ClientResponseException;
@@ -11,7 +13,7 @@ use Sineflow\ElasticsearchBundle\Finder\Finder;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product;
 
-class ScrollAdapterTest extends AbstractElasticsearchTestCase
+final class ScrollAdapterTest extends AbstractElasticsearchTestCase
 {
     use AssertThrows;
 

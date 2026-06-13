@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Result;
 
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
@@ -13,7 +15,7 @@ use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\ObjCategory;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Product;
 
-class DocumentConverterTest extends AbstractContainerAwareTestCase
+final class DocumentConverterTest extends AbstractContainerAwareTestCase
 {
     use ArraySubsetAsserts;
 
@@ -119,7 +121,7 @@ class DocumentConverterTest extends AbstractContainerAwareTestCase
         );
     }
 
-    public function testAssignArrayToObjectWithAllFieldsCorrectlySet()
+    public function testAssignArrayToObjectWithAllFieldsCorrectlySet(): Product
     {
         $converter = $this->getContainer()->get(DocumentConverter::class);
         $metadataCollector = $this->getContainer()->get(DocumentMetadataCollector::class);

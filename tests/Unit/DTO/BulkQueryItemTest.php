@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\DTO;
 
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -9,7 +11,7 @@ use Sineflow\ElasticsearchBundle\DTO\BulkQueryItem;
 /**
  * Class BulkQueryItemTest
  */
-class BulkQueryItemTest extends TestCase
+final class BulkQueryItemTest extends TestCase
 {
     /**
      * @return array
@@ -17,7 +19,7 @@ class BulkQueryItemTest extends TestCase
     public static function getLinesProvider(): \Iterator
     {
         yield [
-            ['index', 'myindex', ['_id' => '3', 'foo' => 'bar'], false],
+            ['index', 'myindex', ['_id' => '3', 'foo' => 'bar'], null],
             [
                 [
                     'index' => [
@@ -31,7 +33,7 @@ class BulkQueryItemTest extends TestCase
             ],
         ];
         yield [
-            ['create', 'myindex', [], false],
+            ['create', 'myindex', [], null],
             [
                 [
                     'create' => [
@@ -54,7 +56,7 @@ class BulkQueryItemTest extends TestCase
             ],
         ];
         yield [
-            ['delete', 'myindex', ['_id' => '3'], false],
+            ['delete', 'myindex', ['_id' => '3'], null],
             [
                 [
                     'delete' => [

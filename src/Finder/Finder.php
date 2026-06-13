@@ -323,7 +323,7 @@ class Finder
             }
         } elseif (isset($data['hits']['hits'][0]['fields'])) {
             foreach ($data['hits']['hits'] as $item) {
-                $output[$item['_id']] = \array_map('current', $item['fields']);
+                $output[$item['_id']] = \array_map(current(...), $item['fields']);
             }
         } else {
             // If empty fields param was supplied (meaning no fields are returned)

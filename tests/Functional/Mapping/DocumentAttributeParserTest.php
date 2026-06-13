@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Mapping;
 
 use Sineflow\ElasticsearchBundle\Exception\InvalidMappingException;
@@ -14,7 +16,7 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Custo
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\EntityWithInvalidEnum;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Enum\CustomerTypeEnum;
 
-class DocumentAttributeParserTest extends AbstractContainerAwareTestCase
+final class DocumentAttributeParserTest extends AbstractContainerAwareTestCase
 {
     private DocumentAttributeParser $documentAttributeParser;
 

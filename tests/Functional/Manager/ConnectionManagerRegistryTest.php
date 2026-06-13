@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Manager;
 
 use Sineflow\ElasticsearchBundle\Exception\InvalidConnectionManagerException;
@@ -7,7 +9,7 @@ use Sineflow\ElasticsearchBundle\Manager\ConnectionManager;
 use Sineflow\ElasticsearchBundle\Manager\ConnectionManagerRegistry;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
 
-class ConnectionManagerRegistryTest extends AbstractContainerAwareTestCase
+final class ConnectionManagerRegistryTest extends AbstractContainerAwareTestCase
 {
     public function testGet(): void
     {

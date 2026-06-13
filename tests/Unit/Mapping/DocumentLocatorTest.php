@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\Mapping;
 
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -10,7 +12,7 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Produ
 /**
  * Class DocumentLocatorTest
  */
-class DocumentLocatorTest extends TestCase
+final class DocumentLocatorTest extends TestCase
 {
     /**
      * @var DocumentLocator

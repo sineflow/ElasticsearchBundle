@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Manager;
 
 use Elastic\Elasticsearch\Exception\ClientResponseException;
@@ -24,7 +26,7 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Provi
 /**
  * Class IndexManagerTest
  */
-class IndexManagerTest extends AbstractElasticsearchTestCase
+final class IndexManagerTest extends AbstractElasticsearchTestCase
 {
     /**
      * {@inheritdoc}

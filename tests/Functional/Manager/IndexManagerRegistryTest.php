@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Manager;
 
 use Sineflow\ElasticsearchBundle\Exception\InvalidIndexManagerException;
@@ -11,7 +13,7 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\Produ
 /**
  * Class IndexManagerTest
  */
-class IndexManagerRegistryTest extends AbstractContainerAwareTestCase
+final class IndexManagerRegistryTest extends AbstractContainerAwareTestCase
 {
     public function testGet(): void
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
@@ -11,7 +13,7 @@ use Symfony\Component\DependencyInjection\Definition;
 /**
  * Unit tests for AddConnectionsPass.
  */
-class AddIndexManagersPassTest extends TestCase
+final class AddIndexManagersPassTest extends TestCase
 {
     /**
      * Before a test method is run, a template method called setUp() is invoked.
@@ -40,9 +42,7 @@ class AddIndexManagersPassTest extends TestCase
             ],
         ];
 
-        $containerMock = $this->getMockBuilder(ContainerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $containerMock = $this->createMock(ContainerBuilder::class);
 
         $containerMock->method('hasDefinition')->with($this->anything())
             ->willReturnCallback(
@@ -75,8 +75,7 @@ class AddIndexManagersPassTest extends TestCase
                 }
             );
 
-        $imPrototypeDefinitionMock = $this->getMockBuilder(Definition::class)
-            ->getMock();
+        $imPrototypeDefinitionMock = $this->createMock(Definition::class);
         $imPrototypeDefinitionMock
             ->method('getClass')
             ->willReturn(IndexManager::class);

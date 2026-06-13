@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Unit\DTO;
 
 use Jchook\AssertThrows\AssertThrows;
@@ -9,7 +11,7 @@ use Sineflow\ElasticsearchBundle\DTO\IndicesToDocumentClasses;
 /**
  * Class IndicesToDocumentClassesTest
  */
-class IndicesToDocumentClassesTest extends TestCase
+final class IndicesToDocumentClassesTest extends TestCase
 {
     use AssertThrows;
 

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Functional\Document\Provider;
 
 use Sineflow\ElasticsearchBundle\Document\Provider\ElasticsearchProvider;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
 use Sineflow\ElasticsearchBundle\Tests\AbstractElasticsearchTestCase;
 
-class ElasticsearchProviderTest extends AbstractElasticsearchTestCase
+final class ElasticsearchProviderTest extends AbstractElasticsearchTestCase
 {
     /**
      * {@inheritdoc}

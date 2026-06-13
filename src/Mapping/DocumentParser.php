@@ -7,7 +7,6 @@ use Sineflow\ElasticsearchBundle\Annotation\DocObject;
 use Sineflow\ElasticsearchBundle\Annotation\Document;
 use Sineflow\ElasticsearchBundle\Annotation\Id;
 use Sineflow\ElasticsearchBundle\Annotation\Property;
-use Sineflow\ElasticsearchBundle\Annotation\PropertyAnnotationInterface;
 use Sineflow\ElasticsearchBundle\Annotation\Score;
 
 /**
@@ -90,7 +89,6 @@ class DocumentParser
 
         /** @var \ReflectionProperty $property */
         foreach ($this->getDocumentPropertiesReflection($documentReflection) as $propertyName => $property) {
-            /** @var PropertyAnnotationInterface $propertyAnnotation */
             $propertyAnnotation = $this->getPropertyAnnotationData($property);
             $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, Id::class);
             $propertyAnnotation = $propertyAnnotation ?: $this->reader->getPropertyAnnotation($property, Score::class);

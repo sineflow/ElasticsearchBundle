@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sineflow\ElasticsearchBundle\Tests\Functional\Document\Provider;
 
 use Sineflow\ElasticsearchBundle\Document\Provider\ElasticsearchProvider;
@@ -12,7 +14,7 @@ use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Order
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Provider\CustomerProvider;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\FooBundle\Document\Provider\OrderProvider;
 
-class ProviderRegistryTest extends AbstractElasticsearchTestCase
+final class ProviderRegistryTest extends AbstractElasticsearchTestCase
 {
     private ProviderRegistry $providerRegistry;
 
