@@ -13,9 +13,9 @@ use Sineflow\ElasticsearchBundle\Mapping\DumperInterface;
  */
 final class Property implements PropertyAnnotationInterface, DumperInterface
 {
-    public const LANGUAGE_PLACEHOLDER = '{lang}';
+    public const string LANGUAGE_PLACEHOLDER = '{lang}';
 
-    public const DEFAULT_LANG_SUFFIX = 'default';
+    public const string DEFAULT_LANG_SUFFIX = 'default';
 
     /**
      * @Required

@@ -17,6 +17,7 @@ class AppKernel extends Kernel
      *
      * @return array
      */
+    #[\Override]
     public function registerBundles(): iterable
     {
         $bundles = [
@@ -38,6 +39,7 @@ class AppKernel extends Kernel
      *
      * @throws \Exception
      */
+    #[\Override]
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');

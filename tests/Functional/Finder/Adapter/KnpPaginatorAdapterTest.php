@@ -17,6 +17,7 @@ final class KnpPaginatorAdapterTest extends AbstractElasticsearchTestCase
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     protected function getDataArray(): array
     {
         return [

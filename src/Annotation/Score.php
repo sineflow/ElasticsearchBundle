@@ -11,8 +11,8 @@ namespace Sineflow\ElasticsearchBundle\Annotation;
  */
 final class Score implements PropertyAnnotationInterface
 {
-    public const NAME = '_score';
-    public const TYPE = 'float';
+    public const string NAME = '_score';
+    public const string TYPE = 'float';
 
     public function getName(): string
     {

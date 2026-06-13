@@ -25,6 +25,7 @@ class SineflowElasticsearchBundle extends Bundle
         $container->addCompilerPass(new SetCachePass());
     }
 
+    #[\Override]
     public function getPath(): string
     {
         return \dirname(__DIR__);

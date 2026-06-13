@@ -31,6 +31,7 @@ final class IndexManagerTest extends AbstractElasticsearchTestCase
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     protected function getDataArray(): array
     {
         return [

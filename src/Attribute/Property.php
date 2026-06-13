@@ -7,9 +7,9 @@ use Sineflow\ElasticsearchBundle\Mapping\DumperInterface;
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class Property implements DumperInterface
 {
-    public const LANGUAGE_PLACEHOLDER = '{lang}';
+    public const string LANGUAGE_PLACEHOLDER = '{lang}';
 
-    public const DEFAULT_LANG_SUFFIX = 'default';
+    public const string DEFAULT_LANG_SUFFIX = 'default';
 
     /**
      * @param array       $multilanguageDefaultOptions Override mapping for the 'default' language field of multilanguage properties

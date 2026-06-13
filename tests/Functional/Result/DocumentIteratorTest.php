@@ -20,6 +20,7 @@ final class DocumentIteratorTest extends AbstractElasticsearchTestCase
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     protected function getDataArray(): array
     {
         return [

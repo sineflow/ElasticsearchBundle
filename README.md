@@ -22,6 +22,7 @@ Installation instructions and documentation of the bundle can be found [here](do
 
 | ElasticsearchBundle | Elasticsearch | Symfony     | PHP         |
 |---------------------|---------------|-------------|-------------|
+| ^9.0                | 9             | 6.4 - 8.x   | 8.3+        |
 | ^8.2                | 8, 9          | 5.4 - 8.x   | 8.1+        |
 | ^8.1                | 8             | 5.0+        | 8.1+        |
 | ^7.2                | >= 7.0, < 8.0 | 5.0+        | 8.1+        |
@@ -30,18 +31,6 @@ Installation instructions and documentation of the bundle can be found [here](do
 | ^6.1.0              | >= 6.0, < 6.2 |             |             |
 | ^5.0                | >= 5.0, < 6.0 |             |             |
 | >= 0.9, < 1.0       | >= 2.0, < 5.0 |             |             |
-
-### Choosing the right elasticsearch-php client version
-
-As of version 8.2, the bundle accepts both `elasticsearch/elasticsearch` `^8.0` and `^9.0`.
-The client major version must not be newer than your Elasticsearch server:
-
-- **Elasticsearch 9 server**: no action needed - composer will install the v9 client (a v8 client also works, via REST API compatibility mode).
-- **Elasticsearch 8 server**: you must constrain the client in your application's composer.json, otherwise composer will install the v9 client, which cannot talk to ES8 servers:
-
-```
-composer require elasticsearch/elasticsearch:^8.0
-```
 
 ## License
 

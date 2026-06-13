@@ -78,6 +78,7 @@ class ProfilerDataCollector extends DataCollector
         return $this->data['queries'];
     }
 
+    #[\Override]
     public function reset(): void
     {
         $this->data = [

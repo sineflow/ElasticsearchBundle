@@ -111,21 +111,15 @@ class Client implements ClientInterface
         return $this->inner->getResponseException();
     }
 
-    /**
-     * Required by ClientInterface of elasticsearch/elasticsearch ^9.0
-     * The method_exists() guards keep the class working with ^8.0, where the inner client has no serverless support
-     */
     public function setServerless(bool $value): self
     {
-        if (method_exists($this->inner, 'setServerless')) {
-            $this->inner->setServerless($value);
-        }
+        $this->inner->setServerless($value);
 
         return $this;
     }
 
     public function getServerless(): bool
     {
-        return method_exists($this->inner, 'getServerless') && $this->inner->getServerless();
+        return $this->inner->getServerless();
     }
 }

@@ -11,8 +11,8 @@ namespace Sineflow\ElasticsearchBundle\Annotation;
  */
 final class Id implements PropertyAnnotationInterface
 {
-    public const NAME = '_id';
-    public const TYPE = 'keyword';
+    public const string NAME = '_id';
+    public const string TYPE = 'keyword';
 
     public function getName(): string
     {
