@@ -14,22 +14,22 @@
         "php": "^8.3",
         "psr/log": "^2.0 || ^3.0",
 
-        "symfony/framework-bundle": "^6.4 || ^7.0 || ^8.0",
-        "symfony/options-resolver": "^6.4 || ^7.0 || ^8.0",
         "symfony/config": "^6.4 || ^7.0 || ^8.0",
-        "symfony/event-dispatcher": "^6.4 || ^7.0 || ^8.0",
-        "symfony/translation": "^6.4 || ^7.0 || ^8.0",
         "symfony/console": "^6.4 || ^7.0 || ^8.0",
-        "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0",
+        "symfony/event-dispatcher": "^6.4 || ^7.0 || ^8.0",
         "symfony/event-dispatcher-contracts": "^3.5",
+        "symfony/framework-bundle": "^6.4 || ^7.0 || ^8.0",
+        "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0",
+        "symfony/options-resolver": "^6.4 || ^7.0 || ^8.0",
+        "symfony/yaml": "^6.4 || ^7.0 || ^8.0",
 
         "elasticsearch/elasticsearch": "^9.0"
     },
     "require-dev": {
         "symfony/dotenv": "^6.4 || ^7.0 || ^8.0",
+        "symfony/translation": "^6.4 || ^7.0 || ^8.0",
 
         "doctrine/orm": "^2.6.3 || ^3.0",
-        "doctrine/annotations": "^1.14 || ^2.0",
         "knplabs/knp-paginator-bundle": "^4.0 || ^5.0 || ^6.0",
         "twig/twig": "^3.0",
         "monolog/monolog": "^2.0|^3.0",
@@ -48,8 +48,7 @@
     "suggest": {
         "monolog/monolog": "Allows for client-level logging and tracing",
         "knplabs/knp-paginator-bundle": "Allows for search results to be paginated",
-        "doctrine/orm": "Allows for using Doctrine as source for rebuilding indices",
-        "doctrine/annotations": "Allows for using annotations to configure the bundle, which is now deprecated"
+        "doctrine/orm": "Allows for using Doctrine as source for rebuilding indices"
     },
     "autoload": {
         "psr-4": {

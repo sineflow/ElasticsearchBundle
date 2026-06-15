@@ -14,7 +14,6 @@ use Sineflow\ElasticsearchBundle\Manager\IndexManagerRegistry;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentAttributeParser;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
-use Sineflow\ElasticsearchBundle\Mapping\DocumentParser;
 use Sineflow\ElasticsearchBundle\Profiler\ProfilerDataCollector;
 use Sineflow\ElasticsearchBundle\Result\DocumentConverter;
 use Sineflow\ElasticsearchBundle\Subscriber\EntityTrackerSubscriber;
@@ -33,8 +32,6 @@ final class ElasticsearchExtensionTest extends TestCase
     {
         $parameters = [
             'sineflow_elasticsearch' => [
-                'use_annotations' => false,
-
                 'entity_locations' => [
                     'AcmeBarBundle' => [
                         'directory' => 'tests/App/fixture/Acme/BarBundle/Document',
@@ -225,7 +222,6 @@ final class ElasticsearchExtensionTest extends TestCase
             IndexManagerRegistry::class,
             Finder::class,
             DocumentLocator::class,
-            DocumentParser::class,
             DocumentAttributeParser::class,
             DocumentMetadataCollector::class,
             ProfilerDataCollector::class,

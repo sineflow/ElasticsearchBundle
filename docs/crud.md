@@ -8,7 +8,7 @@ For all steps below we assume that there is an `App` entity location with the `P
 
 <?php
 //App:Product
-use Sineflow\ElasticsearchBundle\Annotation as ES;
+use Sineflow\ElasticsearchBundle\Attribute as ES;
 use Sineflow\ElasticsearchBundle\Document\AbstractDocument;
 
 #[ES\Document]

@@ -2,7 +2,7 @@
 
 namespace Sineflow\ElasticsearchBundle\Document;
 
-use Sineflow\ElasticsearchBundle\Annotation\Property;
+use Sineflow\ElasticsearchBundle\Attribute\Property;
 
 /**
  * Class MLProperty

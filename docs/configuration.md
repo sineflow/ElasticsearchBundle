@@ -7,8 +7,6 @@ sineflow_elasticsearch:
 
     languages: ['en', 'fr']
 
-    use_annotations: false
-
     metadata_cache_pool: sfes.metadata_cache_pool
 
     entity_locations:

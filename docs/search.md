@@ -6,7 +6,7 @@ Retrieving data from your index should be done via a Repository.
 $repo = $im->getRepository();
 ```
 
-If you want to define your own custom Repository methods, you need to specify the `repositoryClass` for your Document entity in an annotation as described in the `mapping` page.
+If you want to define your own custom Repository methods, you need to specify the `repositoryClass` for your Document entity in an attribute as described in the `mapping` page.
 
 If you want to configure your repository as a service, so you can add additional dependencies and inject it in your services, make sure it is defined like this:
 ```php

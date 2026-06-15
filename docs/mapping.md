@@ -1,9 +1,5 @@
 # Mapping
 
-
-> **Mapping with annotations is still supported, but is deprecated and will be removed in the future.
-To see how it works, check [mapping-annotations.md](mapping-annotations.md).**
-
 The Elasticsearch bundle requires document mapping definitions to create the correct index schema and be able to convert data to objects and vice versa - think Doctrine.
 
 ## Document class attributes
@@ -32,7 +28,7 @@ class Product extends AbstractDocument
 
 ### Document attribute
 
-The class representing a document must be annotated as `@ES\Document`. The following properties are supported inside that attribute:
+The class representing a document must have the `#[ES\Document]` attribute. The following properties are supported inside that attribute:
 
 - `repositoryClass` Allows you to specify a specific repository class for this document. If not specified, the default repository class is used.
 ```
@@ -48,7 +44,7 @@ providerClass: App\Document\Provider\ProductProvider
 
 ### Property attribute
 
-Each field within the document is specified using the `@ES\Property` attribute. The following properties are supported inside that attribute:
+Each field within the document is specified using the `#[ES\Property]` attribute. The following properties are supported inside that attribute:
 
 - `name` Specifies the name of the field (required).
 

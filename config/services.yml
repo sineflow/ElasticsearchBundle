@@ -84,9 +84,7 @@ services:
         arguments:
             $indexManagers: '%sfes.indices%'
             $documentLocator: '@Sineflow\ElasticsearchBundle\Mapping\DocumentLocator'
-            $annotationParser: '@?Sineflow\ElasticsearchBundle\Mapping\DocumentParser'
-            $attributeParser: '@Sineflow\ElasticsearchBundle\Mapping\DocumentAttributeParser'
-            $useAnnotations: '%sfes.use_annotations%'
+            $documentParser: '@Sineflow\ElasticsearchBundle\Mapping\DocumentAttributeParser'
 
     Sineflow\ElasticsearchBundle\Subscriber\KnpPaginateQuerySubscriber:
         arguments: ['@request_stack']

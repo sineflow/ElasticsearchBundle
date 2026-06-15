@@ -9,7 +9,6 @@ use Sineflow\ElasticsearchBundle\Mapping\DocumentAttributeParser;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentLocator;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadata;
 use Sineflow\ElasticsearchBundle\Mapping\DocumentMetadataCollector;
-use Sineflow\ElasticsearchBundle\Mapping\DocumentParser;
 use Sineflow\ElasticsearchBundle\Tests\AbstractContainerAwareTestCase;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\ObjCategory;
 use Sineflow\ElasticsearchBundle\Tests\App\Fixture\Acme\BarBundle\Document\ObjTag;
@@ -27,7 +26,6 @@ final class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
     private DocumentMetadataCollector $metadataCollector;
     private array $indexManagers;
     private DocumentLocator $docLocator;
-    private ?DocumentParser $docParser;
     private DocumentAttributeParser $docAttributeParser;
     private CacheInterface $nullCache;
 
@@ -328,7 +326,6 @@ final class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
     {
         $this->indexManagers = $this->getContainer()->getParameter('sfes.indices');
         $this->docLocator = $this->getContainer()->get(DocumentLocator::class);
-        $this->docParser = $this->getContainer()->has(DocumentParser::class) ? $this->getContainer()->get(DocumentParser::class) : null;
         $this->docAttributeParser = $this->getContainer()->get(DocumentAttributeParser::class);
         $cache = $this->getContainer()->get('cache.system');
         $this->nullCache = $this->getContainer()->get('app.null_cache_adapter');
@@ -336,7 +333,6 @@ final class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
         $this->metadataCollector = new DocumentMetadataCollector(
             $this->indexManagers,
             $this->docLocator,
-            $this->docParser,
             $this->docAttributeParser,
             $cache
         );
@@ -365,7 +361,6 @@ final class DocumentMetadataCollectorTest extends AbstractContainerAwareTestCase
         $metadataCollectorWithCacheDisabled = new DocumentMetadataCollector(
             $this->indexManagers,
             $this->docLocator,
-            $this->docParser,
             $this->docAttributeParser,
             $this->nullCache,
         );

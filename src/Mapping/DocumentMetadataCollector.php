@@ -27,32 +27,17 @@ class DocumentMetadataCollector implements WarmableInterface
      */
     private array $documentClassToIndexManagerNames = [];
 
-    private readonly DocumentParser|DocumentAttributeParser $documentParser;
-
     /**
-     * @param array                   $indexManagers    The list of index managers defined
-     * @param DocumentParser|null     $annotationParser For reading entity annotations
-     * @param DocumentAttributeParser $attributeParser  For reading entity attributes
-     * @param CacheInterface          $cache            For caching entity metadata
-     * @param bool                    $useAnnotations   Whether to use the attribute parser or the annotation parser
+     * @param array                   $indexManagers  The list of index managers defined
+     * @param DocumentAttributeParser $documentParser For reading entity attributes
+     * @param CacheInterface          $cache          For caching entity metadata
      */
     public function __construct(
         private readonly array $indexManagers,
         private readonly DocumentLocator $documentLocator,
-        private readonly ?DocumentParser $annotationParser,
-        private readonly DocumentAttributeParser $attributeParser,
+        private readonly DocumentAttributeParser $documentParser,
         private readonly CacheInterface $cache,
-        private readonly bool $useAnnotations = false,
     ) {
-        if ($this->useAnnotations) {
-            if (null === $this->annotationParser) {
-                throw new \LogicException('Annotations are enabled (use_annotations: true), but the "doctrine/annotations" package is not available.');
-            }
-            $this->documentParser = $this->annotationParser;
-        } else {
-            $this->documentParser = $this->attributeParser;
-        }
-
         // Build an internal array with map of document class to index manager name
         foreach ($this->indexManagers as $indexManagerName => $indexSettings) {
             $documentClass = $this->documentLocator->resolveClassName($indexSettings['class']);
