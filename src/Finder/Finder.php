@@ -183,17 +183,25 @@ class Finder
      * @param string   $scrollId        The Scroll ID identifying the scroll context to clear
      *
      * @throws NoNodeAvailableException     if all the hosts are offline
-     * @throws ClientResponseException      if the status code of response is 4xx
+     * @throws ClientResponseException      if the status code of response is 4xx, except 404
      * @throws ServerResponseException      if the status code of response is 5xx
      * @throws InvalidIndexManagerException
      */
     private function clearScroll(array $documentClasses, string $scrollId): void
     {
-        $this->getConnection($documentClasses)->getClient()->clearScroll([
-            'body' => [
-                'scroll_id' => $scrollId,
-            ],
-        ]);
+        try {
+            $this->getConnection($documentClasses)->getClient()->clearScroll([
+                'body' => [
+                    'scroll_id' => $scrollId,
+                ],
+            ]);
+        } catch (ClientResponseException $e) {
+            // Elasticsearch responds with a 404 ({"succeeded":true,"num_freed":0}) when the scroll
+            // context has already been released - there is nothing to clean up in that case
+            if (404 !== $e->getCode()) {
+                throw $e;
+            }
+        }
     }
 
     /**
